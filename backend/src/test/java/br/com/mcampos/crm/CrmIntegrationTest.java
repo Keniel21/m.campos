@@ -45,6 +45,9 @@ class CrmIntegrationTest {
     @Test void saleAndInventoryChangeAtomicallyAndRejectDuplicates() throws Exception {
         String car = create("estoque", Map.of("model", "Corolla", "status", "disponivel", "buyPrice", 50000));
         String sale = create("vendas", Map.of("client", "Ana", "carId", car, "sellPrice", 60000, "date", "2026-11-01"));
+        mvc.perform(put("/api/crm/vendas/" + sale).header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
+            .content("{\"client\":\"Ana Souza\"}"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.profit").value(10000));
         mvc.perform(get("/api/crm/estoque").header("Authorization", token))
             .andExpect(jsonPath("$[0].status").value("vendido")).andExpect(jsonPath("$[0].sellPrice").value(60000));
         mvc.perform(post("/api/crm/vendas").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)

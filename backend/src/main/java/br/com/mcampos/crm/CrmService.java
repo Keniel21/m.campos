@@ -48,8 +48,11 @@ public class CrmService {
         if (module.equals("estoque") && id != null && !"vendido".equals(data.get("status")) && records.existsByModuleAndVehicleIdAndIdNot("vendas", id, ""))
             throw bad("Exclua a venda vinculada antes de alterar a situação do veículo.");
         if (Set.of("vendas", "despesas", "agenda", "documentos", "leads").contains(module)) {
-            Object carId = data.get(module.equals("leads") ? "interestCarId" : "carId");
-            if (carId == null) carId = data.get("car_id");
+            String carKey = module.equals("leads") ? "interestCarId" : "carId";
+            Object carId = input.containsKey(carKey) ? input.get(carKey)
+                : input.containsKey("car_id") ? input.get("car_id")
+                : record.getVehicle() != null ? record.getVehicle().getId()
+                : data.getOrDefault(carKey, data.get("car_id"));
             if (carId != null && !carId.toString().isBlank()) {
                 var vehicle = get("estoque", carId.toString());
                 if (module.equals("vendas")) {
