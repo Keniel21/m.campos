@@ -1,0 +1,1472 @@
+[
+  {
+    "id": 254,
+    "carId": 178,
+    "date": "2026-09-30",
+    "val": 580,
+    "category": "Marketing"
+  },
+  {
+    "id": 255,
+    "carId": 178,
+    "date": "2026-09-30",
+    "val": 900,
+    "category": "Operacional"
+  },
+  {
+    "id": 252,
+    "carId": 172,
+    "date": "2026-09-28",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 253,
+    "carId": 172,
+    "date": "2026-09-28",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 251,
+    "carId": 171,
+    "date": "2026-09-28",
+    "val": 200,
+    "category": "Preparação"
+  },
+  {
+    "id": 249,
+    "carId": 171,
+    "date": "2026-09-28",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 248,
+    "carId": 170,
+    "date": "2026-09-28",
+    "val": 900,
+    "category": "Preparação"
+  },
+  {
+    "id": 247,
+    "carId": 170,
+    "date": "2026-09-28",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 246,
+    "carId": 169,
+    "date": "2026-09-28",
+    "val": 2200,
+    "category": "Operacional"
+  },
+  {
+    "id": 245,
+    "carId": 168,
+    "date": "2026-09-28",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 244,
+    "carId": 168,
+    "date": "2026-09-28",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 242,
+    "carId": 11,
+    "date": "2026-09-28",
+    "val": 309,
+    "category": "Mecânica"
+  },
+  {
+    "id": 243,
+    "carId": 168,
+    "date": "2026-09-28",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 250,
+    "carId": 171,
+    "date": "2026-09-28",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 238,
+    "carId": 162,
+    "date": "2026-09-24",
+    "val": 4000,
+    "category": "Operacional"
+  },
+  {
+    "id": 241,
+    "carId": 164,
+    "date": "2026-09-24",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 240,
+    "carId": 164,
+    "date": "2026-09-24",
+    "val": 3500,
+    "category": "Operacional"
+  },
+  {
+    "id": 239,
+    "carId": 163,
+    "date": "2026-09-24",
+    "val": 2200,
+    "category": "Operacional"
+  },
+  {
+    "id": 237,
+    "carId": 134,
+    "date": "2026-09-24",
+    "val": 100,
+    "category": "Preparação"
+  },
+  {
+    "id": 236,
+    "carId": 134,
+    "date": "2026-09-24",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 235,
+    "carId": 134,
+    "date": "2026-09-24",
+    "val": 1000,
+    "category": "Mecânica"
+  },
+  {
+    "id": 234,
+    "carId": 161,
+    "date": "2026-09-24",
+    "val": 1200,
+    "category": "Operacional"
+  },
+  {
+    "id": 233,
+    "carId": 160,
+    "date": "2026-09-24",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 231,
+    "carId": 154,
+    "date": "2026-09-24",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 230,
+    "carId": 153,
+    "date": "2026-09-24",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 229,
+    "carId": 153,
+    "date": "2026-09-24",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 227,
+    "carId": 153,
+    "date": "2026-09-24",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 226,
+    "carId": 152,
+    "date": "2026-09-24",
+    "val": 700,
+    "category": "Operacional"
+  },
+  {
+    "id": 225,
+    "carId": 152,
+    "date": "2026-09-24",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 224,
+    "carId": 9,
+    "date": "2026-09-21",
+    "val": 4475,
+    "category": "Operacional"
+  },
+  {
+    "id": 222,
+    "carId": 123,
+    "date": "2026-09-21",
+    "val": 1500,
+    "category": "Preparação"
+  },
+  {
+    "id": 221,
+    "carId": 14,
+    "date": "2026-09-21",
+    "val": 5000,
+    "category": "Operacional"
+  },
+  {
+    "id": 220,
+    "carId": 117,
+    "date": "2026-09-21",
+    "val": 1200,
+    "category": "Preparação"
+  },
+  {
+    "id": 218,
+    "carId": 150,
+    "date": "2026-09-18",
+    "val": 930,
+    "category": "Operacional"
+  },
+  {
+    "id": 215,
+    "carId": 145,
+    "date": "2026-09-17",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 214,
+    "carId": 145,
+    "date": "2026-09-17",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 217,
+    "carId": 146,
+    "date": "2026-09-17",
+    "val": 800,
+    "category": "Operacional"
+  },
+  {
+    "id": 216,
+    "carId": 136,
+    "date": "2026-09-17",
+    "val": 580,
+    "category": "Operacional"
+  },
+  {
+    "id": 212,
+    "carId": 143,
+    "date": "2026-09-16",
+    "val": 1200,
+    "category": "Operacional"
+  },
+  {
+    "id": 210,
+    "carId": 142,
+    "date": "2026-09-16",
+    "val": 1000,
+    "category": "Mecânica"
+  },
+  {
+    "id": 213,
+    "carId": 143,
+    "date": "2026-09-16",
+    "val": 1200,
+    "category": "Operacional"
+  },
+  {
+    "id": 211,
+    "carId": 142,
+    "date": "2026-09-16",
+    "val": 3000,
+    "category": "Operacional"
+  },
+  {
+    "id": 205,
+    "carId": 138,
+    "date": "2026-09-15",
+    "val": 900,
+    "category": "Operacional"
+  },
+  {
+    "id": 203,
+    "carId": 137,
+    "date": "2026-09-15",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 208,
+    "carId": 141,
+    "date": "2026-09-15",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 207,
+    "carId": 140,
+    "date": "2026-09-15",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 206,
+    "carId": 140,
+    "date": "2026-09-15",
+    "val": 500,
+    "category": "Operacional"
+  },
+  {
+    "id": 202,
+    "carId": 137,
+    "date": "2026-09-15",
+    "val": 4000,
+    "category": "Operacional"
+  },
+  {
+    "id": 204,
+    "carId": 138,
+    "date": "2026-09-15",
+    "val": 800,
+    "category": "Operacional"
+  },
+  {
+    "id": 201,
+    "carId": 131,
+    "date": "2026-09-10",
+    "val": 4250,
+    "category": "Operacional"
+  },
+  {
+    "id": 198,
+    "carId": null,
+    "date": "2026-09-10",
+    "val": 443,
+    "category": "Operacional"
+  },
+  {
+    "id": 200,
+    "carId": 120,
+    "date": "2026-09-10",
+    "val": 443,
+    "category": "Operacional"
+  },
+  {
+    "id": 199,
+    "carId": 121,
+    "date": "2026-09-10",
+    "val": 643,
+    "category": "Operacional"
+  },
+  {
+    "id": 197,
+    "carId": 123,
+    "date": "2026-09-10",
+    "val": 443,
+    "category": "Operacional"
+  },
+  {
+    "id": 196,
+    "carId": 117,
+    "date": "2026-09-10",
+    "val": 443,
+    "category": "Operacional"
+  },
+  {
+    "id": 187,
+    "carId": 125,
+    "date": "2026-09-08",
+    "val": 1100,
+    "category": "Operacional"
+  },
+  {
+    "id": 195,
+    "carId": 71,
+    "date": "2026-09-08",
+    "val": 815,
+    "category": "Operacional"
+  },
+  {
+    "id": 193,
+    "carId": 120,
+    "date": "2026-09-08",
+    "val": 2780,
+    "category": "Mecânica"
+  },
+  {
+    "id": 192,
+    "carId": 127,
+    "date": "2026-09-08",
+    "val": 1400,
+    "category": "Operacional"
+  },
+  {
+    "id": 191,
+    "carId": 126,
+    "date": "2026-09-08",
+    "val": 800,
+    "category": "Operacional"
+  },
+  {
+    "id": 190,
+    "carId": 126,
+    "date": "2026-09-08",
+    "val": 1300,
+    "category": "Operacional"
+  },
+  {
+    "id": 189,
+    "carId": 126,
+    "date": "2026-09-08",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 188,
+    "carId": 125,
+    "date": "2026-09-08",
+    "val": 800,
+    "category": "Operacional"
+  },
+  {
+    "id": 185,
+    "carId": 122,
+    "date": "2026-08-31",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 186,
+    "carId": 122,
+    "date": "2026-08-31",
+    "val": 580,
+    "category": "Operacional"
+  },
+  {
+    "id": 184,
+    "carId": 71,
+    "date": "2026-08-27",
+    "val": 900,
+    "category": "Preparação"
+  },
+  {
+    "id": 176,
+    "carId": 9,
+    "date": "2026-08-26",
+    "val": 2300,
+    "category": "Operacional"
+  },
+  {
+    "id": 183,
+    "carId": 119,
+    "date": "2026-08-26",
+    "val": 300,
+    "category": "Operacional"
+  },
+  {
+    "id": 182,
+    "carId": 120,
+    "date": "2026-08-26",
+    "val": 1400,
+    "category": "Operacional"
+  },
+  {
+    "id": 181,
+    "carId": 119,
+    "date": "2026-08-26",
+    "val": 1100,
+    "category": "Operacional"
+  },
+  {
+    "id": 180,
+    "carId": 100,
+    "date": "2026-08-26",
+    "val": 3125,
+    "category": "Operacional"
+  },
+  {
+    "id": 179,
+    "carId": 100,
+    "date": "2026-08-26",
+    "val": 192,
+    "category": "Operacional"
+  },
+  {
+    "id": 178,
+    "carId": 100,
+    "date": "2026-08-26",
+    "val": 442.62,
+    "category": "Operacional"
+  },
+  {
+    "id": 177,
+    "carId": 11,
+    "date": "2026-08-26",
+    "val": 350,
+    "category": "Mecânica"
+  },
+  {
+    "id": 175,
+    "carId": 14,
+    "date": "2026-08-26",
+    "val": 4275,
+    "category": "Mecânica"
+  },
+  {
+    "id": 165,
+    "carId": 112,
+    "date": "2026-08-25",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 174,
+    "carId": 116,
+    "date": "2026-08-25",
+    "val": 700,
+    "category": "Operacional"
+  },
+  {
+    "id": 173,
+    "carId": 115,
+    "date": "2026-08-25",
+    "val": 2400,
+    "category": "Operacional"
+  },
+  {
+    "id": 172,
+    "carId": 96,
+    "date": "2026-08-25",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 171,
+    "carId": 114,
+    "date": "2026-08-25",
+    "val": 2620,
+    "category": "Operacional"
+  },
+  {
+    "id": 170,
+    "carId": 114,
+    "date": "2026-08-25",
+    "val": 550,
+    "category": "Operacional"
+  },
+  {
+    "id": 169,
+    "carId": 114,
+    "date": "2026-08-25",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 168,
+    "carId": 114,
+    "date": "2026-08-25",
+    "val": 3200,
+    "category": "Operacional"
+  },
+  {
+    "id": 167,
+    "carId": 113,
+    "date": "2026-08-25",
+    "val": 500,
+    "category": "Operacional"
+  },
+  {
+    "id": 166,
+    "carId": 112,
+    "date": "2026-08-25",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 164,
+    "carId": 111,
+    "date": "2026-08-25",
+    "val": 600,
+    "category": "Operacional"
+  },
+  {
+    "id": 163,
+    "carId": 110,
+    "date": "2026-08-24",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 162,
+    "carId": 109,
+    "date": "2026-08-20",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 158,
+    "carId": 107,
+    "date": "2026-08-18",
+    "val": 700,
+    "category": "Operacional"
+  },
+  {
+    "id": 157,
+    "carId": 106,
+    "date": "2026-08-18",
+    "val": 800,
+    "category": "Operacional"
+  },
+  {
+    "id": 156,
+    "carId": 105,
+    "date": "2026-08-18",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 153,
+    "carId": 24,
+    "date": "2026-08-17",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 152,
+    "carId": 24,
+    "date": "2026-08-17",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 146,
+    "carId": 98,
+    "date": "2026-08-13",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 149,
+    "carId": 99,
+    "date": "2026-08-13",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 148,
+    "carId": 99,
+    "date": "2026-08-13",
+    "val": 1900,
+    "category": "Operacional"
+  },
+  {
+    "id": 147,
+    "carId": 98,
+    "date": "2026-08-13",
+    "val": 550,
+    "category": "Operacional"
+  },
+  {
+    "id": 145,
+    "carId": 98,
+    "date": "2026-08-13",
+    "val": 900,
+    "category": "Operacional"
+  },
+  {
+    "id": 144,
+    "carId": 97,
+    "date": "2026-08-12",
+    "val": 4000,
+    "category": "Operacional"
+  },
+  {
+    "id": 143,
+    "carId": 96,
+    "date": "2026-08-11",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 154,
+    "carId": 25,
+    "date": "2026-08-11",
+    "val": 1850,
+    "category": "Mecânica"
+  },
+  {
+    "id": 155,
+    "carId": 25,
+    "date": "2026-08-11",
+    "val": 4800,
+    "category": "Operacional"
+  },
+  {
+    "id": 141,
+    "carId": 95,
+    "date": "2026-08-11",
+    "val": 1200,
+    "category": "Operacional"
+  },
+  {
+    "id": 139,
+    "carId": 93,
+    "date": "2026-08-10",
+    "val": 900,
+    "category": "Operacional"
+  },
+  {
+    "id": 133,
+    "carId": 88,
+    "date": "2026-08-10",
+    "val": 1300,
+    "category": "Operacional"
+  },
+  {
+    "id": 134,
+    "carId": 89,
+    "date": "2026-08-10",
+    "val": 550,
+    "category": "Mecânica"
+  },
+  {
+    "id": 135,
+    "carId": 90,
+    "date": "2026-08-10",
+    "val": 900,
+    "category": "Operacional"
+  },
+  {
+    "id": 136,
+    "carId": 91,
+    "date": "2026-08-10",
+    "val": 4000,
+    "category": "Operacional"
+  },
+  {
+    "id": 137,
+    "carId": 91,
+    "date": "2026-08-10",
+    "val": 2100,
+    "category": "Operacional"
+  },
+  {
+    "id": 138,
+    "carId": 92,
+    "date": "2026-08-10",
+    "val": 600,
+    "category": "Operacional"
+  },
+  {
+    "id": 151,
+    "carId": 24,
+    "date": "2026-08-04",
+    "val": 4385,
+    "category": "Mecânica"
+  },
+  {
+    "id": 126,
+    "carId": 60,
+    "date": "2026-07-31",
+    "val": 500,
+    "category": "Operacional"
+  },
+  {
+    "id": 130,
+    "carId": 85,
+    "date": "2026-07-31",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 129,
+    "carId": 85,
+    "date": "2026-07-31",
+    "val": 1800,
+    "category": "Operacional"
+  },
+  {
+    "id": 128,
+    "carId": 60,
+    "date": "2026-07-31",
+    "val": 300,
+    "category": "Operacional"
+  },
+  {
+    "id": 127,
+    "carId": 60,
+    "date": "2026-07-31",
+    "val": 500,
+    "category": "Mecânica"
+  },
+  {
+    "id": 124,
+    "carId": 81,
+    "date": "2026-07-29",
+    "val": 800,
+    "category": "Operacional"
+  },
+  {
+    "id": 125,
+    "carId": 81,
+    "date": "2026-07-29",
+    "val": 800,
+    "category": "Operacional"
+  },
+  {
+    "id": 123,
+    "carId": 81,
+    "date": "2026-07-29",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 122,
+    "carId": 80,
+    "date": "2026-07-29",
+    "val": 1750,
+    "category": "Operacional"
+  },
+  {
+    "id": 121,
+    "carId": 79,
+    "date": "2026-07-29",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 120,
+    "carId": 74,
+    "date": "2026-07-29",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 117,
+    "carId": 76,
+    "date": "2026-07-27",
+    "val": 1100,
+    "category": "Operacional"
+  },
+  {
+    "id": 119,
+    "carId": 78,
+    "date": "2026-07-27",
+    "val": 2500,
+    "category": "Operacional"
+  },
+  {
+    "id": 118,
+    "carId": 76,
+    "date": "2026-07-27",
+    "val": 800,
+    "category": "Operacional"
+  },
+  {
+    "id": 115,
+    "carId": 31,
+    "date": "2026-07-24",
+    "val": 519.62,
+    "category": "Operacional"
+  },
+  {
+    "id": 110,
+    "carId": 73,
+    "date": "2026-07-23",
+    "val": 1000,
+    "category": "Preparação"
+  },
+  {
+    "id": 114,
+    "carId": 10,
+    "date": "2026-07-23",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 116,
+    "carId": 40,
+    "date": "2026-07-23",
+    "val": 919,
+    "category": "Operacional"
+  },
+  {
+    "id": 111,
+    "carId": 73,
+    "date": "2026-07-22",
+    "val": 2500,
+    "category": "Operacional"
+  },
+  {
+    "id": 112,
+    "carId": 73,
+    "date": "2026-07-22",
+    "val": 20530,
+    "category": "Operacional"
+  },
+  {
+    "id": 113,
+    "carId": 10,
+    "date": "2026-07-22",
+    "val": 856,
+    "category": "Operacional"
+  },
+  {
+    "id": 109,
+    "carId": 72,
+    "date": "2026-07-20",
+    "val": 4800,
+    "category": "Operacional"
+  },
+  {
+    "id": 108,
+    "carId": 57,
+    "date": "2026-07-20",
+    "val": 1710,
+    "category": "Mecânica"
+  },
+  {
+    "id": 107,
+    "carId": 40,
+    "date": "2026-07-20",
+    "val": 1650,
+    "category": "Preparação"
+  },
+  {
+    "id": 106,
+    "carId": 70,
+    "date": "2026-07-20",
+    "val": 1200,
+    "category": "Operacional"
+  },
+  {
+    "id": 100,
+    "carId": 24,
+    "date": "2026-07-17",
+    "val": 1250,
+    "category": "Operacional"
+  },
+  {
+    "id": 101,
+    "carId": 25,
+    "date": "2026-07-17",
+    "val": 1250,
+    "category": "Operacional"
+  },
+  {
+    "id": 105,
+    "carId": 40,
+    "date": "2026-07-17",
+    "val": 350,
+    "category": "Mecânica"
+  },
+  {
+    "id": 97,
+    "carId": 69,
+    "date": "2026-07-16",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 98,
+    "carId": 69,
+    "date": "2026-07-16",
+    "val": 1100,
+    "category": "Operacional"
+  },
+  {
+    "id": 103,
+    "carId": 66,
+    "date": "2026-07-15",
+    "val": 85,
+    "category": "Preparação"
+  },
+  {
+    "id": 104,
+    "carId": 66,
+    "date": "2026-07-15",
+    "val": 560,
+    "category": "Mecânica"
+  },
+  {
+    "id": 96,
+    "carId": 68,
+    "date": "2026-07-14",
+    "val": 500,
+    "category": "Operacional"
+  },
+  {
+    "id": 87,
+    "carId": 64,
+    "date": "2026-07-13",
+    "val": 1700,
+    "category": "Operacional"
+  },
+  {
+    "id": 86,
+    "carId": 64,
+    "date": "2026-07-13",
+    "val": 1200,
+    "category": "Operacional"
+  },
+  {
+    "id": 88,
+    "carId": 63,
+    "date": "2026-07-13",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 85,
+    "carId": 62,
+    "date": "2026-07-13",
+    "val": 400,
+    "category": "Operacional"
+  },
+  {
+    "id": 83,
+    "carId": 62,
+    "date": "2026-07-11",
+    "val": 220,
+    "category": "Operacional"
+  },
+  {
+    "id": 84,
+    "carId": 61,
+    "date": "2026-07-11",
+    "val": 300,
+    "category": "Operacional"
+  },
+  {
+    "id": 79,
+    "carId": 58,
+    "date": "2026-07-10",
+    "val": 2610,
+    "category": "Operacional"
+  },
+  {
+    "id": 80,
+    "carId": 59,
+    "date": "2026-07-10",
+    "val": 2500,
+    "category": "Operacional"
+  },
+  {
+    "id": 72,
+    "carId": 56,
+    "date": "2026-07-09",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 77,
+    "carId": 57,
+    "date": "2026-07-09",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 76,
+    "carId": 57,
+    "date": "2026-07-09",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 73,
+    "carId": 56,
+    "date": "2026-07-09",
+    "val": 234.77,
+    "category": "Operacional"
+  },
+  {
+    "id": 66,
+    "carId": 54,
+    "date": "2026-07-08",
+    "val": 600,
+    "category": "Operacional"
+  },
+  {
+    "id": 69,
+    "carId": 54,
+    "date": "2026-07-08",
+    "val": 1198.13,
+    "category": "Operacional"
+  },
+  {
+    "id": 90,
+    "carId": 32,
+    "date": "2026-07-08",
+    "val": 765,
+    "category": "Operacional"
+  },
+  {
+    "id": 67,
+    "carId": 54,
+    "date": "2026-07-08",
+    "val": 500,
+    "category": "Operacional"
+  },
+  {
+    "id": 93,
+    "carId": 66,
+    "date": "2026-07-08",
+    "val": 1303,
+    "category": "Mecânica"
+  },
+  {
+    "id": 94,
+    "carId": 48,
+    "date": "2026-07-08",
+    "val": 2500,
+    "category": "Operacional"
+  },
+  {
+    "id": 102,
+    "carId": 66,
+    "date": "2026-07-07",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 95,
+    "carId": 67,
+    "date": "2026-07-07",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 58,
+    "carId": 52,
+    "date": "2026-07-07",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 57,
+    "carId": 51,
+    "date": "2026-07-07",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 56,
+    "carId": 48,
+    "date": "2026-07-03",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 78,
+    "carId": 34,
+    "date": "2026-07-01",
+    "val": 15474.09,
+    "category": "Operacional"
+  },
+  {
+    "id": 89,
+    "carId": 34,
+    "date": "2026-07-01",
+    "val": 485,
+    "category": "Operacional"
+  },
+  {
+    "id": 49,
+    "carId": 39,
+    "date": "2026-06-30",
+    "val": 700,
+    "category": "Operacional"
+  },
+  {
+    "id": 48,
+    "carId": null,
+    "date": "2026-06-30",
+    "val": 1750,
+    "category": "Operacional"
+  },
+  {
+    "id": 46,
+    "carId": 43,
+    "date": "2026-06-29",
+    "val": 600,
+    "category": "Operacional"
+  },
+  {
+    "id": 47,
+    "carId": 40,
+    "date": "2026-06-29",
+    "val": 300,
+    "category": "Operacional"
+  },
+  {
+    "id": 45,
+    "carId": 43,
+    "date": "2026-06-29",
+    "val": 600,
+    "category": "Operacional"
+  },
+  {
+    "id": 44,
+    "carId": 26,
+    "date": "2026-06-29",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 42,
+    "carId": 37,
+    "date": "2026-06-26",
+    "val": 1200,
+    "category": "Operacional"
+  },
+  {
+    "id": 41,
+    "carId": 36,
+    "date": "2026-06-26",
+    "val": 1200,
+    "category": "Operacional"
+  },
+  {
+    "id": 43,
+    "carId": 41,
+    "date": "2026-06-26",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 40,
+    "carId": 38,
+    "date": "2026-06-26",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 11,
+    "carId": 16,
+    "date": "2026-06-23",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 39,
+    "carId": 35,
+    "date": "2026-06-23",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 35,
+    "carId": 11,
+    "date": "2026-06-23",
+    "val": 41,
+    "category": "Marketing"
+  },
+  {
+    "id": 34,
+    "carId": null,
+    "date": "2026-06-23",
+    "val": 13,
+    "category": "Operacional"
+  },
+  {
+    "id": 33,
+    "carId": 22,
+    "date": "2026-06-23",
+    "val": 1750,
+    "category": "Operacional"
+  },
+  {
+    "id": 28,
+    "carId": null,
+    "date": "2026-06-23",
+    "val": 15,
+    "category": "Operacional"
+  },
+  {
+    "id": 27,
+    "carId": 18,
+    "date": "2026-06-23",
+    "val": 2500,
+    "category": "Operacional"
+  },
+  {
+    "id": 26,
+    "carId": 18,
+    "date": "2026-06-23",
+    "val": 2000,
+    "category": "Operacional"
+  },
+  {
+    "id": 10,
+    "carId": 16,
+    "date": "2026-06-23",
+    "val": 370,
+    "category": "Mecânica"
+  },
+  {
+    "id": 9,
+    "carId": 16,
+    "date": "2026-06-23",
+    "val": 700,
+    "category": "Mecânica"
+  },
+  {
+    "id": 8,
+    "carId": 16,
+    "date": "2026-06-23",
+    "val": 1000,
+    "category": "Operacional"
+  },
+  {
+    "id": 29,
+    "carId": null,
+    "date": "2026-06-22",
+    "val": 119,
+    "category": "Operacional"
+  },
+  {
+    "id": 12,
+    "carId": 12,
+    "date": "2026-06-19",
+    "val": 1250,
+    "category": "Mecânica"
+  },
+  {
+    "id": 20,
+    "carId": 10,
+    "date": "2026-06-17",
+    "val": 650,
+    "category": "Mecânica"
+  },
+  {
+    "id": 19,
+    "carId": 10,
+    "date": "2026-06-17",
+    "val": 1000,
+    "category": "Preparação"
+  },
+  {
+    "id": 25,
+    "carId": null,
+    "date": "2026-06-17",
+    "val": 600,
+    "category": "Preparação"
+  },
+  {
+    "id": 24,
+    "carId": 8,
+    "date": "2026-06-17",
+    "val": 1055,
+    "category": "Operacional"
+  },
+  {
+    "id": 14,
+    "carId": 11,
+    "date": "2026-06-17",
+    "val": 1250,
+    "category": "Operacional"
+  },
+  {
+    "id": 36,
+    "carId": 27,
+    "date": "2026-06-17",
+    "val": 550,
+    "category": "Operacional"
+  },
+  {
+    "id": 13,
+    "carId": 12,
+    "date": "2026-06-17",
+    "val": 724,
+    "category": "Operacional"
+  },
+  {
+    "id": 37,
+    "carId": 27,
+    "date": "2026-06-17",
+    "val": 2500,
+    "category": "Operacional"
+  },
+  {
+    "id": 31,
+    "carId": 21,
+    "date": "2026-06-17",
+    "val": 550,
+    "category": "Operacional"
+  },
+  {
+    "id": 38,
+    "carId": 31,
+    "date": "2026-06-17",
+    "val": 590,
+    "category": "Mecânica"
+  },
+  {
+    "id": 17,
+    "carId": 13,
+    "date": "2026-06-17",
+    "val": 724,
+    "category": "Operacional"
+  },
+  {
+    "id": 15,
+    "carId": 11,
+    "date": "2026-06-17",
+    "val": 400,
+    "category": "Preparação"
+  },
+  {
+    "id": 6,
+    "carId": 16,
+    "date": "2026-06-16",
+    "val": 5400,
+    "category": "Mecânica"
+  },
+  {
+    "id": 16,
+    "carId": 13,
+    "date": "2026-06-16",
+    "val": 2100,
+    "category": "Preparação"
+  },
+  {
+    "id": 30,
+    "carId": 20,
+    "date": "2026-06-16",
+    "val": 1000,
+    "category": "Mecânica"
+  },
+  {
+    "id": 32,
+    "carId": 21,
+    "date": "2026-06-16",
+    "val": 1500,
+    "category": "Operacional"
+  },
+  {
+    "id": 18,
+    "carId": 10,
+    "date": "2026-06-10",
+    "val": 550,
+    "category": "Operacional"
+  },
+  {
+    "id": 21,
+    "carId": 10,
+    "date": "2026-06-10",
+    "val": 724,
+    "category": "Operacional"
+  }
+]

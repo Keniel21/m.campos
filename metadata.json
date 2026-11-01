@@ -1,0 +1,6 @@
+{
+  "name": "AutoDrive CRM",
+  "description": "AutoDrive CRM - Gestão Automotiva Premium com Dashboard, Estoque, CRM, Vendas e Financeiro.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,6 @@
+{
+  "summary": "Plano de ação completo para eliminar a dependência do relógio local no filtro de vendas/estoque, implementar persistência atômica com fila de sincronização (outbox) e restaurar os dados do relatório CSV.",
+  "updatedAt": "2026-10-19T16:25:14.921897710Z",
+  "requestFeedback": true,
+  "userFacing": true
+}

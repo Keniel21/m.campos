@@ -1,0 +1,794 @@
+[
+  {
+    "id": 18,
+    "name": "VIANA VEICULOS LTDA",
+    "document": "46723522000112",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 4,
+    "name": "ANDRECAR VEICULOS LTDA",
+    "document": "59771389000111",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 10,
+    "name": "Jailson Samuel Schirmer",
+    "document": "03399515081",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 3,
+    "name": "ANDRECAR VEICULOS LTDA",
+    "document": "59771389000111",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 8,
+    "name": "GILIAN LODI",
+    "document": "02341998062",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 7,
+    "name": "Elite Comercio de veículos",
+    "document": "17.042.015/0001-15",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 6,
+    "name": "Dieison Lopes Liska",
+    "document": "028.927.540-70",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 14,
+    "name": "MARCELO OSORIO RODRIGUES",
+    "document": "58810536053",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 20,
+    "name": "Vinicius Fonseca",
+    "document": null,
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 21,
+    "name": "William Silva dos Santos",
+    "document": "98102492008",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 9,
+    "name": "GRAMADOCAR VEICULOS COMERCIO LTDA",
+    "document": "22.818.475/0001-22",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 12,
+    "name": "MAICON BORGES MANIQUE",
+    "document": "033.491.110-92",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 1,
+    "name": "AR VEICULOS LTDA",
+    "document": "26651495000102",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 19,
+    "name": "Vinicius de Souza Wermuth",
+    "document": "03122429055",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 16,
+    "name": "Thiago Pacheco da Silva",
+    "document": "00119346036",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 2,
+    "name": "Alexandre Prass Vargas",
+    "document": "50664840000",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 13,
+    "name": "MAIKE WILLI ABREU DO COUTO",
+    "document": "825.966.700-20",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 11,
+    "name": "JONATHAN CORNEO",
+    "document": "031.070.470-74",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 17,
+    "name": "VIANA VEICULOS LTDA",
+    "document": "46.723.522/0001-12",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 15,
+    "name": "MICHELLE MENEZES DIEDRICH",
+    "document": "94178224034",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 5,
+    "name": "BLUE OCEAN PARTICIPAÇÕES",
+    "document": "45.236.393/0001-75",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-04T21:47:44.227617+00:00"
+  },
+  {
+    "id": 22,
+    "name": "EC COMÉRCIO DE VEÍCULOS LTDA",
+    "document": "31.840.950/0001-58",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-09T16:29:07.913476+00:00"
+  },
+  {
+    "id": 23,
+    "name": "Michele Garcia da Silva ",
+    "document": " 006.745.120-90  ",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-09T18:26:40.802458+00:00"
+  },
+  {
+    "id": 24,
+    "name": "BRUNA CERIS DOS SANTOS CORNEO",
+    "document": "029.816.090-09",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-10T21:47:19.494222+00:00"
+  },
+  {
+    "id": 25,
+    "name": "ORION VEICULOS LTDA",
+    "document": " 44681793000127",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-10T21:48:37.016715+00:00"
+  },
+  {
+    "id": 26,
+    "name": "SILVANIA MARA EIDT HANNECKER",
+    "document": "001.429.820-16",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-11T22:08:45.467759+00:00"
+  },
+  {
+    "id": 27,
+    "name": "m.campos",
+    "document": "0000000000",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-11T22:21:59.794131+00:00"
+  },
+  {
+    "id": 28,
+    "name": "RICARDO DE MORES NUNES",
+    "document": "013.085.420-46  ",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-13T22:22:12.848312+00:00"
+  },
+  {
+    "id": 29,
+    "name": "  CHARLES HENDLER ",
+    "document": "03071975066",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-13T22:34:26.871787+00:00"
+  },
+  {
+    "id": 30,
+    "name": "Danilo Lopes da Silva",
+    "document": "035.785.730-51",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-13T22:50:02.031332+00:00"
+  },
+  {
+    "id": 31,
+    "name": "Tiago Fabiano Fernandes",
+    "document": "01684188008",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-14T22:09:56.478656+00:00"
+  },
+  {
+    "id": 32,
+    "name": "Vinicius Aramis Paz da Costa",
+    "document": "05447574080",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-14T22:13:42.404694+00:00"
+  },
+  {
+    "id": 33,
+    "name": "PALMER OSWALDO DORNELES HANSEN JUNIOR",
+    "document": "716.884.120-34",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-14T22:24:06.857854+00:00"
+  },
+  {
+    "id": 34,
+    "name": "ANDRE DA SILVEIRA BERNARDES",
+    "document": "26.651.495/0001-02",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-14T22:29:23.436172+00:00"
+  },
+  {
+    "id": 35,
+    "name": "SERGIO GOETZ",
+    "document": "00705504921",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-16T13:04:05.518439+00:00"
+  },
+  {
+    "id": 36,
+    "name": "VANDERLEI DA SILVA",
+    "document": "719.911.070-72",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-23T23:29:34.188855+00:00"
+  },
+  {
+    "id": 37,
+    "name": "DIOGENES SIEGFRIED DOS SANTOS DORNELES",
+    "document": "862.060.870-34",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-24T00:14:31.843758+00:00"
+  },
+  {
+    "id": 38,
+    "name": "HERZER VEICULOS LTDA",
+    "document": "43332551000165",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-27T15:26:33.974516+00:00"
+  },
+  {
+    "id": 39,
+    "name": "HELEN MARIA FURTADO",
+    "document": "22183426004",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-27T15:39:37.415395+00:00"
+  },
+  {
+    "id": 40,
+    "name": "ANGELO SEVERO TEIXEIRA",
+    "document": "40140144000168",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-27T16:02:25.215594+00:00"
+  },
+  {
+    "id": 41,
+    "name": "AUTO CENTENARIO C. VEICULOS LTDA",
+    "document": "15.602.508/0001-37",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-29T11:59:17.434335+00:00"
+  },
+  {
+    "id": 42,
+    "name": "WELINTOM DOS SANTOS FEIDEN",
+    "document": " 034.725.970-70",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-29T12:02:23.353675+00:00"
+  },
+  {
+    "id": 43,
+    "name": " BRAVIK MOTORS LTDA",
+    "document": "43735962000100",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-29T12:07:08.978889+00:00"
+  },
+  {
+    "id": 44,
+    "name": "Juliano de Jesus Bernardo",
+    "document": "025.075.170-42",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-07-31T12:38:12.636357+00:00"
+  },
+  {
+    "id": 45,
+    "name": "ANA CAROLINA FACHIN",
+    "document": "028.980.150-83 ",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-01T18:18:20.173989+00:00"
+  },
+  {
+    "id": 46,
+    "name": "CONNECT TRADE AUTO LTDA",
+    "document": "49.124.096/0001-99",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-03T12:16:47.824693+00:00"
+  },
+  {
+    "id": 47,
+    "name": "Gledison Lopes Licht",
+    "document": "019.029.390-00",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-10T22:05:26.236281+00:00"
+  },
+  {
+    "id": 48,
+    "name": "TIAGO RICARDO MARQUESA",
+    "document": "00286258030",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-10T22:20:46.197508+00:00"
+  },
+  {
+    "id": 49,
+    "name": "NICOLAS ENINGER BERTI",
+    "document": "04588478010",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-10T22:31:45.933304+00:00"
+  },
+  {
+    "id": 50,
+    "name": "ARTUR ROCHA DE OLIVEIRA",
+    "document": "175.995200-15",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-11T21:42:28.675676+00:00"
+  },
+  {
+    "id": 51,
+    "name": "JOÃO VITOR LEDUR DE LIMA",
+    "document": "04076811089",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-11T21:53:34.452625+00:00"
+  },
+  {
+    "id": 52,
+    "name": "ADELIA ROSA DE FIGUEREDO",
+    "document": "336.523.680-53",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-17T18:07:00.739647+00:00"
+  },
+  {
+    "id": 53,
+    "name": "PLAY MOTORS",
+    "document": "56420831000177",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-17T18:21:45.662659+00:00"
+  },
+  {
+    "id": 54,
+    "name": "ROTA DO SOL LATICINIOS E DISTRIBUIDORA",
+    "document": "08.780.877/0001-54",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-17T18:50:06.608062+00:00"
+  },
+  {
+    "id": 55,
+    "name": "QUALYGRAN TECNOLOGIA AGROINDUSTRIAL LTDA",
+    "document": "07.914.890/0001-96",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-17T18:52:08.706501+00:00"
+  },
+  {
+    "id": 56,
+    "name": "DOTTO VEICULOS LTDA",
+    "document": "89.680.185/0001-36",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-18T22:35:03.708455+00:00"
+  },
+  {
+    "id": 57,
+    "name": "PAULO HENRIQUE MUMBACH",
+    "document": "028.050.090-45",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-18T22:39:18.28925+00:00"
+  },
+  {
+    "id": 58,
+    "name": "AUTOCENTENARIO COMERCIO DE VEICULOS",
+    "document": "15.602.508.0001-37",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-24T21:12:23.123275+00:00"
+  },
+  {
+    "id": 59,
+    "name": "ROGERIO RIOLFI LEVORSE",
+    "document": "439.543.750-87",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-25T11:59:10.602191+00:00"
+  },
+  {
+    "id": 60,
+    "name": "CHARLES HENDLER",
+    "document": "03071975066",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-25T12:02:55.161802+00:00"
+  },
+  {
+    "id": 61,
+    "name": "EDUARDO ZILLI TEIXEIRA",
+    "document": "975.131.640-53",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-25T12:06:03.748413+00:00"
+  },
+  {
+    "id": 62,
+    "name": "DILES ESTEFANO NICOLAS",
+    "document": "036.100.100-29",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-25T12:12:46.750343+00:00"
+  },
+  {
+    "id": 63,
+    "name": "GILSON MULTIMARCAS LTDA",
+    "document": "39411605000100",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-25T12:18:46.804014+00:00"
+  },
+  {
+    "id": 64,
+    "name": "LS MULTIMARCAS LTDA",
+    "document": "28.834.039/0001-23",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-26T19:59:36.652518+00:00"
+  },
+  {
+    "id": 65,
+    "name": "CLAUDIO EBOLI",
+    "document": "535.540.008-68",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-08-26T20:32:04.736234+00:00"
+  },
+  {
+    "id": 66,
+    "name": "Camila Machado Sebastião",
+    "document": "022.652.960-66",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-08T16:43:14.225622+00:00"
+  },
+  {
+    "id": 67,
+    "name": "MUMBACH COMERCIO DE VEICULOS LTDA",
+    "document": "61.284.646/0001-32",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-08T17:06:00.716479+00:00"
+  },
+  {
+    "id": 68,
+    "name": "GASTAO VANDERLEI DREIFKE",
+    "document": "65.760.566/0001-67",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-08T17:12:59.401478+00:00"
+  },
+  {
+    "id": 69,
+    "name": "FABIANY ROGERIA DOS SANTOS MARINHO",
+    "document": "227.625.068-24",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-08T19:21:52.587735+00:00"
+  },
+  {
+    "id": 70,
+    "name": "ADRIANO DANIEL DA SILVA",
+    "document": "007.276.430-96",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-08T19:24:31.036902+00:00"
+  },
+  {
+    "id": 71,
+    "name": "GCAR COMERCIAL DE VEICULOS LTDA",
+    "document": "500.401.27/0001-02",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-10T15:25:04.982541+00:00"
+  },
+  {
+    "id": 72,
+    "name": "Bruna de Souza Schirmer",
+    "document": "43.735.962/001-00",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-15T23:29:32.582236+00:00"
+  },
+  {
+    "id": 73,
+    "name": "DARLENE CASSIANO",
+    "document": "27.020.035/0001-49",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-16T14:24:21.764928+00:00"
+  },
+  {
+    "id": 74,
+    "name": "AUTO BELLO COMERCIAL DE VEICULOS LTDA",
+    "document": "08.331.598/0001-03",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-17T13:36:02.650226+00:00"
+  },
+  {
+    "id": 75,
+    "name": "LUIZ FERNANDO LANZINI",
+    "document": "021.296.020-29",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-17T13:40:50.424345+00:00"
+  },
+  {
+    "id": 76,
+    "name": "Catrina Aguiar Nunes",
+    "document": "008.523.550-41",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-18T17:24:31.126112+00:00"
+  },
+  {
+    "id": 79,
+    "name": "AutoDrive Motors Matriz",
+    "document": "12.345.678/0001-90",
+    "phone": "[EMPRESA_CNPJ]",
+    "email": "{\"isDefault\":true,\"ie\":\"123.456.789.110\",\"createdBy\":\"admin@admin.com.br\",\"savedAt\":\"2026-09-19T15:26:33.245Z\"}",
+    "created_at": "2026-09-19T15:26:33.207162+00:00"
+  },
+  {
+    "id": 80,
+    "name": "AutoDrive Repasses LTDA",
+    "document": "12.345.678/0002-71",
+    "phone": "[EMPRESA_CNPJ]",
+    "email": "{\"isDefault\":false,\"ie\":\"123.456.789.111\",\"createdBy\":\"admin@admin.com.br\",\"savedAt\":\"2026-09-19T15:26:33.489Z\"}",
+    "created_at": "2026-09-19T15:26:33.368575+00:00"
+  },
+  {
+    "id": 81,
+    "name": "AutoDrive Filial Zona Sul",
+    "document": "98.765.432/0001-10",
+    "phone": "[EMPRESA_CNPJ]",
+    "email": "{\"isDefault\":false,\"ie\":\"987.654.321.000\",\"createdBy\":\"admin@admin.com.br\",\"savedAt\":\"2026-09-19T15:26:33.656Z\"}",
+    "created_at": "2026-09-19T15:26:33.53678+00:00"
+  },
+  {
+    "id": 82,
+    "name": "GABRIEL PAULINO KLIPPEL",
+    "document": "046.604.080-60",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-21T20:50:34.96559+00:00"
+  },
+  {
+    "id": 83,
+    "name": "JOSE DAVI CARSPER DE ALMEIDA",
+    "document": "566.085.510-53",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-21T20:52:26.356116+00:00"
+  },
+  {
+    "id": 84,
+    "name": "MARCIO LEANDRO OLIVEIRA",
+    "document": "81455941034",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-24T17:22:29.172267+00:00"
+  },
+  {
+    "id": 85,
+    "name": "LEANDRO SCHONARTH DA SILV",
+    "document": "036.054.530-07",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-24T17:38:10.036175+00:00"
+  },
+  {
+    "id": 86,
+    "name": "OFFICE VEICULOS LTDA",
+    "document": "05.007.940/0001-26",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-24T17:57:44.06728+00:00"
+  },
+  {
+    "id": 87,
+    "name": "DIEGO BRITO DÁVILA",
+    "document": "024.649.870-69",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-24T18:28:21.738555+00:00"
+  },
+  {
+    "id": 88,
+    "name": "AMANDA DA COSTA NEPOMUCENO LTDA",
+    "document": "64.975.708/0001-40",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-24T19:11:44.844087+00:00"
+  },
+  {
+    "id": 89,
+    "name": "RL LOPES COMERCIO DE VEICULOS LTDA",
+    "document": "19.796.723/0001-77",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-24T19:25:42.5895+00:00"
+  },
+  {
+    "id": 90,
+    "name": "JULIANO BARTELT FERREIRA DA SILVA",
+    "document": "02944449044",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-24T19:30:20.78442+00:00"
+  },
+  {
+    "id": 91,
+    "name": "LLS COBRANCAS EXTRAJUDICIAIS LTDA",
+    "document": "11.396.143/0001-80",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-28T19:27:18.989261+00:00"
+  },
+  {
+    "id": 92,
+    "name": "Carlos Alberto Corneo",
+    "document": "41160002053",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-28T20:31:38.904526+00:00"
+  },
+  {
+    "id": 93,
+    "name": "ANELISE CARDOZO FETZNER FONSECA",
+    "document": "00516738003",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-28T20:46:15.947082+00:00"
+  },
+  {
+    "id": 94,
+    "name": "DILLES ESTEFANO NICOLAS",
+    "document": "036.100.100-29",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-28T21:06:59.737748+00:00"
+  },
+  {
+    "id": 95,
+    "name": "LIRA IVANOVICH NICOLAU",
+    "document": "027.865.980-28",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-09-28T21:37:44.469984+00:00"
+  },
+  {
+    "id": 96,
+    "name": "R DE MORAES NUNES",
+    "document": "25.348.683/0001-01",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-10-07T12:00:00.000Z"
+  },
+  {
+    "id": 97,
+    "name": "LUCAS MALLMANN LOF",
+    "document": "040.775.280-38",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-10-07T12:00:00.000Z"
+  },
+  {
+    "id": 98,
+    "name": "LUCAS SILVA MATEUS",
+    "document": "012.638.860-19",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-10-07T12:00:00.000Z"
+  },
+  {
+    "id": 99,
+    "name": "crístian Gabriel de Souza Siqueira Oliveira",
+    "document": "042.443.180-70",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-10-07T12:00:00.000Z"
+  },
+  {
+    "id": 100,
+    "name": "DIMOTORS COMERCIO DE VEICULOS LTDA",
+    "document": "39.781.800/0001-22",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-10-07T12:00:00.000Z"
+  },
+  {
+    "id": 101,
+    "name": "EDUARDO DALLAGNOL",
+    "document": "044.837.020-41",
+    "phone": null,
+    "email": null,
+    "created_at": "2026-10-07T12:00:00.000Z"
+  }
+]

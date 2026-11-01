@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "M. DIAS DE CAMPOS LTDA",
+    "cnpj": "65.760.566/0001-67",
+    "ie": "096/4119528",
+    "isDefault": true
+  },
+  {
+    "id": 2,
+    "name": "JK LEAL CONSULTORIA",
+    "cnpj": "60.116.934/0001-15",
+    "ie": "",
+    "isDefault": false
+  }
+]

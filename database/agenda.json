@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "title": "Apresentação Jeep Compass",
+    "date": "2026-05-22",
+    "time": "14:30",
+    "carId": null,
+    "category": "visitas"
+  },
+  {
+    "id": 3,
+    "title": "Levar Polo para Martelinho/Estética",
+    "date": "2026-05-22",
+    "time": "16:00",
+    "carId": null,
+    "category": "revisao"
+  },
+  {
+    "id": 4,
+    "title": "Vistoria Cautelar Civic",
+    "date": "2026-05-24",
+    "time": "09:00",
+    "carId": null,
+    "category": "documentos"
+  },
+  {
+    "id": 2,
+    "title": "Entrega do Toyota Corolla",
+    "date": "2026-05-23",
+    "time": "10:00",
+    "carId": null,
+    "category": "entregas"
+  },
+  {
+    "id": 5,
+    "title": "Atualizar sistema",
+    "date": "2026-07-06",
+    "time": "10:00",
+    "carId": null,
+    "category": "documentos"
+  },
+  {
+    "id": 6,
+    "title": "Entrega Ranger vermelha",
+    "date": "2026-07-08",
+    "time": "19:00",
+    "carId": null,
+    "category": "visitas"
+  }
+]
