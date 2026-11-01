@@ -1,3 +1,4 @@
+import { filterStock } from '../../utils/stock.js';
 // ==========================================================================
 // AUTO DRIVE CRM - SALES COMPILATION & REPORTS FEATURE
 // ==========================================================================
@@ -469,11 +470,11 @@ export function downloadCSV(data, headers, fileName) {
 
 export function exportEstoqueToExcel() {
     const headers = ["ID", "Modelo", "Ano", "KM", "Valor Compra", "Valor Venda", "Tipo", "Status", "Placa", "Cor", "Chassi"];
-    const activeCars = state.estoque.filter(c => c.status !== 'vendido');
+    const activeCars = filterStock(state.estoque, document.getElementById('search-estoque')?.value || '', document.getElementById('filter-estoque-status')?.value || 'todos');
     const rows = activeCars.map(c => [
         c.id, c.model, c.year, c.km, c.buyPrice, c.sellPrice, c.type, c.status, c.plate || "", c.color || "", c.chassis || ""
     ]);
-    downloadCSV(rows, headers, `autodrive_estoque_patio_${new Date().toISOString().split('T')[0]}.csv`);
+    downloadCSV(rows, headers, `autodrive_estoque_${new Date().toISOString().split('T')[0]}.csv`);
 }
 
 export function exportLeadsToExcel() {

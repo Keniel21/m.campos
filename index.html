@@ -39,30 +39,11 @@
 
         <ul class="sidebar-menu">
             <span class="menu-category">Navegação</span>
-            <li class="menu-item active" data-tab="dashboard">
-                <a onclick="switchTab('dashboard')">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="menu-item" data-tab="estoque">
+            <li class="menu-item active" data-tab="estoque">
                 <a onclick="switchTab('estoque')">
                     <i data-lucide="package"></i>
                     <span>Estoque</span>
                     <span class="menu-badge red" id="badge-estoque-alert">0</span>
-                </a>
-            </li>
-            <li class="menu-item" data-tab="leads">
-                <a onclick="switchTab('leads')">
-                    <i data-lucide="users"></i>
-                    <span>Leads / CRM</span>
-                    <span class="menu-badge blue" id="badge-leads-active">0</span>
-                </a>
-            </li>
-            <li class="menu-item" data-tab="vendas">
-                <a onclick="switchTab('vendas')">
-                    <i data-lucide="banknote"></i>
-                    <span>Vendas</span>
                 </a>
             </li>
             <li class="menu-item" data-tab="clientes">
@@ -72,26 +53,14 @@
                 </a>
             </li>
 
-            <span class="menu-category">Financeiro & Agenda</span>
+            <span class="menu-category">Financeiro</span>
             <li class="menu-item" data-tab="financeiro">
                 <a onclick="switchTab('financeiro')">
                     <i data-lucide="wallet"></i>
                     <span>Financeiro</span>
                 </a>
             </li>
-            <li class="menu-item" data-tab="agenda">
-                <a onclick="switchTab('agenda')">
-                    <i data-lucide="calendar"></i>
-                    <span>Agenda</span>
-                </a>
-            </li>
 
-            <li class="menu-item" data-tab="usuarios" id="menu-item-usuarios" style="display:none;">
-                <a onclick="switchTab('usuarios')">
-                    <i data-lucide="shield-check"></i>
-                    <span>Aprovações</span>
-                </a>
-            </li>
         </ul>
     </aside>
 
@@ -103,8 +72,8 @@
                 <i data-lucide="menu"></i>
             </button>
             <div class="header-title-area">
-                <h2 id="current-tab-title">Dashboard Operacional</h2>
-                <p id="current-tab-subtitle">Visão unificada das vendas, estoque e lucratividade</p>
+                <h2 id="current-tab-title">Gestão de Estoque</h2>
+                <p id="current-tab-subtitle">Veículos disponíveis e vendidos, conforme a situação selecionada</p>
             </div>
             <div class="header-actions">
                 <div class="cloud-sync-badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); color:#10b981; padding:5px 12px; border-radius:9999px; font-size:11px; font-weight:600;" title="Sincronização centralizada na nuvem ativa">
@@ -201,7 +170,7 @@
         <!-- ==========================================
              ABA 1: HOME / DASHBOARD
              ========================================== -->
-        <section id="dashboard-tab" class="tab-pane active">
+        <section id="dashboard-tab" class="tab-pane">
             <!-- Barra de Filtro de Período -->
             <div class="period-filter-bar">
                 <span class="period-filter-label"><i data-lucide="calendar-range"
@@ -295,13 +264,23 @@
         <!-- ==========================================
              ABA 2: ESTOQUE (PRODUTO E TABELAS)
              ========================================== -->
-        <section id="estoque-tab" class="tab-pane">
+        <section id="estoque-tab" class="tab-pane active">
             <div class="table-controls">
                 <div class="search-wrapper">
                     <i data-lucide="search"></i>
                     <input type="text" class="search-input" id="search-estoque"
                         placeholder="Buscar por modelo, placa, cor, chassi..." oninput="filterEstoqueTable()">
                 </div>
+                <label class="stock-status-filter" for="filter-estoque-status">Situação dos veículos
+                    <select id="filter-estoque-status" class="form-control" onchange="filterEstoqueStatus()">
+                        <option value="todos">Todos os veículos</option>
+                        <option value="disponivel">Disponível</option>
+                        <option value="vendido">Vendido</option>
+                        <option value="preparacao">Em preparação</option>
+                        <option value="reservado">Reservado</option>
+                    </select>
+                </label>
+                <span id="estoque-filter-count" aria-live="polite"></span>
                 <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
                     <div class="view-toggle" style="margin-right: 8px;">
                         <button class="view-toggle-btn active" id="toggle-estoque-lista"

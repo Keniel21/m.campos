@@ -3,6 +3,10 @@ export type Module = { title: string; fields: Field[] };
 const date: Field = { key: 'date', label: 'Data', type: 'date', required: true };
 const vehicle: Field = { key: 'carId', label: 'Veículo', type: 'vehicle' };
 const name: Field = { key: 'name', label: 'Nome', required: true };
+export const navigationModules = ['estoque', 'clientes', 'despesas', 'documentos', 'company_cnpjs'];
+export const vehicleStatusLabels: Record<string, string> = {
+  disponivel: 'Disponível', vendido: 'Vendido', preparacao: 'Em preparação', reservado: 'Reservado'
+};
 export const modules: Record<string, Module> = {
   estoque: { title: 'Estoque', fields: [
     { key: 'model', label: 'Modelo', required: true }, { key: 'plate', label: 'Placa' }, { key: 'year', label: 'Ano' },

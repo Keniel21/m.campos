@@ -53,7 +53,10 @@ O Vite encaminha `/api` para a porta 8080. O frontend não precisa conhecer a se
 ## O que esta versão oferece
 
 - Login validado no servidor, sem restauração automática do administrador de demonstração.
-- Listagem, busca, criação, edição e exclusão para estoque, clientes, leads, vendas, despesas, agenda, documentos por link e empresas.
+- Navegação com Estoque, Clientes, Financeiro, Documentos e Empresas. Dashboard, Vendas, Leads, Agenda e Aprovações foram retirados do menu.
+- Estoque reúne veículos disponíveis e vendidos, com filtro por situação (todos, disponível, vendido, em preparação e reservado), busca combinada e situação visível na tabela.
+- A versão original também abre em Estoque, usa o mesmo filtro nas visualizações de lista/grade e na exportação CSV, e permite consultar a venda dentro da ficha do veículo.
+- As APIs e os registros de vendas, leads e agenda permanecem para preservar os dados existentes; a remoção dos menus não exclui históricos.
 - Vínculos JPA `@ManyToOne` com o veículo e bloqueio de exclusão de veículos com registros vinculados.
 - Venda e mudança de situação do veículo na mesma transação, com bloqueio pessimista para evitar novas vendas concorrentes do mesmo veículo.
 - Cálculo do lucro e margem da venda considerando custo e despesas cadastradas naquele momento. Alterar despesas posteriormente não recalcula retroativamente vendas antigas.
@@ -85,7 +88,7 @@ Sem `TEST_DB_URL`, os testes de backend usam H2 em modo PostgreSQL. No GitHub Ac
 ## Etapas restantes para substituir o legado
 
 1. Extrair entidades e DTOs tipados por domínio, com constraints SQL específicas, índices de pesquisa e paginação. JSONB fica para metadados e campos legados durante a transição.
-2. Recriar a experiência completa de dashboard/gráficos, kanban e timeline de leads, filtros de período e ficha detalhada do veículo.
+2. Completar a ficha detalhada do veículo e os dados de venda na interface React, mantendo a navegação concentrada em Estoque conforme o escopo atualizado.
 3. Migrar integrações Gemini, Google Calendar, FIPE, upload de arquivos, relatórios/recibos/Excel e PWA/offline. Essas integrações continuam somente no aplicativo original.
 4. Migrar usuários externos com fluxo de redefinição de senha e implementar aprovação, permissões por função e administração de usuários. Esta versão oferece apenas o usuário administrativo inicial.
 5. Conferir valores, documentos e contagens da base real antes de mudar a aplicação usada pela loja; executar testes visuais e end-to-end das rotinas completas.

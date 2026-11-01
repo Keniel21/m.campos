@@ -2,6 +2,7 @@
 // AUTO DRIVE CRM - STOCK MANAGEMENT FEATURE
 // ==========================================================================
 
+import { filterStock } from '../../utils/stock.js';
 import { state } from '../../services/state.js';
 import { formatCurrency, calcDaysInStock, parseCurrencyBR } from '../../utils/helpers.js';
 import { persistLocalData, fetchCloudData } from '../../services/supabase.js';
@@ -206,10 +207,10 @@ export function sortEstoque(column) {
 
 // Global update function for Stock
 export function updateEstoqueFilterCounts() {
-    const totalYard = (state.estoque || []).filter(c => c.status !== 'vendido').length;
+    const totalYard = (state.estoque || []).length;
     const btns = document.querySelectorAll('#filter-estoque-group .filter-btn');
     if (btns && btns.length > 0) {
-        btns[0].innerHTML = `Todos no Pátio (${totalYard})`;
+        btns[0].innerHTML = `Todos os veículos (${totalYard})`;
     }
 }
 window.updateEstoqueFilterCounts = updateEstoqueFilterCounts;
@@ -220,8 +221,8 @@ export function renderEstoque() {
     renderEstoqueTable(searchVal);
 }
 
-// Renders list or grid records - strictly unsold vehicles
-export function renderEstoqueTable(searchQuery = '') {
+// Both inventory views include available and sold vehicles, according to the filter.
+export function renderEstoqueTable(searchQuery = document.getElementById('search-estoque')?.value || '') {
     const listBody = document.getElementById("estoque-modern-list-body");
     const gridView = document.getElementById("estoque-grid-view");
     if (!listBody || !gridView) return;
@@ -229,21 +230,10 @@ export function renderEstoqueTable(searchQuery = '') {
     listBody.innerHTML = "";
     gridView.innerHTML = "";
 
-    // Flow: Only unsold vehicles remain in estoque; sold vehicles are displayed ONLY in Vendas
-    let filteredCars = (state.estoque || []).filter(car => {
-        if (car.status === 'vendido') return false;
-
-        const query = (searchQuery || '').trim().toLowerCase();
-        if (!query) return true;
-
-        return (
-            (car.model && car.model.toLowerCase().includes(query)) ||
-            (car.year && String(car.year).toLowerCase().includes(query)) ||
-            (car.plate && car.plate.toLowerCase().includes(query)) ||
-            (car.color && car.color.toLowerCase().includes(query)) ||
-            (car.chassis && car.chassis.toLowerCase().includes(query))
-        );
-    });
+    const status = document.getElementById('filter-estoque-status')?.value || 'todos';
+    let filteredCars = filterStock(state.estoque || [], searchQuery, status);
+    const count = document.getElementById('estoque-filter-count');
+    if (count) count.textContent = `${filteredCars.length} de ${(state.estoque || []).length} veículos`;
 
     // Sort records
     filteredCars.sort((a, b) => {
@@ -370,7 +360,7 @@ export function renderEstoqueTable(searchQuery = '') {
                     <button class="btn btn-secondary" style="padding:6px; border-radius:8px;" onclick="window.openCarDetails(${car.id})" title="Ficha Técnica / Editar"><i data-lucide="pencil" style="width:14px;height:14px;"></i></button>
                     ${car.status !== 'vendido' 
                         ? `<button class="btn btn-success" style="padding:6px; border-radius:8px;" onclick="window.openCarDetailsForSale(${car.id})" title="Registrar Venda"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>` 
-                        : `<button class="btn btn-secondary" style="padding:6px; border-radius:8px; color:var(--blue-primary);" onclick="const s = (state.vendas||[]).find(v => String(v.carId) === String('${car.id}') || String(v.car_id) === String('${car.id}')); if(s){ window.switchTab('vendas'); window.highlightVendaRow(s.id); } else { window.openCarDetailsForSale(${car.id}); }" title="Ver Venda no Menu de Vendas"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>`}
+                        : `<button class="btn btn-secondary" style="padding:6px; border-radius:8px; color:var(--blue-primary);" onclick="window.openCarDetailsForSale(${car.id});" title="Ver venda na ficha do veículo"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>`}
                     <button class="btn" style="padding:6px; border-radius:8px; background-color:rgba(239,68,68,0.12); color:var(--red-alert); border:1px solid rgba(239,68,68,0.18)" onclick="window.deleteCarConfirm(${car.id})" title="Excluir"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
                 </div>
             </div>
@@ -419,7 +409,7 @@ export function renderEstoqueTable(searchQuery = '') {
                         <button class="btn btn-secondary btn-sm" onclick="window.openCarDetails(${car.id})"><i data-lucide="pencil" style="width:12px; height:12px; margin-right:4px;"></i> Editar</button>
                         ${car.status !== 'vendido' 
                             ? `<button class="btn btn-success btn-sm" onclick="window.openCarDetailsForSale(${car.id})"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Vender</button>` 
-                            : `<button class="btn btn-secondary btn-sm" style="color:var(--blue-primary);" onclick="const s = (state.vendas||[]).find(v => String(v.carId) === String('${car.id}') || String(v.car_id) === String('${car.id}')); if(s){ window.switchTab('vendas'); window.highlightVendaRow(s.id); } else { window.openCarDetailsForSale(${car.id}); }"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Ver Venda</button>`}
+                            : `<button class="btn btn-secondary btn-sm" style="color:var(--blue-primary);" onclick="window.openCarDetailsForSale(${car.id});"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Ver Venda</button>`}
                     </div>
                 </div>
             </div>
@@ -2428,16 +2418,8 @@ export function openCarDetailsForSale(carId) {
         return;
     }
 
-    const existingSale = (state.vendas || []).find(v => (String(v.carId) === String(car.id) || String(v.car_id) === String(car.id)) && v.carId !== null);
-    if (existingSale) {
-        if (confirm(`O veículo "${car.model}" já possui uma venda registrada no sistema (Venda #${existingSale.id}). Deseja visualizar esta venda no Menu de Vendas?`)) {
-            if (window.switchTab) window.switchTab('vendas');
-            if (window.highlightVendaRow) window.highlightVendaRow(existingSale.id);
-            return;
-        }
-    }
-
-    openCarDetails(carId);
+    openCarDetails(carId, 'estoque');
+    switchCarDetailsTab('docs');
     setTimeout(() => {
         const saleCard = document.getElementById('cd-sale-card');
         if (saleCard) saleCard.scrollIntoView({ behavior: 'smooth' });
@@ -2462,10 +2444,7 @@ export async function confirmCarSale(event) {
 
     const existingSale = (state.vendas || []).find(v => (String(v.carId) === String(car.id) || String(v.car_id) === String(car.id)) && v.carId !== null);
     if (existingSale) {
-        if (confirm(`Este veículo ("${car.model}") já possui uma venda registrada no sistema (Venda #${existingSale.id}). Deseja visualizar esta venda no Menu de Vendas?`)) {
-            if (window.switchTab) window.switchTab('vendas');
-            if (window.highlightVendaRow) window.highlightVendaRow(existingSale.id);
-        }
+        openCarDetailsForSale(carId);
         return;
     }
 
@@ -2610,17 +2589,14 @@ export async function confirmCarSale(event) {
         if (carDetailsTab) carDetailsTab.classList.remove("active");
     }
 
-    // 9. Migrate immediately to the Sales Menu
-    if (window.switchTab) {
-        window.switchTab('vendas');
-    }
-    if (window.highlightVendaRow) {
-        window.highlightVendaRow(savedSale.id);
-    }
+    // Keep the sold vehicle visible in the unified inventory.
+    const statusFilter = document.getElementById('filter-estoque-status');
+    if (statusFilter) statusFilter.value = 'vendido';
+    const search = document.getElementById('search-estoque');
+    if (search) search.value = '';
+    if (window.switchTab) window.switchTab('estoque');
+    if (window.showToast) window.showToast(`Venda do ${car.model} registrada com sucesso! Veículo disponível no filtro Vendido.`, 'success');
 
-    if (window.showToast) {
-        window.showToast(`Venda do ${car.model} registrada com sucesso! Veículo migrado para o Menu de Vendas.`, 'success');
-    }
 }
 
 // Populate and adapt the Fechamento e Venda card based on sale registration status
@@ -2679,8 +2655,8 @@ export function renderCarSaleCard(car) {
                     <button type="button" class="btn btn-secondary" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:42px; padding:0 16px; border-radius:10px;" onclick="window.generatePDFReceipt(${existingSale.id})" title="Emitir Recibo em PDF">
                         <i data-lucide="file-check" style="width:16px;height:16px; color:var(--blue-primary);"></i> Emitir Recibo
                     </button>
-                    <button type="button" class="btn btn-secondary" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:42px; padding:0 16px; border-radius:10px; color:var(--blue-primary);" onclick="window.switchTab('vendas'); if (window.highlightVendaRow) window.highlightVendaRow(${existingSale.id});" title="Ver no Menu de Vendas">
-                        <i data-lucide="badge-dollar-sign" style="width:16px;height:16px;"></i> Ver no Menu Vendas
+                    <button type="button" class="btn btn-secondary" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:42px; padding:0 16px; border-radius:10px; color:var(--blue-primary);" onclick="window.closeCarDetails();" title="Voltar ao estoque">
+                        <i data-lucide="badge-dollar-sign" style="width:16px;height:16px;"></i> Voltar ao Estoque
                     </button>
                     <button type="button" class="btn btn-danger" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:42px; padding:0 16px; border-radius:10px;" onclick="window.deleteVendaConfirm(${existingSale.id})" title="Reverter venda e devolver ao estoque">
                         <i data-lucide="undo-2" style="width:16px;height:16px;"></i> Reverter Venda
@@ -2709,7 +2685,7 @@ export function renderCarSaleCard(car) {
                 saleCardTitle.innerHTML = `Venda Pendente de Registro <span class="badge repasse" style="margin-left:8px; font-size:11px; vertical-align:middle; text-transform:uppercase;">Pendente</span>`;
             }
             if (saleCardSubtitle) {
-                saleCardSubtitle.innerHTML = `<span style="color:var(--yellow-warning); font-weight:500;">⚠️ Veículo consta como vendido no pátio. Confirme os dados abaixo para salvar e migrar para o Menu de Vendas.</span>`;
+                saleCardSubtitle.innerHTML = `<span style="color:var(--yellow-warning); font-weight:500;">⚠️ Veículo consta como vendido no pátio. Confirme os dados abaixo para salvar os dados da venda nesta ficha.</span>`;
             }
             if (saleCardIcon) {
                 saleCardIcon.setAttribute('data-lucide', 'badge-alert');
@@ -2718,7 +2694,7 @@ export function renderCarSaleCard(car) {
             if (saleActionRow) {
                 saleActionRow.innerHTML = `
                     <button class="btn btn-success btn-confirm-sale-premium" onclick="confirmCarSale(event)">
-                        <i data-lucide="check-circle" style="width:18px; height:18px;"></i> Salvar e Migrar Venda para o Menu de Vendas
+                        <i data-lucide="check-circle" style="width:18px; height:18px;"></i> Salvar dados da venda
                     </button>
                 `;
             }

@@ -485,7 +485,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const cacheKeys = await caches.keys();
             for (const key of cacheKeys) {
-                if (key !== 'autodrive-crm-v5') {
+                if (key !== 'autodrive-crm-v6') {
                     await caches.delete(key);
                 } else {
                     const c = await caches.open(key);

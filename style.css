@@ -8276,3 +8276,5 @@ body.dark-mode .emerald-glow-card {
 
 
 
+
+.stock-status-filter{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text-muted);min-width:180px}#estoque-filter-count{font-size:12px;color:var(--text-muted)}
