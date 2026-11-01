@@ -16,6 +16,12 @@ public class CrmRecord {
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "vehicle_id") CrmRecord vehicle;
     @Version long version;
     protected CrmRecord() {}
+    public String getId() { return id; }
+    public String getModule() { return module; }
+    public CrmRecord getVehicle() { return vehicle; }
+    public void setVehicle(CrmRecord vehicle) { this.vehicle = vehicle; }
+    public Map<String, Object> getPayload() { return payload; }
+    public void setPayload(Map<String, Object> payload) { this.payload = payload; }
     CrmRecord(String module, Map<String, Object> payload) {
         this.module = module;
         this.payload = new LinkedHashMap<>(payload);

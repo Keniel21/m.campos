@@ -24,24 +24,24 @@ public class CrmService {
         return records.findByModuleOrderByIdAsc(module).stream().map(this::view).toList();
     }
     Map<String, Object> view(CrmRecord record) {
-        var result = new LinkedHashMap<>(record.payload);
-        result.put("id", record.id);
-        if (record.vehicle != null) {
-            result.put("carId", record.vehicle.id);
-            result.put("car_id", record.vehicle.id);
-            if (record.module.equals("leads")) result.put("interestCarId", record.vehicle.id);
+        var result = new LinkedHashMap<>(record.getPayload());
+        result.put("id", record.getId());
+        if (record.getVehicle() != null) {
+            result.put("carId", record.getVehicle().getId());
+            result.put("car_id", record.getVehicle().getId());
+            if (record.getModule().equals("leads")) result.put("interestCarId", record.getVehicle().getId());
         }
         return result;
     }
     CrmRecord get(String module, String id) {
         module(module);
-        return records.findOneById(id).filter(r -> r.module.equals(module))
+        return records.findOneById(id).filter(r -> r.getModule().equals(module))
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro não encontrado."));
     }
     public Map<String, Object> save(String module, String id, Map<String, Object> input) {
         module(module);
         var record = id == null ? new CrmRecord(module, Map.of()) : get(module, id);
-        var data = new LinkedHashMap<>(record.payload);
+        var data = new LinkedHashMap<>(record.getPayload());
         data.putAll(input);
         data.remove("id");
         validate(module, data);
@@ -53,42 +53,43 @@ public class CrmService {
             if (carId != null && !carId.toString().isBlank()) {
                 var vehicle = get("estoque", carId.toString());
                 if (module.equals("vendas")) {
-                    if (record.vehicle != null && !record.vehicle.id.equals(vehicle.id))
+                    if (record.getVehicle() != null && !record.getVehicle().getId().equals(vehicle.getId()))
                         throw bad("Não é possível trocar o veículo de uma venda; exclua e cadastre novamente.");
-                    if (record.vehicle == null && records.existsByModuleAndVehicleIdAndIdNot("vendas", vehicle.id, record.id))
+                    if (record.getVehicle() == null && records.existsByModuleAndVehicleIdAndIdNot("vendas", vehicle.getId(), record.getId()))
                         throw bad("Este veículo já possui uma venda.");
-                    vehicle.payload = new LinkedHashMap<>(vehicle.payload);
-                    vehicle.payload.put("status", "vendido");
-                    vehicle.payload.put("soldDate", data.get("date"));
-                    vehicle.payload.put("sellPrice", data.get("sellPrice"));
+                    vehicle.setPayload(new LinkedHashMap<>(vehicle.getPayload()));
+                    vehicle.getPayload().put("status", "vendido");
+                    vehicle.getPayload().put("soldDate", data.get("date"));
+                    vehicle.getPayload().put("sellPrice", data.get("sellPrice"));
                     BigDecimal price = new BigDecimal(data.get("sellPrice").toString());
-                    BigDecimal cost = new BigDecimal(Objects.toString(vehicle.payload.get("buyPrice"), "0"));
+                    BigDecimal cost = new BigDecimal(Objects.toString(vehicle.getPayload().get("buyPrice"), "0"));
                     BigDecimal expenses = records.findByModuleOrderByIdAsc("despesas").stream()
-                        .filter(r -> r.vehicle != null && r.vehicle.id.equals(vehicle.id))
-                        .map(r -> new BigDecimal(Objects.toString(r.payload.get("val"), "0")))
+                        .filter(r -> r.getVehicle() != null && r.getVehicle().getId().equals(vehicle.getId()))
+                        .map(r -> new BigDecimal(Objects.toString(r.getPayload().get("val"), "0")))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                     BigDecimal profit = price.subtract(cost).subtract(expenses).setScale(2, java.math.RoundingMode.HALF_UP);
                     data.put("profit", profit);
                     data.put("margin", profit.multiply(BigDecimal.valueOf(100)).divide(price, 2, java.math.RoundingMode.HALF_UP));
                 }
-                record.vehicle = vehicle;
+                record.setVehicle(vehicle);
             } else if (module.equals("vendas") || module.equals("documentos")) {
                 throw bad("Selecione um veículo.");
-            } else record.vehicle = null;
+            } else record.setVehicle(null);
         }
-        record.payload = data;
+        record.setPayload(data);
         return view(records.saveAndFlush(record));
     }
     public void delete(String module, String id) {
         var record = get(module, id);
         if (module.equals("estoque") && records.existsByVehicleId(id))
             throw bad("O veículo possui registros vinculados e não pode ser excluído.");
-        if (module.equals("vendas") && record.vehicle != null && !records.existsByModuleAndVehicleIdAndIdNot("vendas", record.vehicle.id, record.id)) {
-            var car = record.vehicle;
-            car.payload = new LinkedHashMap<>(car.payload);
-            car.payload.put("status", "disponivel");
-            car.payload.remove("soldDate");
-            car.payload.remove("saleDate");
+        if (module.equals("vendas") && record.getVehicle() != null && !records.existsByModuleAndVehicleIdAndIdNot("vendas", record.getVehicle().getId(), record.getId())) {
+            var car = record.getVehicle();
+            var payload = new LinkedHashMap<>(car.getPayload());
+            payload.put("status", "disponivel");
+            payload.remove("soldDate");
+            payload.remove("saleDate");
+            car.setPayload(payload);
         }
         records.delete(record);
     }

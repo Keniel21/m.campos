@@ -70,7 +70,8 @@ class CrmIntegrationTest {
         java.nio.file.Files.writeString(folder.resolve("estoque.json"), "[{\"id\":1,\"model\":\"Corolla\",\"status\":\"vendido\",\"renavam\":\"123\"}]");
         java.nio.file.Files.writeString(folder.resolve("leads.json"), "[{\"id\":1,\"name\":\"Ana\",\"interestCarId\":1}]");
         java.nio.file.Files.writeString(folder.resolve("vendas.json"), "[{\"id\":1,\"client\":\"Ana\",\"carId\":1},{\"id\":2,\"client\":\"Bia\",\"carId\":1}]");
-        bootstrap.directory = folder.toString();
+        Bootstrap target = org.springframework.test.util.AopTestUtils.getTargetObject(bootstrap);
+        target.directory = folder.toString();
         try {
             bootstrap.run(new org.springframework.boot.DefaultApplicationArguments(new String[0]));
             bootstrap.run(new org.springframework.boot.DefaultApplicationArguments(new String[0]));
@@ -80,7 +81,7 @@ class CrmIntegrationTest {
             String sale = records.findByModuleAndLegacyId("vendas", "1").orElseThrow().id;
             mvc.perform(delete("/api/crm/vendas/" + sale).header("Authorization", token)).andExpect(status().isNoContent());
             mvc.perform(get("/api/crm/estoque").header("Authorization", token)).andExpect(jsonPath("$[0].status").value("vendido"));
-        } finally { bootstrap.directory = ""; }
+        } finally { target.directory = ""; }
     }
     private String create(String module, Map<String, Object> data) throws Exception {
         var response = mvc.perform(post("/api/crm/" + module).header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
