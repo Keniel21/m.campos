@@ -13,3 +13,8 @@ node_modules/
 "Auto agent"/
 Auto agent/
 
+frontend/node_modules/
+frontend/dist/
+backend/target/
+.env
+*.log
