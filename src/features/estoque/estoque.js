@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import { filterStock } from '../../utils/stock.js';
+import { pendingLabel, escapePending } from '../../utils/pendencias.js';
 import { state } from '../../services/state.js';
 import { formatCurrency, calcDaysInStock, parseCurrencyBR } from '../../utils/helpers.js';
 import { persistLocalData, fetchCloudData } from '../../services/supabase.js';
@@ -13,6 +14,51 @@ export let estoqueSortDirection = 'desc';
 
 export let currentCdCarId = null;
 export let carDetailsOriginTab = 'estoque';
+
+function renderPendingSelect(value) {
+    const select = document.getElementById('cd-document');
+    if (!select) return;
+    const options = state.pendencias || [];
+    select.replaceChildren(new Option('Sem pendência', 'none'));
+    for (const option of options) select.add(new Option(option.name, option.code));
+    if (value !== 'none' && !options.some(option => option.code === value))
+        select.add(new Option(pendingLabel(value, options), value || 'unreported'));
+    select.value = value || 'unreported';
+    const editable = options.some(option => option.code === select.value);
+    document.getElementById('pending-edit').disabled = !editable;
+    document.getElementById('pending-delete').disabled = !editable;
+    select.onchange = () => renderPendingSelect(select.value);
+}
+
+export async function managePending(action) {
+    const select = document.getElementById('cd-document');
+    const previous = select.value;
+    const option = (state.pendencias || []).find(item => item.code === previous);
+    if (action !== 'create' && !option) return;
+    let name;
+    if (action !== 'delete') {
+        name = window.prompt(action === 'create' ? 'Qual é a pendência? (até 100 caracteres)' : 'Editar pendência (atualiza todos os veículos que a utilizam):', option?.name || '');
+        if (name === null) return;
+        name = name.trim();
+        if (!name || name.length > 100) { window.showToast('Informe uma pendência com até 100 caracteres.', 'error'); return; }
+    } else if (!window.confirm(`Excluir a opção “${option.name}”? Opções utilizadas por veículos não podem ser excluídas.`)) return;
+    const buttons = [...document.querySelectorAll('[data-pending-action]')];
+    buttons.forEach(button => button.disabled = true);
+    try {
+        const response = await fetch('/api/crm/pendencias' + (option && action !== 'create' ? '/' + option.id : ''), {
+            method: action === 'delete' ? 'DELETE' : action === 'create' ? 'POST' : 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            ...(action === 'delete' ? {} : { body: JSON.stringify({ name }) })
+        });
+        const saved = action === 'delete' ? null : await response.json();
+        await fetchCloudData();
+        renderPendingSelect(action === 'create' ? (saved.item || saved).code : action === 'delete' ? 'none' : previous);
+        renderEstoque();
+        if (action === 'create') triggerCarDetailsAutoSave(0);
+        window.showToast(action === 'delete' ? 'Opção excluída.' : 'Pendência salva.', 'success');
+    } catch (error) { renderPendingSelect(previous); window.showToast(error.message, 'error'); }
+    finally { buttons[0].disabled = false; }
+}
 
 // Select stock visual view: List vs Grid
 export function setEstoqueView(mode) {
@@ -253,7 +299,7 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
                 break;
             case 'type': valA = a.type; valB = b.type; break;
             case 'status': valA = a.status; valB = b.status; break;
-            case 'document_status': valA = a.documentStatus; valB = b.documentStatus; break;
+            case 'document_status': valA = pendingLabel(a.documentStatus, state.pendencias); valB = pendingLabel(b.documentStatus, state.pendencias); break;
             default: valA = a.id; valB = b.id; break;
         }
 
@@ -296,18 +342,7 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
             ? `<img src="${firstImageUrl}" alt="${car.model}" style="width:100%; height:100%; object-fit:cover;">`
             : `<i data-lucide="car"></i>`;
 
-        let docColor = 'var(--yellow-warning)';
-        let docTitle = 'Pendente';
-        let docIcon = 'file-clock';
-        if (car.documentStatus === 'sim') {
-            docColor = 'var(--green-profit)';
-            docTitle = 'Documento OK';
-            docIcon = 'file-check';
-        } else if (car.documentStatus === 'nao') {
-            docColor = 'var(--red-alert)';
-            docTitle = 'Sem Documento';
-            docIcon = 'file-x';
-        }
+        const docTitle = escapePending(pendingLabel(car.documentStatus, state.pendencias));
 
         // --- ROW (LIST) ---
         const listDiv = document.createElement("div");
@@ -331,9 +366,7 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
                 </div>
             </div>
             <div class="col-doc">
-                <div style="display:flex; justify-content:flex-start; align-items:center; color:${docColor};" title="${docTitle}">
-                    <i data-lucide="${docIcon}" style="width:20px;height:20px;"></i>
-                </div>
+                <span class="pending-cell" title="${escapePending(pendingLabel(car.documentStatus, state.pendencias))}">${escapePending(pendingLabel(car.documentStatus, state.pendencias))}</span>
             </div>
             <div class="col-year" style="font-weight:500;">${car.year}</div>
             <div class="col-km" style="font-family:monospace; color:var(--text-light); font-weight:500;">${car.km.toLocaleString('pt-BR')} km</div>
@@ -389,8 +422,8 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
                     <span style="color:var(--green-profit); font-weight:600;">Lucro Est: ${formatCurrency(lucroEst)} (${margemEst.toFixed(0)}%)</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-color);">
-                    <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:${docColor}; font-weight:500;">
-                        <i data-lucide="${docIcon}" style="width:16px; height:16px;"></i> ${docTitle}
+                    <div style="font-size:12px; color:var(--text-muted); font-weight:500;">
+                        ${docTitle}
                     </div>
                 </div>
             </div>
@@ -692,7 +725,7 @@ export function openCarDetails(id, originTab = null) {
     if (cdRenavam) cdRenavam.value = car.renavam || "";
 
     const cdDocument = document.getElementById("cd-document");
-    if (cdDocument) cdDocument.value = car.documentStatus || "pendente";
+    if (cdDocument) renderPendingSelect(car.documentStatus);
 
     const cdType = document.getElementById("cd-type");
     if (cdType) cdType.value = car.type || "convencional";
@@ -1296,7 +1329,8 @@ export async function saveCarDetails(options = { silent: true }) {
     const plate = document.getElementById("cd-plate")?.value.trim().toUpperCase() || "";
     const chassis = document.getElementById("cd-chassis")?.value.trim().toUpperCase() || "";
     const renavam = document.getElementById("cd-renavam")?.value.trim() || "";
-    const documentStatus = document.getElementById("cd-document")?.value || car.documentStatus || "pendente";
+    const selectedPending = document.getElementById("cd-document")?.value;
+    const documentStatus = selectedPending === 'unreported' ? (car.documentStatus || null) : (selectedPending || car.documentStatus || null);
     const type = document.getElementById("cd-type")?.value || car.type || "convencional";
     const status = document.getElementById("cd-status-select")?.value || car.status || "disponivel";
     const fipeCode = document.getElementById("cd-fipe-code")?.value.trim() || "";

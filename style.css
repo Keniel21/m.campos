@@ -8278,3 +8278,7 @@ body.dark-mode .emerald-glow-card {
 
 
 .stock-status-filter{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text-muted);min-width:180px}#estoque-filter-count{font-size:12px;color:var(--text-muted)}
+.pending-options-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.pending-options-actions .btn { font-size: 10px; padding: 4px 7px; }
+.pending-options-actions .btn:disabled { opacity: .45; cursor: default; }
+.pending-cell { display: block; white-space: normal; overflow-wrap: anywhere; font-size: 11px; line-height: 1.35; padding-right: 8px; }

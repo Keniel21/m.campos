@@ -92,6 +92,7 @@ jobs:
         working-directory: frontend
       - run: node --test scripts/audit-legacy.test.cjs
       - run: node --test scripts/financeiro.test.cjs
+      - run: node --test scripts/pendencias.test.cjs
       - run: node --test scripts/migrate-documents.test.cjs
       - run: node --test scripts/backup.test.cjs
       - run: node --experimental-vm-modules --test scripts/desktop-startup.test.cjs

@@ -499,14 +499,17 @@
                                     </div>
 
                                     <div class="premium-form-group">
-                                        <label class="premium-input-label">Documento Físico</label>
+                                        <label class="premium-input-label" for="cd-document">Pendência</label>
                                         <div class="input-with-icon-wrapper">
                                             <i data-lucide="file-check"></i>
                                             <select class="premium-select-field" id="cd-document">
-                                                <option value="sim">Sim, na Loja</option>
-                                                <option value="nao">Não Possui</option>
-                                                <option value="pendente">Pendente de Entrega</option>
+                                                <option value="none">Sem pendência</option>
                                             </select>
+                                        </div>
+                                        <div class="pending-options-actions">
+                                            <button type="button" class="btn btn-secondary" data-pending-action onclick="managePending('create')">Nova opção</button>
+                                            <button type="button" class="btn btn-secondary" data-pending-action id="pending-edit" onclick="managePending('edit')">Editar opção</button>
+                                            <button type="button" class="btn btn-secondary" data-pending-action id="pending-delete" onclick="managePending('delete')">Excluir opção</button>
                                         </div>
                                     </div>
 

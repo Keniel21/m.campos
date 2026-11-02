@@ -37,6 +37,28 @@ class DesktopIntegrationTest {
         for (String module : CrmService.MODULES) if (!module.equals("estoque")) records.deleteAll(records.findByModuleOrderByIdAsc(module));
         records.flush(); records.deleteAll(records.findByModuleOrderByIdAsc("estoque")); records.flush();
     }
+    @Test void pendingOptionsCanBeRenamedButNotDeletedWhileLinked() throws Exception {
+        var option = desktop.save("pendencias", null, java.util.Map.of("name", "Transferência"));
+        long optionId = ((Number)option.get("id")).longValue();
+        String code = option.get("code").toString();
+        var car = desktop.save("estoque", null, java.util.Map.of("model", "Teste", "status", "disponivel", "plate", "ABC1D23", "buyPrice", 50000, "document_status", code));
+        long carId = ((Number)car.get("id")).longValue();
+        desktop.save("pendencias", optionId, java.util.Map.of("name", "Transferência em andamento", "code", "forged"));
+        assertEquals(code, desktop.list("pendencias").getFirst().get("code"));
+        assertEquals("Transferência em andamento", desktop.list("pendencias").getFirst().get("name"));
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> desktop.delete("pendencias", optionId));
+        var preserved = desktop.list("estoque").getFirst();
+        assertEquals("ABC1D23", preserved.get("plate"));
+        assertEquals(code, preserved.get("documentStatus"));
+        desktop.save("estoque", carId, java.util.Map.of("document_status", "none"));
+        desktop.delete("pendencias", optionId);
+        assertTrue(desktop.list("pendencias").isEmpty());
+        assertEquals("none", desktop.list("estoque").getFirst().get("documentStatus"));
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> desktop.save("estoque", carId, java.util.Map.of("document_status", code)));
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> desktop.save("pendencias", null, java.util.Map.of("name", " ")));
+        mvc.perform(post("/api/desktop/crm/pendencias").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Teste\"}"))
+            .andExpect(status().isForbidden());
+    }
     @Test void requiresCsrfAndRejectsExternalHostsAndOrigins() throws Exception {
         mvc.perform(get("/api/desktop/session")).andExpect(status().isOk()).andExpect(jsonPath("$.token").isString());
         mvc.perform(post("/api/desktop/crm/estoque").contentType(MediaType.APPLICATION_JSON).content("{}"))

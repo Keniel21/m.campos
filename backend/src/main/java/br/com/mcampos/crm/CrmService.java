@@ -11,7 +11,7 @@ import java.util.*;
 @Service
 @Transactional
 public class CrmService {
-    static final Set<String> MODULES = Set.of("estoque", "vendas", "clientes", "leads", "despesas", "agenda", "documentos", "company_cnpjs");
+    static final Set<String> MODULES = Set.of("estoque", "vendas", "clientes", "leads", "despesas", "agenda", "documentos", "company_cnpjs", "pendencias");
     private final RecordRepository records;
     public CrmService(RecordRepository records) { this.records = records; }
 
@@ -45,6 +45,10 @@ public class CrmService {
         var data = new LinkedHashMap<>(record.getPayload());
         data.putAll(input);
         data.remove("id");
+        if (module.equals("pendencias")) {
+            data.put("code", id == null ? "pending:" + record.getId() : record.getPayload().get("code"));
+            data.put("name", Objects.toString(data.get("name"), "").trim());
+        }
         validate(module, data);
         if (module.equals("estoque") && id != null && !"vendido".equals(data.get("status")) && records.existsByModuleAndVehicleIdAndIdNot("vendas", id, ""))
             throw bad("Exclua a venda vinculada antes de alterar a situação do veículo.");
@@ -92,6 +96,9 @@ public class CrmService {
     }
     public void delete(String module, String id) {
         var record = get(module, id);
+        if (module.equals("pendencias") && records.findByModuleOrderByIdAsc("estoque").stream().anyMatch(car ->
+            Objects.equals(record.getPayload().get("code"), car.getPayload().get("documentStatus"))))
+            throw bad("Esta pendência está em uso. Altere os veículos vinculados antes de excluir.");
         if (module.equals("estoque") && records.existsByVehicleId(id))
             throw bad("O veículo possui registros vinculados e não pode ser excluído.");
         if (module.equals("vendas") && record.getVehicle() != null && !records.existsByModuleAndVehicleIdAndIdNot("vendas", record.getVehicle().getId(), record.getId())) {
@@ -129,12 +136,18 @@ public class CrmService {
         String required = switch (module) {
             case "estoque" -> "model";
             case "vendas" -> "client";
-            case "clientes", "leads", "company_cnpjs" -> "name";
+            case "clientes", "leads", "company_cnpjs", "pendencias" -> "name";
             case "agenda" -> "title";
             case "despesas" -> "desc";
             default -> "fileName";
         };
         if (!(data.get(required) instanceof String s) || s.isBlank()) throw bad("Preencha o campo " + required + ".");
+        if (module.equals("pendencias") && data.get("name").toString().length() > 100)
+            throw bad("Use até 100 caracteres para a pendência.");
+        if (module.equals("estoque") && Objects.toString(data.get("documentStatus"), "").startsWith("pending:")) {
+            var option = get("pendencias", data.get("documentStatus").toString().substring(8));
+            if (!Objects.equals(option.getPayload().get("code"), data.get("documentStatus"))) throw bad("Pendência inválida.");
+        }
         for (String key : List.of("buyPrice", "sellPrice", "val", "km")) {
             if (data.get(key) != null && !data.get(key).toString().isBlank()) {
                 try { if (new BigDecimal(data.get(key).toString()).signum() < 0) throw bad("Valor negativo: " + key); }

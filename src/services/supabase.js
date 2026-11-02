@@ -56,7 +56,7 @@ class LocalQuery {
     then(resolve, reject) { return this.execute().then(resolve, reject); }
     catch(reject) { return this.execute().catch(reject); }
     async execute() {
-        if (!['estoque','vendas','clientes','despesas','documentos','company_cnpjs'].includes(this.module)) throw new Error('Cadastro indisponível.');
+        if (!['estoque','vendas','clientes','despesas','documentos','company_cnpjs','pendencias'].includes(this.module)) throw new Error('Cadastro indisponível.');
         if (['PUT','DELETE'].includes(this.method) && this.id == null) throw new Error('Selecione um registro.');
         const url = `/api/crm/${this.module}` + (this.id == null ? '' : `/${encodeURIComponent(this.id)}`);
         const bodies = Array.isArray(this.body) ? this.body : [this.body];
@@ -77,6 +77,7 @@ export async function fetchCloudData() {
     for (const key of ['estoque','vendas','clientes','despesas','leads','agenda']) state[key] = Array.isArray(data[key]) ? data[key] : [];
     state.companyCnpjs = data.company_cnpjs || data.companyCnpjs || [];
     state.documentosVeiculo = data.documentos || [];
+    state.pendencias = data.pendencias || [];
     state.serverDate = data.serverDate;
     state.operationalDate = data.serverDate;
     return data;

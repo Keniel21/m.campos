@@ -71,7 +71,7 @@ import {
     openCarDetails, 
     closeCarDetails, 
     editCarDetails, 
-    saveEditCarDetails, 
+    saveEditCarDetails, managePending,
     deleteCarDoc, 
     openCarDoc,
     closeDocPreviewModal,
@@ -264,6 +264,7 @@ window.openCarDetails = openCarDetails;
 window.closeCarDetails = closeCarDetails;
 window.editCarDetails = editCarDetails;
 window.saveEditCarDetails = saveEditCarDetails;
+window.managePending = managePending;
 window.deleteCarDoc = deleteCarDoc;
 window.openCarDoc = openCarDoc;
 window.closeDocPreviewModal = closeDocPreviewModal;
