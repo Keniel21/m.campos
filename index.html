@@ -227,37 +227,28 @@
                 </div>
             </div>
 
+            <div class="stock-column-filter-summary"><button type="button" id="clear-stock-column-filters" hidden>Limpar filtros de coluna</button></div>
             <div class="estoque-modern-container" id="estoque-list-view">
                 <div class="estoque-modern-header">
-                    <div class="col-veh sortable-header" onclick="sortEstoque('model')">
-                        Veículo <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-model"></i>
+                    <div class="col-veh stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('model')">Veículo <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-model"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="model" aria-label="Filtrar Veículo"><i data-lucide="filter"></i></button>
                     </div>
-                    <div class="col-doc sortable-header" onclick="sortEstoque('document_status')">
-                        Doc <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-document_status"></i>
+                    <div class="col-doc stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('document_status')">Pendência <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-document_status"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="document_status" aria-label="Filtrar Pendência"><i data-lucide="filter"></i></button>
                     </div>
-                    <div class="col-year sortable-header" onclick="sortEstoque('year')">
-                        Ano <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-year"></i>
+                    <div class="col-days stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('days')">Tempo no pátio <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-days"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="days" aria-label="Filtrar Tempo no pátio"><i data-lucide="filter"></i></button>
                     </div>
-                    <div class="col-km sortable-header" onclick="sortEstoque('km')">
-                        KM <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-km"></i>
+                    <div class="col-type stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('type')">Tipo <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-type"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="type" aria-label="Filtrar Tipo"><i data-lucide="filter"></i></button>
                     </div>
-                    <div class="col-buy sortable-header" onclick="sortEstoque('buyPrice')">
-                        Compra <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-buyPrice"></i>
-                    </div>
-                    <div class="col-sell sortable-header" onclick="sortEstoque('sellPrice')">
-                        Venda <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-sellPrice"></i>
-                    </div>
-                    <div class="col-margin sortable-header" onclick="sortEstoque('margin')">
-                        Margem / Lucro <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-margin"></i>
-                    </div>
-                    <div class="col-days sortable-header" onclick="sortEstoque('days')">
-                        Tempo Pátio <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-days"></i>
-                    </div>
-                    <div class="col-type sortable-header" onclick="sortEstoque('type')">
-                        Tipo <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-type"></i>
-                    </div>
-                    <div class="col-status sortable-header" onclick="sortEstoque('status')">
-                        Status <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status"></i>
+                    <div class="col-status stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('status')">Status <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="status" aria-label="Filtrar Status"><i data-lucide="filter"></i></button>
                     </div>
                 </div>
                 <div id="estoque-modern-list-body" class="estoque-modern-list-body">

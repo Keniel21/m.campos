@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import { filterStock } from '../../utils/stock.js';
+import { filterInventoryColumns } from './inventory-filters.js';
 import { pendingLabel, escapePending } from '../../utils/pendencias.js';
 import { renderPendingField } from './pending-field.js';
 import { state } from '../../services/state.js';
@@ -180,8 +181,10 @@ export async function confirmDocUpload() {
 }
 
 // Sorting logic
-export function sortEstoque(column) {
-    if (estoqueSortColumn === column) {
+export function sortEstoque(column, direction) {
+    if (direction) {
+        estoqueSortColumn = column; estoqueSortDirection = direction;
+    } else if (estoqueSortColumn === column) {
         estoqueSortDirection = estoqueSortDirection === 'asc' ? 'desc' : 'asc';
     } else {
         estoqueSortColumn = column;
@@ -225,6 +228,16 @@ export function renderEstoque() {
     renderEstoqueTable(searchVal);
 }
 
+function inventoryCell(car, column) {
+    switch (column) {
+        case 'model': return { value: String(car.id), label: [car.model, car.plate, car.color].filter(Boolean).join(' · ') + ' (#' + car.id + ')' };
+        case 'document_status': return { value: car.documentStatus || 'unreported', label: pendingLabel(car.documentStatus, state.pendencias) };
+        case 'days': { const days = calcDaysInStock(car.purchaseDate); return { value: String(days), label: days + ' dias' }; }
+        case 'type': return { value: car.type === 'repasse' ? 'repasse' : car.type === 'outros' ? 'outros' : 'varejo', label: car.type === 'repasse' ? 'Repasse' : car.type === 'outros' ? 'Outros' : 'Varejo' };
+        case 'status': return { value: car.status || '', label: ({ disponivel: 'Disponível', vendido: 'Vendido', preparacao: 'Em preparação', reservado: 'Reservado' })[car.status] || car.status || 'Não informado' };
+    }
+}
+
 // Both inventory views include available and sold vehicles, according to the filter.
 export function renderEstoqueTable(searchQuery = document.getElementById('search-estoque')?.value || '') {
     const listBody = document.getElementById("estoque-modern-list-body");
@@ -236,6 +249,7 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
 
     const status = document.getElementById('filter-estoque-status')?.value || 'todos';
     let filteredCars = filterStock(state.estoque || [], searchQuery, status);
+    filteredCars = filterInventoryColumns(filteredCars, inventoryCell, renderEstoque, sortEstoque);
     const count = document.getElementById('estoque-filter-count');
     if (count) count.textContent = `${filteredCars.length} de ${(state.estoque || []).length} veículos`;
 
@@ -288,8 +302,6 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
     }
 
     filteredCars.forEach(car => {
-        const lucroEst = car.sellPrice - car.buyPrice;
-        const margemEst = car.sellPrice > 0 ? (lucroEst / car.sellPrice) * 100 : 0;
         const days = calcDaysInStock(car.purchaseDate);
         const isParado = days > 30 && car.status !== 'vendido';
         const daysClass = isParado ? "stock-days alert" : "stock-days";
@@ -328,14 +340,6 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
             <div class="col-doc">
                 <span class="pending-cell" title="${escapePending(pendingLabel(car.documentStatus, state.pendencias))}">${escapePending(pendingLabel(car.documentStatus, state.pendencias))}</span>
             </div>
-            <div class="col-year" style="font-weight:500;">${car.year}</div>
-            <div class="col-km" style="font-family:monospace; color:var(--text-light); font-weight:500;">${car.km.toLocaleString('pt-BR')} km</div>
-            <div class="col-buy" style="font-family:monospace; color:var(--text-muted);">${formatCurrency(car.buyPrice)}</div>
-            <div class="col-sell" style="font-family:monospace; font-weight:700; color:var(--blue-primary);">${formatCurrency(car.sellPrice)}</div>
-            <div class="col-margin">
-                <div style="font-weight:600; color: var(--green-profit); font-size:13px;">${formatCurrency(lucroEst)}</div>
-                <div style="font-size:10px; color: var(--text-muted); font-weight:500;">${margemEst.toFixed(1)}% margem</div>
-            </div>
             <div class="col-days">
                 <span class="${daysClass}">${daysContent}</span>
             </div>
@@ -363,24 +367,11 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
             <div class="card-details-content">
                 <h3 class="card-veh-title">${car.model}</h3>
                 <div class="card-veh-meta">
-                    <span>${car.year}</span>
-                    <span>•</span>
-                    <span>${car.km.toLocaleString('pt-BR')} km</span>
-                    ${car.plate ? `<span>•</span><span>Placa: ${car.plate}</span>` : ''}
+                    <span>ID: #${car.id}</span>
+                    ${car.plate ? `<span>Placa: ${car.plate}</span>` : ''}
+                    ${car.color ? `<span>Cor: ${car.color}</span>` : ''}
                 </div>
-                <div class="card-prices-row">
-                    <div class="card-price-block">
-                        <span class="price-lbl">Preço de Venda</span>
-                        <span class="price-val">${formatCurrency(car.sellPrice)}</span>
-                    </div>
-                    <div class="card-days-badge ${daysClass}">
-                        ${daysContent}
-                    </div>
-                </div>
-                <div class="card-margins-row">
-                    <span>Custo: ${formatCurrency(car.buyPrice)}</span>
-                    <span style="color:var(--green-profit); font-weight:600;">Lucro Est: ${formatCurrency(lucroEst)} (${margemEst.toFixed(0)}%)</span>
-                </div>
+                <div class="card-stock-time"><span class="${daysClass}">${daysContent}</span> no pátio</div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-color);">
                     <div style="font-size:12px; color:var(--text-muted); font-weight:500;">
                         ${docTitle}

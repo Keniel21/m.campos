@@ -1,4 +1,5 @@
 import { filterStock } from '../../utils/stock.js';
+import { applyInventoryColumnFilters } from '../estoque/inventory-filters.js';
 // ==========================================================================
 // AUTO DRIVE CRM - SALES COMPILATION & REPORTS FEATURE
 // ==========================================================================
@@ -470,7 +471,7 @@ export function downloadCSV(data, headers, fileName) {
 
 export function exportEstoqueToExcel() {
     const headers = ["ID", "Modelo", "Ano", "KM", "Valor Compra", "Valor Venda", "Tipo", "Status", "Placa", "Cor", "Chassi"];
-    const activeCars = filterStock(state.estoque, document.getElementById('search-estoque')?.value || '', document.getElementById('filter-estoque-status')?.value || 'todos');
+    const activeCars = applyInventoryColumnFilters(filterStock(state.estoque, document.getElementById('search-estoque')?.value || '', document.getElementById('filter-estoque-status')?.value || 'todos'));
     const rows = activeCars.map(c => [
         c.id, c.model, c.year, c.km, c.buyPrice, c.sellPrice, c.type, c.status, c.plate || "", c.color || "", c.chassis || ""
     ]);
@@ -851,3 +852,5 @@ export async function syncVendasFromCloud() {
 if (typeof window !== 'undefined') {
     window.syncVendasFromCloud = syncVendasFromCloud;
 }
+
+
