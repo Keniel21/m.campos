@@ -1056,14 +1056,20 @@ table.saas-table tbody tr:hover {
 }
 
 .stock-days.alert {
-    color: var(--red-alert);
-    background-color: rgba(248, 113, 113, 0.08);
-    padding: 3px 8px;
-    border-radius: var(--radius-sm);
+    color: var(--text-light);
+    background-color: transparent;
+    padding: 0;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    border: 1px solid rgba(248, 113, 113, 0.15);
+    border: none;
+}
+
+.stock-days.alert svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    color: var(--red-alert);
 }
 
 .badge {
@@ -8300,7 +8306,7 @@ body.dark-mode .emerald-glow-card {
 .pending-inline-editor input { min-width: 0; flex: 1; font: inherit; font-size: 12px; border: 1px solid var(--blue-primary); border-radius: 4px; padding: 6px; background: var(--card-bg); color: var(--text-light); }
 #pending-menu-message, .catalog-message { font-size: 11px; color: var(--red-alert, #dc2626); padding: 0 6px; }
 
-.stock-column-heading { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
+.stock-column-heading { display: flex; align-items: center; justify-content: flex-start; gap: 6px; min-width: 0; }
 .stock-column-heading > button { border: none; background: transparent; color: inherit; font: inherit; text-transform: inherit; letter-spacing: inherit; padding: 4px 0; }
 .stock-column-filter { cursor: pointer; flex-shrink: 0; width: 24px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 5px; }
 .stock-column-filter svg { width: 13px; height: 13px; }
