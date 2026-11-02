@@ -1,5 +1,6 @@
 import { filterStock } from '../../utils/stock.js';
 import { applyInventoryColumnFilters } from '../estoque/inventory-filters.js';
+import { pendingLabel } from '../../utils/pendencias.js';
 // ==========================================================================
 // AUTO DRIVE CRM - SALES COMPILATION & REPORTS FEATURE
 // ==========================================================================
@@ -470,10 +471,10 @@ export function downloadCSV(data, headers, fileName) {
 }
 
 export function exportEstoqueToExcel() {
-    const headers = ["ID", "Modelo", "Ano", "KM", "Valor Compra", "Valor Venda", "Tipo", "Status", "Placa", "Cor", "Chassi"];
+    const headers = ["ID", "Modelo", "Ano", "KM", "Valor Compra", "Valor Venda", "Tipo", "Situação no pátio", "Placa", "Cor", "Chassi", "Status MC", "Status"];
     const activeCars = applyInventoryColumnFilters(filterStock(state.estoque, document.getElementById('search-estoque')?.value || '', document.getElementById('filter-estoque-status')?.value || 'todos'));
     const rows = activeCars.map(c => [
-        c.id, c.model, c.year, c.km, c.buyPrice, c.sellPrice, c.type, c.status, c.plate || "", c.color || "", c.chassis || ""
+        c.id, c.model, c.year, c.km, c.buyPrice, c.sellPrice, c.type, c.status, c.plate || "", c.color || "", c.chassis || "", pendingLabel(c.statusMc, state.status_mc_options), pendingLabel(c.customStatus, state.status_options)
     ]);
     downloadCSV(rows, headers, `autodrive_estoque_${new Date().toISOString().split('T')[0]}.csv`);
 }

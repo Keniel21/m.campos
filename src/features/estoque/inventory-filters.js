@@ -1,7 +1,7 @@
 import { matchesStockColumns, stockColumnOptions } from '../../utils/stock-filters.js';
 
 const filters = new Map();
-const titles = { model: 'Veículo', document_status: 'Pendência', days: 'Tempo no pátio', type: 'Tipo', status: 'Status' };
+const titles = { model: 'Veículo', document_status: 'Pendência', days: 'Tempo no pátio', type: 'Tipo', status: 'Situação no pátio', status_mc: 'Status MC', custom_status: 'Status' };
 let cars = [], cell, change, sort, installed = false, menu;
 export function applyInventoryColumnFilters(base) { return cell ? base.filter(car => matchesStockColumns(car, filters, cell)) : base; }
 export function filterInventoryColumns(base, valueOf, onChange, onSort) {

@@ -83,13 +83,6 @@ import {
     cancelDocUpload,
     confirmDocUpload,
     openAddDespesaModalFromCar,
-    openFipeSearchModal, 
-    closeFipeSearchModal, 
-    fetchFipeBrands, 
-    fetchFipeModels, 
-    fetchFipeYears, 
-    fetchFipePrice, 
-    applyFipeResult, 
     openPlacaDemoModal, 
     closePlacaDemoModal, 
     runPlacaDemoSearch, 
@@ -103,7 +96,6 @@ import {
     previewDetailsPhotos,
     clearCarPhotos,
     updateSummaryFields,
-    quickFipeSearch,
     appendQuickNote,
     saveCarDetails,
     triggerCarDetailsAutoSave,
@@ -275,13 +267,6 @@ window.handleDocFileSelected = handleDocFileSelected;
 window.cancelDocUpload = cancelDocUpload;
 window.confirmDocUpload = confirmDocUpload;
 window.openAddDespesaModalFromCar = openAddDespesaModalFromCar;
-window.openFipeSearchModal = openFipeSearchModal;
-window.closeFipeSearchModal = closeFipeSearchModal;
-window.fetchFipeBrands = fetchFipeBrands;
-window.fetchFipeModels = fetchFipeModels;
-window.fetchFipeYears = fetchFipeYears;
-window.fetchFipePrice = fetchFipePrice;
-window.applyFipeResult = applyFipeResult;
 window.openPlacaDemoModal = openPlacaDemoModal;
 window.closePlacaDemoModal = closePlacaDemoModal;
 window.runPlacaDemoSearch = runPlacaDemoSearch;
@@ -295,7 +280,6 @@ window.calculateDetailsFinancials = calculateDetailsFinancials;
 window.previewDetailsPhotos = previewDetailsPhotos;
 window.clearCarPhotos = clearCarPhotos;
 window.updateSummaryFields = updateSummaryFields;
-window.quickFipeSearch = quickFipeSearch;
 window.appendQuickNote = appendQuickNote;
 window.saveCarDetails = saveCarDetails;
 window.triggerCarDetailsAutoSave = triggerCarDetailsAutoSave;

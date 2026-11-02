@@ -11,7 +11,8 @@ import java.util.*;
 @Service
 @Transactional
 public class CrmService {
-    static final Set<String> MODULES = Set.of("estoque", "vendas", "clientes", "leads", "despesas", "agenda", "documentos", "company_cnpjs", "pendencias");
+    static final Set<String> MODULES = Set.of("estoque", "vendas", "clientes", "leads", "despesas", "agenda", "documentos", "company_cnpjs", "pendencias", "status_mc_options", "status_options");
+    static final Map<String,String> CATALOG_FIELDS = Map.of("pendencias", "documentStatus", "status_mc_options", "statusMc", "status_options", "customStatus");
     private final RecordRepository records;
     public CrmService(RecordRepository records) { this.records = records; }
 
@@ -45,8 +46,8 @@ public class CrmService {
         var data = new LinkedHashMap<>(record.getPayload());
         data.putAll(input);
         data.remove("id");
-        if (module.equals("pendencias")) {
-            data.put("code", id == null ? "pending:" + record.getId() : record.getPayload().get("code"));
+        if (CATALOG_FIELDS.containsKey(module)) {
+            data.put("code", id == null ? (module.equals("pendencias") ? "pending:" : "catalog:") + record.getId() : record.getPayload().get("code"));
             data.put("name", Objects.toString(data.get("name"), "").trim());
             data.remove("legacyValue");
             if (record.getPayload().containsKey("legacyValue")) data.put("legacyValue", record.getPayload().get("legacyValue"));
@@ -109,9 +110,9 @@ public class CrmService {
     }
     public void delete(String module, String id) {
         var record = get(module, id);
-        if (module.equals("pendencias") && records.findByModuleOrderByIdAsc("estoque").stream().anyMatch(car ->
-            Objects.equals(record.getPayload().get("code"), car.getPayload().get("documentStatus"))))
-            throw bad("Esta pendência está em uso. Altere os veículos vinculados antes de excluir.");
+        if (CATALOG_FIELDS.containsKey(module) && records.findByModuleOrderByIdAsc("estoque").stream().anyMatch(car ->
+            Objects.equals(record.getPayload().get("code"), car.getPayload().get(CATALOG_FIELDS.get(module)))))
+            throw bad("Esta opção está em uso. Altere os veículos vinculados antes de excluir.");
         if (module.equals("estoque") && records.existsByVehicleId(id))
             throw bad("O veículo possui registros vinculados e não pode ser excluído.");
         if (module.equals("vendas") && record.getVehicle() != null && !records.existsByModuleAndVehicleIdAndIdNot("vendas", record.getVehicle().getId(), record.getId())) {
@@ -149,13 +150,13 @@ public class CrmService {
         String required = switch (module) {
             case "estoque" -> "model";
             case "vendas" -> "client";
-            case "clientes", "leads", "company_cnpjs", "pendencias" -> "name";
+            case "clientes", "leads", "company_cnpjs", "pendencias", "status_mc_options", "status_options" -> "name";
             case "agenda" -> "title";
             case "despesas" -> "desc";
             default -> "fileName";
         };
         if (!(data.get(required) instanceof String s) || s.isBlank()) throw bad("Preencha o campo " + required + ".");
-        if (module.equals("pendencias") && data.get("name").toString().length() > 100)
+        if (CATALOG_FIELDS.containsKey(module) && data.get("name").toString().length() > 100)
             throw bad("Use até 100 caracteres para a pendência.");
         if (module.equals("estoque")) {
             String value = Objects.toString(data.get("documentStatus"), "");
@@ -165,6 +166,15 @@ public class CrmService {
         if (module.equals("estoque") && Objects.toString(data.get("documentStatus"), "").startsWith("pending:")) {
             var option = get("pendencias", data.get("documentStatus").toString().substring(8));
             if (!Objects.equals(option.getPayload().get("code"), data.get("documentStatus"))) throw bad("Pendência inválida.");
+        }
+        if (module.equals("estoque")) {
+            for (String catalog : List.of("status_mc_options", "status_options")) {
+                String value = Objects.toString(data.get(CATALOG_FIELDS.get(catalog)), "");
+                if (value.isBlank()) continue;
+                if (!value.startsWith("catalog:")) throw bad("Selecione um status do catálogo correspondente.");
+                var option = get(catalog, value.substring(8));
+                if (!value.equals(option.getPayload().get("code"))) throw bad("Status inválido.");
+            }
         }
         for (String key : List.of("buyPrice", "sellPrice", "val", "km")) {
             if (data.get(key) != null && !data.get(key).toString().isBlank()) {

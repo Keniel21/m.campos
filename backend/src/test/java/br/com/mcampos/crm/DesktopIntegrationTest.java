@@ -64,6 +64,29 @@ class DesktopIntegrationTest {
         assertThrows(org.springframework.web.server.ResponseStatusException.class,
             () -> desktop.save("estoque", ((Number)migrated.getFirst().get("id")).longValue(), java.util.Map.of("document_status", "opção solta")));
     }
+    @Test void customStatusCatalogsAreIndependentAndPreserveOperationalAndHistoricalFields() {
+        var mc = desktop.save("status_mc_options", null, java.util.Map.of("name", "Conferido"));
+        var custom = desktop.save("status_options", null, java.util.Map.of("name", "Conferido"));
+        var car = desktop.save("estoque", null, java.util.Map.of("model", "Teste status", "status", "disponivel",
+            "statusMc", mc.get("code"), "customStatus", custom.get("code"), "fipe_code", "OLD-123", "fipe_price", 9000,
+            "buyPrice", 10000, "sellPrice", 12000));
+        long carId = ((Number)car.get("id")).longValue();
+        assertEquals("disponivel", car.get("status"));
+        assertEquals("OLD-123", car.get("fipeCode"));
+        assertEquals(9000, car.get("fipePrice"));
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> desktop.save("estoque", carId, java.util.Map.of("statusMc", custom.get("code"))));
+        for (var entry : java.util.Map.of("status_mc_options", mc, "status_options", custom).entrySet()) {
+            long optionId = ((Number)entry.getValue().get("id")).longValue();
+            assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> desktop.delete(entry.getKey(), optionId));
+            desktop.save(entry.getKey(), optionId, java.util.Map.of("name", "Revisado"));
+            assertEquals(entry.getValue().get("code"), desktop.list(entry.getKey()).getFirst().get("code"));
+        }
+        var clear = new java.util.HashMap<String,Object>();clear.put("statusMc",null);clear.put("customStatus",null);
+        var saved = desktop.save("estoque", carId, clear);
+        assertEquals("disponivel", saved.get("status"));assertEquals("OLD-123",saved.get("fipeCode"));assertEquals(12000,saved.get("sellPrice"));
+        desktop.delete("status_mc_options", ((Number)mc.get("id")).longValue());
+        desktop.delete("status_options", ((Number)custom.get("id")).longValue());
+    }
     @Test void pendingOptionsCanBeRenamedButNotDeletedWhileLinked() throws Exception {
         var option = desktop.save("pendencias", null, java.util.Map.of("name", "Transferência"));
         long optionId = ((Number)option.get("id")).longValue();

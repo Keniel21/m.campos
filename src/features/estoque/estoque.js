@@ -5,7 +5,7 @@
 import { filterStock } from '../../utils/stock.js';
 import { filterInventoryColumns } from './inventory-filters.js';
 import { pendingLabel, escapePending } from '../../utils/pendencias.js';
-import { renderPendingField } from './pending-field.js';
+import { renderPendingField, renderStatusMcField, renderCustomStatusField } from './pending-field.js';
 import { state } from '../../services/state.js';
 import { formatCurrency, calcDaysInStock, parseCurrencyBR } from '../../utils/helpers.js';
 import { persistLocalData, fetchCloudData } from '../../services/supabase.js';
@@ -232,6 +232,8 @@ function inventoryCell(car, column) {
     switch (column) {
         case 'model': return { value: String(car.id), label: [car.model, car.plate, car.color].filter(Boolean).join(' · ') + ' (#' + car.id + ')' };
         case 'document_status': return { value: car.documentStatus || 'unreported', label: pendingLabel(car.documentStatus, state.pendencias) };
+        case 'status_mc': return { value: car.statusMc || 'unreported', label: pendingLabel(car.statusMc, state.status_mc_options) };
+        case 'custom_status': return { value: car.customStatus || 'unreported', label: pendingLabel(car.customStatus, state.status_options) };
         case 'days': { const days = calcDaysInStock(car.purchaseDate); return { value: String(days), label: days + ' dias' }; }
         case 'type': return { value: car.type === 'repasse' ? 'repasse' : car.type === 'outros' ? 'outros' : 'varejo', label: car.type === 'repasse' ? 'Repasse' : car.type === 'outros' ? 'Outros' : 'Varejo' };
         case 'status': return { value: car.status || '', label: ({ disponivel: 'Disponível', vendido: 'Vendido', preparacao: 'Em preparação', reservado: 'Reservado' })[car.status] || car.status || 'Não informado' };
@@ -267,6 +269,8 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
                 valA = (a.sellPrice - a.buyPrice);
                 valB = (b.sellPrice - b.buyPrice);
                 break;
+            case 'status_mc': valA = pendingLabel(a.statusMc, state.status_mc_options); valB = pendingLabel(b.statusMc, state.status_mc_options); break;
+            case 'custom_status': valA = pendingLabel(a.customStatus, state.status_options); valB = pendingLabel(b.customStatus, state.status_options); break;
             case 'days':
                 valA = a.purchaseDate ? calcDaysInStock(a.purchaseDate) : 0;
                 valB = b.purchaseDate ? calcDaysInStock(b.purchaseDate) : 0;
@@ -346,6 +350,8 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
             <div class="col-type">
                 <span class="badge ${car.type}">${car.type === 'repasse' ? 'repasse' : (car.type === 'outros' ? 'outros' : 'varejo')}</span>
             </div>
+            <div class="col-status-mc"><span class="pending-cell">${escapePending(pendingLabel(car.statusMc, state.status_mc_options))}</span></div>
+            <div class="col-custom-status"><span class="pending-cell">${escapePending(pendingLabel(car.customStatus, state.status_options))}</span></div>
             <div class="col-status">
                 <span class="badge ${car.status}">${car.status}</span>
             </div>
@@ -468,8 +474,6 @@ export async function handleAddCar(event) {
         color: color || null,
         chassis: chassis || null,
         renavam: renavam || null,
-        fipe_code: null,
-        fipe_price: 0,
         notes: null,
         document_status: documentStatus || null,
         image_url: imagesUrl || null
@@ -484,8 +488,6 @@ export async function handleAddCar(event) {
         color: color || "",
         chassis: chassis || "",
         renavam: renavam || "",
-        fipeCode: "",
-        fipePrice: 0,
         notes: "",
         documentStatus: documentStatus || null,
         image_url: imagesUrl || null
@@ -616,17 +618,10 @@ export function openCarDetails(id, originTab = null) {
 
     // Auto-heal corrupted prices from former input mask dividing bug
     if (car.sellPrice > 0 && car.sellPrice < 500) {
-        if (car.fipePrice > 1000) {
-            car.sellPrice = car.fipePrice;
-        } else {
-            car.sellPrice = Math.round(car.sellPrice * 10000);
-        }
+        car.sellPrice = Math.round(car.sellPrice * 10000);
     }
     if (car.buyPrice > 0 && car.buyPrice < 500) {
         car.buyPrice = Math.round(car.buyPrice * 10000);
-    }
-    if (car.fipePrice > 0 && car.fipePrice < 500) {
-        car.fipePrice = Math.round(car.fipePrice * 10000);
     }
 
     // Pricing card details
@@ -677,23 +672,14 @@ export function openCarDetails(id, originTab = null) {
 
     const cdDocument = document.getElementById("cd-document");
     if (cdDocument) renderPendingSelect(car.documentStatus);
+    renderStatusMcField(car.statusMc, renderEstoque);
+    renderCustomStatusField(car.customStatus, renderEstoque);
 
     const cdType = document.getElementById("cd-type");
     if (cdType) cdType.value = car.type || "convencional";
 
     const cdStatusSelect = document.getElementById("cd-status-select");
     if (cdStatusSelect) cdStatusSelect.value = car.status || "disponivel";
-
-    const cdFipeCode = document.getElementById("cd-fipe-code");
-    if (cdFipeCode) cdFipeCode.value = car.fipeCode || "";
-
-    const cdFipePrice = document.getElementById("cd-fipe-price");
-    if (cdFipePrice) {
-        window.formatCurrencyInput(cdFipePrice, car.fipePrice || 0);
-    }
-
-    const cdPurchaseDate = document.getElementById("cd-purchase-date");
-    if (cdPurchaseDate) cdPurchaseDate.value = car.purchaseDate || "";
 
     const cdBuy = document.getElementById("cd-buy");
     if (cdBuy) {
@@ -751,13 +737,6 @@ export function openCarDetails(id, originTab = null) {
     const editCarRenavam = document.getElementById("edit-car-renavam");
     if (editCarRenavam) editCarRenavam.value = car.renavam || "";
     
-    const editCarFipeCode = document.getElementById("edit-car-fipe-code");
-    if (editCarFipeCode) editCarFipeCode.value = car.fipeCode || "";
-    
-    const fipePriceEl = document.getElementById("edit-car-fipe-price");
-    if (fipePriceEl) {
-        window.formatCurrencyInput(fipePriceEl, car.fipePrice || 0);
-    }
 
     const editCarNotes = document.getElementById("edit-car-notes");
     if (editCarNotes) editCarNotes.value = car.notes || "";
@@ -1147,28 +1126,6 @@ export function appendQuickNote(text) {
     }
 }
 
-export async function quickFipeSearch() {
-    const code = document.getElementById("cd-fipe-code")?.value.trim();
-    if (!code) return;
-    try {
-        const response = await fetch(`https://brasilapi.com.br/api/fipe/preco/v1/${code}`);
-        if (!response.ok) return;
-        const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-            const item = data[0];
-            const price = parseFloat(item.valor.replace(/[^\d]/g, "")) / 100;
-            const fipePriceEl = document.getElementById("cd-fipe-price");
-            if (fipePriceEl) {
-                window.formatCurrencyInput(fipePriceEl, price);
-                triggerCarDetailsAutoSave(0);
-            }
-        }
-    } catch (e) {
-        console.error("FIPE lookup failed", e);
-            return;
-    }
-}
-
 // Auto-Save Management for Car Details Screen
 let autoSaveDebounceTimer = null;
 let isAutoSaving = false;
@@ -1234,13 +1191,13 @@ export function initCarDetailsAutoSaveListeners() {
 
     // Listen to input events (typing in text, numbers, textarea, contenteditable)
     tab.addEventListener("input", (e) => {
-        if (e.target.type === 'file' || e.target.id === 'fipe-search-input') return;
+        if (e.target.type === 'file') return;
         triggerCarDetailsAutoSave(400);
     });
 
     // Listen to change events (selects, dates, finalized fields)
     tab.addEventListener("change", (e) => {
-        if (e.target.type === 'file' || e.target.id === 'fipe-search-input') return;
+        if (e.target.type === 'file') return;
         triggerCarDetailsAutoSave(0);
     });
 
@@ -1284,10 +1241,12 @@ export async function saveCarDetails(options = { silent: true }) {
     const selectedPending = document.getElementById("cd-document")?.value;
     const unresolvedPending = document.getElementById('cd-document')?.dataset.unresolvedValue;
     const documentStatus = unresolvedPending || (selectedPending === 'unreported' ? null : (selectedPending || car.documentStatus || null));
+    const readStatus = (id, fallback) => { const input = document.getElementById(id); return input?.dataset.unresolvedValue || (input?.value === 'unreported' ? null : input?.value || fallback || null); };
+    const statusMc = readStatus('cd-status-mc', car.statusMc);
+    const customStatus = readStatus('cd-custom-status', car.customStatus);
+
     const type = document.getElementById("cd-type")?.value || car.type || "convencional";
     const status = document.getElementById("cd-status-select")?.value || car.status || "disponivel";
-    const fipeCode = document.getElementById("cd-fipe-code")?.value.trim() || "";
-    const fipePrice = parseCurrencyBR(document.getElementById("cd-fipe-price")?.value) || 0;
     const purchaseDate = document.getElementById("cd-purchase-date")?.value || null;
     const buyPrice = parseCurrencyBR(document.getElementById("cd-buy")?.value) || 0;
     const sellPrice = parseCurrencyBR(document.getElementById("cd-sell")?.value) || 0;
@@ -1306,10 +1265,10 @@ export async function saveCarDetails(options = { silent: true }) {
         color: color || null,
         chassis: chassis || null,
         renavam: renavam || null,
-        fipe_code: fipeCode || null,
-        fipe_price: fipePrice,
         notes: notes || null,
         document_status: documentStatus,
+        statusMc,
+        customStatus,
         image_url: car.image_url
     };
 
@@ -1324,10 +1283,10 @@ export async function saveCarDetails(options = { silent: true }) {
     car.chassis = chassis;
     car.renavam = renavam;
     car.documentStatus = documentStatus;
+    car.statusMc = statusMc;
+    car.customStatus = customStatus;
     car.type = type;
     car.status = status;
-    car.fipeCode = fipeCode;
-    car.fipePrice = fipePrice;
     car.purchaseDate = purchaseDate;
     car.buyPrice = buyPrice;
     car.sellPrice = sellPrice;
@@ -1994,267 +1953,6 @@ export async function deleteCarDoc(docId) {
         },
         "Excluir"
     );
-}
-
-// --------------------------------------------------------------------------
-// CONSULTAS TABELA FIPE (BRASILAPI INTEGRATION)
-// --------------------------------------------------------------------------
-let fipeSelectedBrand = '';
-let fipeSelectedModel = '';
-let fipeSelectedYear = '';
-let fipeSelectedPrice = 0;
-let fipeSelectedCode = '';
-let fipeSelectedMonth = '';
-
-export function openFipeSearchModal() {
-    const modal = document.getElementById("modal-fipe");
-    if (!modal) return;
-    modal.classList.add("active");
-
-    // Clear dropdowns
-    document.getElementById("fipe-brand").innerHTML = `<option value="">Selecione...</option>`;
-    document.getElementById("fipe-brand").disabled = true;
-    document.getElementById("fipe-model").innerHTML = `<option value="">Selecione...</option>`;
-    document.getElementById("fipe-model").disabled = true;
-    document.getElementById("fipe-year").innerHTML = `<option value="">Selecione...</option>`;
-    document.getElementById("fipe-year").disabled = true;
-    document.getElementById("fipe-result").style.display = "none";
-    document.getElementById("btn-apply-fipe").disabled = true;
-
-    // Fetch initial brands
-    fetchFipeBrands();
-}
-
-export function closeFipeSearchModal() {
-    const modal = document.getElementById("modal-fipe");
-    if (modal) modal.classList.remove("active");
-}
-
-export async function fetchFipeBrands() {
-    const type = document.getElementById("fipe-type")?.value || "carros";
-    const brandSel = document.getElementById("fipe-brand");
-    const modelSel = document.getElementById("fipe-model");
-    const yearSel = document.getElementById("fipe-year");
-    if (!brandSel) return;
-
-    brandSel.innerHTML = `<option value="">Carregando marcas...</option>`;
-    brandSel.disabled = true;
-    if (modelSel) { modelSel.innerHTML = `<option value="">Selecione...</option>`; modelSel.disabled = true; }
-    if (yearSel) { yearSel.innerHTML = `<option value="">Selecione...</option>`; yearSel.disabled = true; }
-
-    try {
-        const response = await fetch(`https://parallelum.com.br/fipe/api/v1/${type}/marcas`);
-        const data = await response.json();
-
-        if (!response.ok || !Array.isArray(data)) {
-            brandSel.innerHTML = `<option value="">Nenhuma marca encontrada</option>`;
-            return;
-        }
-
-        brandSel.innerHTML = `<option value="">Selecione...</option>` + 
-            data.map(b => `<option value="${b.codigo}">${b.nome}</option>`).join('');
-        brandSel.disabled = false;
-
-        // Auto-detect brand from explicitly entered brand input or car title
-        const cdBrandVal = document.getElementById("cd-brand")?.value?.trim().toLowerCase() || "";
-        const carTitle = document.getElementById("cd-title")?.innerText?.trim().toLowerCase() || "";
-        
-        let foundBrand = null;
-        if (cdBrandVal && cdBrandVal !== "-") {
-            foundBrand = data.find(b => b.nome && (b.nome.toLowerCase() === cdBrandVal || b.nome.toLowerCase().startsWith(cdBrandVal) || cdBrandVal.includes(b.nome.toLowerCase())));
-        }
-        if (!foundBrand && carTitle) {
-            foundBrand = data.find(b => b.nome && carTitle.includes(b.nome.toLowerCase()));
-        }
-
-        if (foundBrand) {
-            brandSel.value = foundBrand.codigo;
-            fetchFipeModels();
-        }
-    } catch (e) {
-        console.error(e);
-        brandSel.innerHTML = `<option value="">Erro ao carregar marcas</option>`;
-    }
-}
-
-export async function fetchFipeModels() {
-    const type = document.getElementById("fipe-type")?.value || "carros";
-    const brand = document.getElementById("fipe-brand")?.value;
-    const modelSel = document.getElementById("fipe-model");
-    const yearSel = document.getElementById("fipe-year");
-    if (!brand || !modelSel) return;
-
-    fipeSelectedBrand = brand;
-    modelSel.innerHTML = `<option value="">Carregando modelos...</option>`;
-    modelSel.disabled = true;
-    if (yearSel) { yearSel.innerHTML = `<option value="">Selecione...</option>`; yearSel.disabled = true; }
-
-    try {
-        const modelsRes = await fetch(`https://parallelum.com.br/fipe/api/v1/${type}/marcas/${brand}/modelos`);
-        const data = await modelsRes.json();
-
-        const modelsList = Array.isArray(data?.modelos) ? data.modelos : [];
-
-        if (!modelsRes.ok || modelsList.length === 0) {
-            modelSel.innerHTML = `<option value="">Nenhum modelo encontrado</option>`;
-            return;
-        }
-
-        modelSel.innerHTML = `<option value="">Selecione...</option>` + 
-            modelsList.map(m => `<option value="${m.codigo}">${m.nome}</option>`).join('');
-        modelSel.disabled = false;
-
-        // Auto-detect model from explicit cd-model or car title
-        const cdModelVal = document.getElementById("cd-model")?.value?.trim().toLowerCase() || "";
-        const carTitle = document.getElementById("cd-title")?.innerText?.trim().toLowerCase() || "";
-        const brandSel = document.getElementById("fipe-brand");
-        const brandOptionText = brandSel?.options[brandSel?.selectedIndex]?.text?.toLowerCase() || "";
-        
-        let searchString = (cdModelVal && cdModelVal !== "-") ? cdModelVal : carTitle;
-        if (searchString && brandOptionText) {
-            searchString = searchString.replace(brandOptionText, "");
-        }
-        
-        if (searchString) {
-            const targetWords = searchString.split(/[\s\-\/]+/).filter(w => w.length >= 2);
-            
-            if (targetWords.length > 0) {
-                let bestModel = null;
-                let bestScore = -1;
-
-                modelsList.forEach(m => {
-                    const mName = m.nome.toLowerCase();
-                    let score = 0;
-                    
-                    targetWords.forEach((word, index) => {
-                        if (mName.includes(word)) {
-                            score += (index === 0 ? 5 : 2);
-                        }
-                    });
-
-                    if (targetWords[0] && mName.startsWith(targetWords[0])) {
-                        score += 3;
-                    }
-
-                    if (score > bestScore && score > 0) {
-                        bestScore = score;
-                        bestModel = m;
-                    }
-                });
-
-                if (bestModel) {
-                    modelSel.value = bestModel.codigo;
-                    fetchFipeYears();
-                }
-            }
-        }
-    } catch (e) {
-        console.error(e);
-        modelSel.innerHTML = `<option value="">Erro ao carregar modelos</option>`;
-    }
-}
-
-export async function fetchFipeYears() {
-    const type = document.getElementById("fipe-type")?.value || "carros";
-    const brand = document.getElementById("fipe-brand")?.value;
-    const model = document.getElementById("fipe-model")?.value;
-    const yearSel = document.getElementById("fipe-year");
-    if (!brand || !model || !yearSel) return;
-
-    fipeSelectedModel = model;
-    yearSel.innerHTML = `<option value="">Carregando anos...</option>`;
-    yearSel.disabled = true;
-
-    try {
-        const response = await fetch(`https://parallelum.com.br/fipe/api/v1/${type}/marcas/${brand}/modelos/${model}/anos`);
-        const data = await response.json();
-
-        if (!response.ok || !Array.isArray(data)) {
-            yearSel.innerHTML = `<option value="">Nenhum ano encontrado</option>`;
-            return;
-        }
-
-        yearSel.innerHTML = `<option value="">Selecione...</option>` + 
-            data.map(y => `<option value="${y.codigo}">${y.nome}</option>`).join('');
-        yearSel.disabled = false;
-
-        // Auto-detect year if available
-        const carYear = document.getElementById("cd-year")?.value?.trim() || "";
-        if (carYear) {
-            const rawNumbers = carYear.match(/\d+/g) || [];
-            const parsedYears = rawNumbers.map(num => {
-                if (num.length === 2) return (parseInt(num, 10) > 50 ? "19" : "20") + num;
-                return num;
-            }).reverse(); // Check model year (last number) first
-
-            let foundYear = null;
-            for (const yearStr of parsedYears) {
-                foundYear = data.find(y => y.nome.includes(yearStr) || y.codigo.startsWith(yearStr));
-                if (foundYear) break;
-            }
-
-            if (foundYear) {
-                yearSel.value = foundYear.codigo;
-                fetchFipePrice();
-            }
-        }
-    } catch (e) {
-        console.error(e);
-        yearSel.innerHTML = `<option value="">Erro ao carregar anos</option>`;
-    }
-}
-
-export async function fetchFipePrice() {
-    const type = document.getElementById("fipe-type")?.value || "carros";
-    const brand = document.getElementById("fipe-brand")?.value;
-    const model = document.getElementById("fipe-model")?.value;
-    const year = document.getElementById("fipe-year")?.value;
-    const resultBox = document.getElementById("fipe-result");
-    const applyBtn = document.getElementById("btn-apply-fipe");
-    if (!brand || !model || !year || !resultBox || !applyBtn) return;
-
-    fipeSelectedYear = year;
-
-    try {
-        const response = await fetch(`https://parallelum.com.br/fipe/api/v1/${type}/marcas/${brand}/modelos/${model}/anos/${year}`);
-        const data = await response.json();
-
-        if (!response.ok || !data?.Valor) {
-            alert("Erro ao buscar preço Fipe para a seleção atual.");
-            return;
-        }
-
-        fipeSelectedPrice = parseFloat(data.Valor.replace(/[^\d]/g, "")) / 100;
-        fipeSelectedCode = data.CodigoFipe || '';
-        fipeSelectedMonth = data.MesReferencia || '';
-
-        const elMonth = document.getElementById("fipe-res-month");
-        const elCode = document.getElementById("fipe-res-code");
-        const elPrice = document.getElementById("fipe-res-price");
-        if (elMonth) elMonth.innerText = fipeSelectedMonth;
-        if (elCode) elCode.innerText = fipeSelectedCode;
-        if (elPrice) elPrice.innerText = data.Valor;
-
-        resultBox.style.display = "block";
-        applyBtn.disabled = false;
-    } catch (e) {
-        console.error(e);
-        alert("Erro ao buscar preço Fipe.");
-    }
-}
-
-export function applyFipeResult() {
-    // Inject pricing back into active form (Edit Car)
-    const inputPrice = document.getElementById("cd-fipe-price");
-    const inputCode = document.getElementById("cd-fipe-code");
-    if (inputPrice) { 
-        inputPrice.value = fipeSelectedPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-    if (inputCode) {
-        inputCode.value = fipeSelectedCode;
-    }
-
-    closeFipeSearchModal();
 }
 
 // --------------------------------------------------------------------------

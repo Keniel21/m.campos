@@ -246,8 +246,10 @@
                         <button type="button" class="sortable-header" onclick="sortEstoque('type')">Tipo <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-type"></i></button>
                         <button type="button" class="stock-column-filter" data-stock-filter="type" aria-label="Filtrar Tipo"><i data-lucide="filter"></i></button>
                     </div>
+<div class="col-status-mc stock-column-heading"><button type="button" class="sortable-header" onclick="sortEstoque('status_mc')">Status MC <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status_mc"></i></button><button type="button" class="stock-column-filter" data-stock-filter="status_mc" aria-label="Filtrar Status MC"><i data-lucide="filter"></i></button></div>
+<div class="col-custom-status stock-column-heading"><button type="button" class="sortable-header" onclick="sortEstoque('custom_status')">Status <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-custom_status"></i></button><button type="button" class="stock-column-filter" data-stock-filter="custom_status" aria-label="Filtrar Status"><i data-lucide="filter"></i></button></div>
                     <div class="col-status stock-column-heading">
-                        <button type="button" class="sortable-header" onclick="sortEstoque('status')">Status <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status"></i></button>
+                        <button type="button" class="sortable-header" onclick="sortEstoque('status')">Situação no pátio <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status"></i></button>
                         <button type="button" class="stock-column-filter" data-stock-filter="status" aria-label="Filtrar Status"><i data-lucide="filter"></i></button>
                     </div>
                 </div>
@@ -521,22 +523,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="premium-form-group full-row-grid">
-                                        <label class="premium-input-label">Código & Preço de Referência FIPE</label>
-                                        <div class="fipe-premium-inputs-row">
-                                            <div class="input-with-icon-wrapper" style="flex:1;">
-                                                <i data-lucide="key"></i>
-                                                <input type="text" class="premium-input-field" id="cd-fipe-code"
-                                                    placeholder="Código Fipe" onblur="quickFipeSearch()" title="Código Fipe">
-                                            </div>
-                                            <div class="input-with-icon-wrapper" style="flex:1.2;">
-                                                <i data-lucide="dollar-sign"></i>
-                                                <input type="text" class="premium-input-field" id="cd-fipe-price"
-                                                    placeholder="Valor Fipe" title="Valor Fipe">
-                                            </div>
-                                            <button class="btn btn-secondary fipe-search-premium-btn" onclick="openFipeSearchModal()" title="Buscar na Tabela Fipe">
-                                                <i data-lucide="search"></i> Buscar
-                                            </button>
+                                    <div class="premium-form-group">
+                                        <label class="premium-input-label" for="status-mc-toggle">Status MC</label>
+                                        <div id="status-mc-field" class="pending-field">
+                                            <select id="cd-status-mc" hidden aria-hidden="true" tabindex="-1"><option value="unreported">Não informado</option></select>
+                                            <button type="button" id="status-mc-toggle" class="premium-select-field catalog-toggle" aria-expanded="false" aria-controls="status-mc-menu"><span id="status-mc-toggle-label">Não informado</span><span aria-hidden="true">⌄</span></button>
+                                            <div id="status-mc-menu" class="pending-menu" hidden role="group" aria-label="Opções de Status MC"></div>
+                                        </div>
+                                    </div>
+                                    <div class="premium-form-group">
+                                        <label class="premium-input-label" for="custom-status-toggle">Status</label>
+                                        <div id="custom-status-field" class="pending-field">
+                                            <select id="cd-custom-status" hidden aria-hidden="true" tabindex="-1"><option value="unreported">Não informado</option></select>
+                                            <button type="button" id="custom-status-toggle" class="premium-select-field catalog-toggle" aria-expanded="false" aria-controls="custom-status-menu"><span id="custom-status-toggle-label">Não informado</span><span aria-hidden="true">⌄</span></button>
+                                            <div id="custom-status-menu" class="pending-menu" hidden role="group" aria-label="Opções de Status"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -2185,63 +2185,6 @@
 
     <!-- EDITAR PERFIL DO OPERADOR -->
 
-
-    <!-- Modal Busca Fipe -->
-    <div class="modal-overlay" id="modal-fipe">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2><i data-lucide="search" style="width:20px;height:20px;margin-right:8px;"></i> Consulta Tabela Fipe
-                </h2>
-                <button class="btn btn-secondary btn-icon" onclick="closeFipeSearchModal()"><i
-                        data-lucide="x"></i></button>
-            </div>
-            <div class="modal-body" style="display:flex; flex-direction:column; gap:16px;">
-                <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Selecione os dados do veículo
-                    para buscar o código e valor oficial na tabela Fipe. Esta busca usa a BrasilAPI.</p>
-                <div class="form-group">
-                    <label>Tipo de Veículo</label>
-                    <select id="fipe-type" class="form-control" onchange="fetchFipeBrands()">
-                        <option value="carros">Carros</option>
-                        <option value="motos">Motos</option>
-                        <option value="caminhoes">Caminhões</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Marca</label>
-                    <select id="fipe-brand" class="form-control" onchange="fetchFipeModels()" disabled>
-                        <option value="">Selecione...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Modelo</label>
-                    <select id="fipe-model" class="form-control" onchange="fetchFipeYears()" disabled>
-                        <option value="">Selecione...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Ano de Referência</label>
-                    <select id="fipe-year" class="form-control" onchange="fetchFipePrice()" disabled>
-                        <option value="">Selecione...</option>
-                    </select>
-                </div>
-
-                <div id="fipe-result"
-                    style="display:none; padding:16px; background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.3); border-radius:8px; margin-top:8px;">
-                    <div style="font-size:12px; color:var(--text-muted);">Mês de Referência: <span id="fipe-res-month"
-                            style="color:#FFF;">-</span></div>
-                    <div style="font-size:12px; color:var(--text-muted);">Código Fipe: <span id="fipe-res-code"
-                            style="color:#FFF;">-</span></div>
-                    <div style="font-size:20px; font-weight:700; color:var(--blue-primary); margin-top:8px;"
-                        id="fipe-res-price">R$ 0,00</div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeFipeSearchModal()">Cancelar</button>
-                <button class="btn btn-primary" id="btn-apply-fipe" onclick="applyFipeResult()" disabled>Aplicar
-                    Valor</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal Global de Confirmação (Substitui confirm() nativo do navegador) -->
     <div class="modal-overlay" id="modal-global-confirm" style="z-index: 100000;">

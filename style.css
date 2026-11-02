@@ -5134,9 +5134,9 @@ body.dark-mode .search-result-item:hover, body.dark-mode .search-result-item.sel
 
 .estoque-modern-header {
     display: grid;
-    grid-template-columns: minmax(270px, 2.4fr) minmax(180px, 1.5fr) minmax(120px, 1fr) minmax(90px, .7fr) minmax(110px, .8fr);
+    grid-template-columns: minmax(250px, 2.2fr) minmax(170px, 1.5fr) minmax(110px, .9fr) minmax(80px, .6fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(130px, 1fr);
     column-gap: 24px;
-    min-width: 900px;
+    min-width: 1230px;
     padding: 12px 24px;
     color: var(--text-muted);
     font-size: 11px;
@@ -5177,13 +5177,13 @@ body.dark-mode .search-result-item:hover, body.dark-mode .search-result-item.sel
     display: flex;
     flex-direction: column;
     gap: 12px;
-    min-width: 900px;
+    min-width: 1230px;
     padding: 2px 0 10px 0;
 }
 
 .estoque-modern-row {
     display: grid;
-    grid-template-columns: minmax(270px, 2.4fr) minmax(180px, 1.5fr) minmax(120px, 1fr) minmax(90px, .7fr) minmax(110px, .8fr);
+    grid-template-columns: minmax(250px, 2.2fr) minmax(170px, 1.5fr) minmax(110px, .9fr) minmax(80px, .6fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(130px, 1fr);
     column-gap: 24px;
     align-items: center;
     background-color: var(--card-bg);
@@ -6677,7 +6677,7 @@ body.dark-mode .emerald-glow-card {
 .clientes-modern-header {
     display: grid;
     grid-template-columns: 2.2fr 1.2fr 1.2fr 1.8fr 1.1fr 1fr;
-    min-width: 900px;
+    min-width: 1230px;
     padding: 12px 24px;
     color: var(--text-muted);
     font-size: 11px;
@@ -6697,7 +6697,7 @@ body.dark-mode .emerald-glow-card {
     padding: 14px 24px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.015);
-    min-width: 900px;
+    min-width: 1230px;
 }
 
 .clientes-modern-row:hover {
@@ -8284,8 +8284,8 @@ body.dark-mode .emerald-glow-card {
 .pending-cell { display: block; white-space: normal; overflow-wrap: anywhere; font-size: 11px; line-height: 1.35; padding-right: 8px; }
 
 .pending-field { position: relative; min-width: 0; }
-#pending-toggle { width: 100%; height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; cursor: pointer; padding: 0 12px; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-primary); color: var(--text-light); font-size: 13px; font-weight: 500; }
-#pending-toggle-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#pending-toggle, .catalog-toggle { width: 100%; height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; cursor: pointer; padding: 0 12px; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-primary); color: var(--text-light); font-size: 13px; font-weight: 500; }
+#pending-toggle-label, .catalog-toggle > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pending-menu[hidden] { display: none; }
 .pending-menu { position: absolute; top: calc(100% + 5px); left: 0; width: max(100%, 330px); max-width: min(420px, 85vw); max-height: 300px; overflow-y: auto; z-index: 100; padding: 5px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--card-bg); box-shadow: 0 8px 24px rgba(15,23,42,.15); }
 .pending-menu button { border: 0; background: transparent; color: var(--text-light); padding: 7px 8px; border-radius: 5px; font: inherit; font-size: 12px; cursor: pointer; text-align: left; }
@@ -8298,7 +8298,7 @@ body.dark-mode .emerald-glow-card {
 .pending-menu .pending-delete, .pending-menu .pending-delete-confirm { color: var(--red-alert, #dc2626); }
 .pending-inline-editor { display: flex; gap: 2px; align-items: center; width: 100%; }
 .pending-inline-editor input { min-width: 0; flex: 1; font: inherit; font-size: 12px; border: 1px solid var(--blue-primary); border-radius: 4px; padding: 6px; background: var(--card-bg); color: var(--text-light); }
-#pending-menu-message { font-size: 11px; color: var(--red-alert, #dc2626); padding: 0 6px; }
+#pending-menu-message, .catalog-message { font-size: 11px; color: var(--red-alert, #dc2626); padding: 0 6px; }
 
 .stock-column-heading { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
 .stock-column-heading > button { border: none; background: transparent; color: inherit; font: inherit; text-transform: inherit; letter-spacing: inherit; padding: 4px 0; }
@@ -8318,3 +8318,5 @@ body.dark-mode .emerald-glow-card {
 .stock-filter-values { max-height: 220px; min-height: 40px; overflow: auto; display: flex; flex-direction: column; gap: 9px; }
 .stock-filter-values label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; line-height: 1.4; }
 .stock-filter-values input { margin-top: 2px; flex-shrink: 0; accent-color: var(--blue-primary); }
+
+.pending-menu [role="status"] { font-size: 11px; color: var(--red-alert); padding: 0 6px; }
