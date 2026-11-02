@@ -1215,7 +1215,7 @@
                     <div class="finance-card-details">
                         <h4>Saídas (Aquisição)</h4>
                         <p id="fin-saidas">R$ 0,00</p>
-                        <span>Custo pago por veículos de estoque</span>
+                        <span>Compras pela data de aquisição</span>
                     </div>
                 </div>
 
@@ -1231,13 +1231,21 @@
                 <div class="finance-card net-profit">
                     <div class="finance-card-icon"><i data-lucide="coins"></i></div>
                     <div class="finance-card-details">
-                        <h4>Lucro Líquido Real</h4>
+                        <h4>Saldo do Período</h4>
                         <p id="fin-liquido">R$ 0,00</p>
-                        <span>Faturamento total livre de custos</span>
+                        <span>Vendas − compras − despesas do período</span>
+                        <h4 style="margin-top:12px">Lucro das Vendas</h4>
+                        <p id="fin-lucro-vendas" style="font-size:20px">R$ 0,00</p>
+                        <span>Resultado atualizado dos veículos vendidos</span>
                     </div>
                 </div>
             </div>
 
+            <p style="color:var(--text-muted);font-size:12px;margin:0 0 16px;line-height:1.5">
+                O saldo usa as datas cadastradas de venda, aquisição e despesa, sem conciliação de pagamentos ou parcelas.
+                O lucro das vendas desconta a compra e todas as despesas vinculadas ao veículo, mesmo de outros períodos; despesas gerais não são rateadas nesse indicador.
+            </p>
+            <p id="fin-data-notice" hidden role="status" style="color:var(--orange-warning,#b45309);font-size:12px;margin:0 0 16px"></p>
             <div class="charts-grid" style="grid-template-columns: 2fr 1fr; margin-bottom: 24px;">
                 <div class="dashboard-panel">
                     <div class="panel-header">
