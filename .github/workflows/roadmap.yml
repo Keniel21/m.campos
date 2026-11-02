@@ -1,6 +1,29 @@
 name: Stack roadmap
 on: [push, pull_request]
 jobs:
+  windows-package:
+    needs: [backend, frontend]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/download-artifact@v4
+        with:
+          name: mcampos-backend
+          path: backend/target
+      - name: Package Windows with Java
+        shell: pwsh
+        run: ./scripts/package-windows.ps1 -Jar ./backend/target/crm-2.0.0-SNAPSHOT.jar -JavaHome $env:JAVA_HOME -Version "2.0.0-preview.${{ github.run_number }}" -OutputDirectory ./windows-dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcampos-windows
+          path: |
+            windows-dist/*.zip
+            windows-dist/*.sha256
+          retention-days: 7
   backend:
     runs-on: ubuntu-latest
     services:
