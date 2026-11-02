@@ -24,6 +24,13 @@ class DesktopIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
     @Autowired RecordRepository records;
+    static final java.nio.file.Path documentDirectory;
+    static { try { documentDirectory=java.nio.file.Files.createTempDirectory("mcampos-documents-test-"); }
+        catch(java.io.IOException e) { throw new ExceptionInInitializerError(e); } }
+    @org.springframework.test.context.DynamicPropertySource
+    static void documentProperties(org.springframework.test.context.DynamicPropertyRegistry registry) {
+        registry.add("app.document-directory",documentDirectory::toString);
+    }
     @BeforeEach void clearRecords() {
         for (String module : CrmService.MODULES) if (!module.equals("estoque")) records.deleteAll(records.findByModuleOrderByIdAsc(module));
         records.flush(); records.deleteAll(records.findByModuleOrderByIdAsc("estoque")); records.flush();
@@ -39,6 +46,28 @@ class DesktopIntegrationTest {
         mvc.perform(get("/api/crm/estoque")).andExpect(status().isForbidden());
         mvc.perform(get("/.env.neon")).andExpect(status().isNotFound());
         mvc.perform(get("/database/estoque.json")).andExpect(status().isNotFound());
+    }
+    @Test void persistsUploadedDocumentOutsideDatabaseAndServesVerifiedBytes() throws Exception {
+        String carResponse=mvc.perform(post("/api/desktop/crm/estoque").with(csrf()).contentType(MediaType.APPLICATION_JSON)
+            .content("{\"model\":\"Teste\",\"status\":\"disponivel\"}"))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        long car=mapper.readTree(carResponse).get("id").asLong();
+        byte[] bytes="%PDF-1.4\n%%EOF\n".getBytes(java.nio.charset.StandardCharsets.US_ASCII);
+        var body=java.util.Map.of("fileName","teste.pdf","carId",car,"fileUrl","data:application/pdf;base64,"+java.util.Base64.getEncoder().encodeToString(bytes));
+        String response=mvc.perform(post("/api/desktop/crm/documentos").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(body)))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        var saved=mapper.readTree(response);
+        String url=saved.get("fileUrl").asText();
+        mvc.perform(get(url)).andExpect(status().isOk()).andExpect(content().bytes(bytes))
+            .andExpect(header().string("X-Frame-Options","SAMEORIGIN"));
+        var stored=records.findByModuleOrderByIdAsc("documentos").get(0).getPayload();
+        assertFalse(stored.toString().contains("base64"));
+        assertTrue(stored.containsKey("storageHash"));
+        var migratedBody=java.util.Map.of("sha256",saved.get("storageHash").asText(),"size",bytes.length,"mediaType","application/pdf","sourceUrl","https://example.com/changed.pdf");
+        mvc.perform(post("/api/desktop/documents/"+saved.get("id").asLong()+"/local-copy").with(csrf())
+            .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(migratedBody))).andExpect(status().isBadRequest());
+        java.nio.file.Files.delete(documentDirectory.resolve(saved.get("storageHash").asText()));
+        mvc.perform(get(url)).andExpect(status().isNotFound());
     }
     @Test void servesOriginalUiAndPersistsNumericAliasesAndSnakeCaseUpdates() throws Exception {
         mvc.perform(get("/index.html")).andExpect(status().isOk());

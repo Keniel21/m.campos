@@ -13,7 +13,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Configuration @Profile("desktop")
 class DesktopSecurity {
     @Bean SecurityFilterChain desktopFilterChain(HttpSecurity http) throws Exception {
-        return http.authorizeHttpRequests(a -> a.requestMatchers("/api/desktop/**").permitAll()
+        return http.headers(h -> h.frameOptions(f -> f.sameOrigin()))
+            .authorizeHttpRequests(a -> a.requestMatchers("/api/desktop/**").permitAll()
                 .requestMatchers("/api/**").denyAll().anyRequest().permitAll())
             .addFilterBefore(new OncePerRequestFilter() {
                 @Override protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

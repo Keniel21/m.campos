@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $repoPath = Split-Path -Parent $PSScriptRoot
 if (-not [IO.Path]::IsPathRooted($ConfigFile)) { $ConfigFile = Join-Path $repoPath $ConfigFile }
 if (-not (Test-Path -LiteralPath $ConfigFile)) { throw 'Copie .env.neon.example para .env.neon e configure os valores localmente.' }
-$allowed = @('DB_URL','DB_USER','DB_PASSWORD','JWT_SECRET','ADMIN_EMAIL','ADMIN_PASSWORD','DB_MIGRATE','IMPORT_DIRECTORY','APP_PORT')
+$allowed = @('DB_URL','DB_USER','DB_PASSWORD','JWT_SECRET','ADMIN_EMAIL','ADMIN_PASSWORD','DB_MIGRATE','IMPORT_DIRECTORY','APP_PORT','DOCUMENT_DIRECTORY')
 $settings = @{}
 foreach ($line in [IO.File]::ReadAllLines($ConfigFile)) {
     if ([string]::IsNullOrWhiteSpace($line) -or $line.TrimStart().StartsWith('#')) { continue }

@@ -48,11 +48,11 @@ ele está vazio. Não há gravação offline, carga automática de dados de demo
 ou envio automático de outboxes antigas. Internet é necessária para usar o Neon.
 Despesas e alterações de custo recalculam os lucros das vendas vinculadas.
 
-Os documentos antigos foram importados como cadastros com seus links existentes.
-Os arquivos desses links ainda estão no Supabase; eles não foram copiados para outro
-armazenamento. Não encerre o armazenamento antigo antes da migração dos arquivos.
-Novos anexos podem ser persistidos como data URLs no JSONB; limite seu uso até
-implementar armazenamento de arquivos separado e controlar o espaço disponível.
+Os documentos legados foram copiados e conferidos no armazenamento local privado,
+com referências no Neon e endereços antigos preservados. Novos PDFs/JPEGs também
+ficam em arquivos, sem base64 no banco. Consulte [migração, abertura e backup de
+documentos](docs/documents.md). A pasta de arquivos precisa acompanhar a instalação
+e o backup do banco; o Neon não guarda os bytes locais.
 
 ## Validação
 

@@ -1745,8 +1745,8 @@ export function openCarDoc(docId) {
     }
 
     const ext = (doc.fileName || '').split('.').pop().toLowerCase();
-    const isImage = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext) || doc.fileUrl.startsWith('data:image/');
-    const isPdf = ext === 'pdf' || doc.fileUrl.startsWith('data:application/pdf');
+    const isImage = doc.storageMediaType ? doc.storageMediaType.startsWith('image/') : ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext) || doc.fileUrl.startsWith('data:image/');
+    const isPdf = doc.storageMediaType ? doc.storageMediaType === 'application/pdf' : ext === 'pdf' || doc.fileUrl.startsWith('data:application/pdf');
 
     if (isImage) {
         previewBody.innerHTML = `<img src="${doc.fileUrl}" alt="${doc.fileName || 'Documento'}" style="max-width:100%; max-height:68vh; object-fit:contain; border-radius:8px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);" />`;

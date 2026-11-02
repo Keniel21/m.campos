@@ -100,5 +100,6 @@ preservado. As migrações V1/V2 e a importação foram ensaiadas na branch de
 desenvolvimento. O arquivo local desta instalação usa APP_PORT=18080 para não
 conflitar com um serviço existente na porta 8080.
 
-A importação de documentos preserva os links dos arquivos no Supabase; ainda é
-necessário migrar os arquivos físicos antes de desligar esse armazenamento.
+Os cadastros de documentos preservam os links antigos para recuperação. As cópias
+locais e os novos anexos são gerenciados conforme [o guia de documentos](documents.md).
+O backup da pasta storage é necessário além do backup PostgreSQL.

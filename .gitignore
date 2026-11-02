@@ -21,4 +21,5 @@ backend/target/
 .env.neon.*
 !.env.neon.example
 backups/
+storage/
 *.log

@@ -3,4 +3,6 @@
 **/target
 frontend/dist
 .env
+storage
+.env.neon*
 *.log
