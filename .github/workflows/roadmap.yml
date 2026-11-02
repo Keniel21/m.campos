@@ -1,6 +1,17 @@
 name: Stack roadmap
 on: [push, pull_request]
 jobs:
+  storage-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: tools/storage/package-lock.json
+      - run: npm ci --prefix tools/storage
+      - run: node --test tools/storage/migrate.test.cjs
   windows-package:
     needs: [backend, frontend]
     runs-on: windows-latest
