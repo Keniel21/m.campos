@@ -1,10 +1,9 @@
-FROM node:24-alpine AS build
+FROM node:24-alpine
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
+COPY package.json ./
+RUN npm install --omit=dev
+COPY server.js app.js index.html style.css service-worker.js manifest.json firebase-applet-config.json ./
+COPY src ./src
+COPY database ./database
+EXPOSE 3000
+CMD ["node", "server.js"]
