@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.nio.file.*;
 import java.util.*;
 
-@Component
+@Component @org.springframework.core.annotation.Order(0)
 public class Bootstrap implements ApplicationRunner {
     private final UserRepository users;
     private final RecordRepository records;

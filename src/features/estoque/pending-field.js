@@ -7,16 +7,14 @@ let busy = false;
 let editor = null;
 let removal = null;
 let installed = false;
+let fieldRevision = 0;
+let openRequest = 0;
 
 export function renderPendingField(value, refresh) {
+    fieldRevision++;
     refreshStock = refresh;
+    syncSelectedOptions(value);
     const select = document.getElementById('cd-document');
-    select.replaceChildren(new Option('Sem pendência', 'none'));
-    for (const option of state.pendencias || []) select.add(new Option(option.name, option.code));
-    if (value !== 'none' && !(state.pendencias || []).some(option => option.code === value))
-        select.add(new Option(pendingLabel(value, state.pendencias), value || 'unreported'));
-    select.value = value || 'unreported';
-    document.getElementById('pending-toggle-label').textContent = pendingLabel(value, state.pendencias);
     if (!installed) {
         installed = true;
         const field = document.getElementById('pending-field');
@@ -24,24 +22,47 @@ export function renderPendingField(value, refresh) {
         field.addEventListener('input', event => event.stopPropagation());
         field.addEventListener('change', event => { if (event.target !== select) event.stopPropagation(); });
         document.getElementById('pending-toggle').onclick = () => {
-            const menu = document.getElementById('pending-menu');
-            if (menu.hidden) { editor = removal = null; draw(); setOpen(true); menu.querySelector('button')?.focus(); }
+            if (document.getElementById('pending-menu').hidden) openMenu();
             else setOpen(false);
         };
         document.addEventListener('pointerdown', event => { if (!field.contains(event.target)) setOpen(false); });
         field.addEventListener('keydown', event => {
             if (event.key === 'Escape') { event.stopPropagation(); editor = removal = null; setOpen(false); document.getElementById('pending-toggle').focus(); }
-            if (event.target.id === 'pending-toggle' && event.key === 'ArrowDown') {
-                event.preventDefault(); draw(); setOpen(true); document.querySelector('#pending-menu button')?.focus();
-            }
+            if (event.target.id === 'pending-toggle' && event.key === 'ArrowDown') { event.preventDefault(); openMenu(); }
         });
         select.onchange = () => { document.getElementById('pending-toggle-label').textContent = pendingLabel(select.value === 'unreported' ? null : select.value, state.pendencias); };
     }
     editor = removal = null;
     setOpen(false);
 }
-
+function syncSelectedOptions(value) {
+    const select = document.getElementById('cd-document');
+    select.replaceChildren(new Option('Sem pendência', 'none'), new Option('Não informado', 'unreported'));
+    for (const option of state.pendencias || []) select.add(new Option(option.name, option.code));
+    const known = !value || value === 'none' || value === 'unreported' || (state.pendencias || []).some(option => option.code === value);
+    select.dataset.unresolvedValue = known ? '' : value;
+    select.value = known ? (value || 'unreported') : 'unreported';
+    document.getElementById('pending-toggle-label').textContent = pendingLabel(value, state.pendencias);
+}
+async function openMenu() {
+    editor = removal = null; draw(); setOpen(true);
+    document.querySelector('#pending-menu button')?.focus();
+    const request = ++openRequest, revision = fieldRevision;
+    try {
+        const response = await fetch('/api/crm/pendencias');
+        const options = await response.json();
+        if (request !== openRequest || revision !== fieldRevision || busy || editor || removal) return;
+        state.pendencias = options;
+        const select = document.getElementById('cd-document');
+        syncSelectedOptions(select.dataset.unresolvedValue || select.value);
+        refreshStock(); draw();
+    } catch (error) {
+        if (request === openRequest && revision === fieldRevision)
+            document.getElementById('pending-menu-message').textContent = 'Não foi possível atualizar o catálogo. ' + error.message;
+    }
+}
 function setOpen(open) {
+    if (!open) openRequest++;
     document.getElementById('pending-menu').hidden = !open;
     document.getElementById('pending-toggle').setAttribute('aria-expanded', String(open));
 }
@@ -52,6 +73,7 @@ function button(label, action, className = '') {
 }
 function choose(code) {
     const select = document.getElementById('cd-document');
+    select.dataset.unresolvedValue = '';
     select.value = code;
     document.getElementById('pending-toggle-label').textContent = pendingLabel(code === 'unreported' ? null : code, state.pendencias);
     setOpen(false);
@@ -62,9 +84,7 @@ function draw() {
     const menu = document.getElementById('pending-menu');
     menu.replaceChildren();
     menu.append(button('Sem pendência', () => choose('none'), 'pending-choice'));
-    const select = document.getElementById('cd-document');
-    if (select.value !== 'none' && !(state.pendencias || []).some(option => option.code === select.value))
-        menu.append(button(pendingLabel(select.value === 'unreported' ? null : select.value, state.pendencias), () => choose(select.value), 'pending-choice'));
+    menu.append(button('Não informado', () => choose('unreported'), 'pending-choice'));
     for (const option of state.pendencias || []) {
         const row = document.createElement('div'); row.className = 'pending-option-row'; row.dataset.code = option.code;
         if (editor?.id === option.id) row.append(editInput(option));

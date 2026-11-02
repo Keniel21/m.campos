@@ -25,6 +25,7 @@ class DesktopIntegrationTest {
     @Autowired ObjectMapper mapper;
     @Autowired RecordRepository records;
     @Autowired DesktopService desktop;
+    @Autowired PendingCatalogMigration pendingMigration;
     @Autowired jakarta.persistence.EntityManagerFactory entityManagerFactory;
     static final java.nio.file.Path documentDirectory;
     static { try { documentDirectory=java.nio.file.Files.createTempDirectory("mcampos-documents-test-"); }
@@ -36,6 +37,32 @@ class DesktopIntegrationTest {
     @BeforeEach void clearRecords() {
         for (String module : CrmService.MODULES) if (!module.equals("estoque")) records.deleteAll(records.findByModuleOrderByIdAsc(module));
         records.flush(); records.deleteAll(records.findByModuleOrderByIdAsc("estoque")); records.flush();
+    }
+    @Test void migratesLegacyPendingValuesWithoutChangingOtherDataAndIsRepeatable() throws Exception {
+        var custom = desktop.save("pendencias", null, java.util.Map.of("name", "Pendente"));
+        for (String value : java.util.List.of("sim", "nao", "pendente"))
+            records.saveAndFlush(new CrmRecord("estoque", java.util.Map.of("model", "Legacy " + value,
+                "document_status", value, "status", value.equals("sim") ? "vendido" : "disponivel", "buyPrice", 1000, "notes", "Preservar")));
+        pendingMigration.migrate();
+        var firstOptions = desktop.list("pendencias");
+        assertEquals(4, firstOptions.size());
+        assertTrue(firstOptions.stream().anyMatch(p -> p.get("code").equals(custom.get("code"))));
+        for (var car : desktop.list("estoque")) {
+            String original = car.get("documentStatusBeforeCatalogMigration").toString();
+            var option = firstOptions.stream().filter(p -> original.equals(p.get("legacyValue"))).findFirst().orElseThrow();
+            assertEquals(option.get("code"), car.get("documentStatus"));
+            assertEquals(option.get("code"), car.get("document_status"));
+            assertEquals("Preservar", car.get("notes"));
+            assertEquals(1000, car.get("buyPrice"));
+            assertEquals(original.equals("sim") ? "vendido" : "disponivel", car.get("status"));
+            desktop.save("estoque", ((Number)car.get("id")).longValue(), java.util.Map.of("document_status", original));
+        }
+        var migrated = desktop.list("estoque");
+        pendingMigration.migrate();
+        assertEquals(firstOptions, desktop.list("pendencias"));
+        assertEquals(migrated, desktop.list("estoque"));
+        assertThrows(org.springframework.web.server.ResponseStatusException.class,
+            () -> desktop.save("estoque", ((Number)migrated.getFirst().get("id")).longValue(), java.util.Map.of("document_status", "opção solta")));
     }
     @Test void pendingOptionsCanBeRenamedButNotDeletedWhileLinked() throws Exception {
         var option = desktop.save("pendencias", null, java.util.Map.of("name", "Transferência"));

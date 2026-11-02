@@ -48,6 +48,19 @@ public class CrmService {
         if (module.equals("pendencias")) {
             data.put("code", id == null ? "pending:" + record.getId() : record.getPayload().get("code"));
             data.put("name", Objects.toString(data.get("name"), "").trim());
+            data.remove("legacyValue");
+            if (record.getPayload().containsKey("legacyValue")) data.put("legacyValue", record.getPayload().get("legacyValue"));
+        }
+        if (module.equals("estoque")) {
+            String value = Objects.toString(data.get("documentStatus"), "");
+            if (Set.of("sim", "nao", "pendente").contains(value)) {
+                String canonical = records.findByModuleOrderByIdAsc("pendencias").stream()
+                    .filter(option -> value.equals(option.getPayload().get("legacyValue")))
+                    .map(option -> option.getPayload().get("code").toString()).findFirst()
+                    .orElseThrow(() -> bad("Atualize a página e selecione uma pendência do catálogo."));
+                data.put("documentStatus", canonical);
+                if (data.containsKey("document_status")) data.put("document_status", canonical);
+            }
         }
         validate(module, data);
         if (module.equals("estoque") && id != null && !"vendido".equals(data.get("status")) && records.existsByModuleAndVehicleIdAndIdNot("vendas", id, ""))
@@ -144,6 +157,11 @@ public class CrmService {
         if (!(data.get(required) instanceof String s) || s.isBlank()) throw bad("Preencha o campo " + required + ".");
         if (module.equals("pendencias") && data.get("name").toString().length() > 100)
             throw bad("Use até 100 caracteres para a pendência.");
+        if (module.equals("estoque")) {
+            String value = Objects.toString(data.get("documentStatus"), "");
+            if (!value.isBlank() && !value.equals("none") && !value.startsWith("pending:"))
+                throw bad("Selecione uma pendência do catálogo compartilhado.");
+        }
         if (module.equals("estoque") && Objects.toString(data.get("documentStatus"), "").startsWith("pending:")) {
             var option = get("pendencias", data.get("documentStatus").toString().substring(8));
             if (!Objects.equals(option.getPayload().get("code"), data.get("documentStatus"))) throw bad("Pendência inválida.");

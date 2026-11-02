@@ -1291,7 +1291,8 @@ export async function saveCarDetails(options = { silent: true }) {
     const chassis = document.getElementById("cd-chassis")?.value.trim().toUpperCase() || "";
     const renavam = document.getElementById("cd-renavam")?.value.trim() || "";
     const selectedPending = document.getElementById("cd-document")?.value;
-    const documentStatus = selectedPending === 'unreported' ? (car.documentStatus || null) : (selectedPending || car.documentStatus || null);
+    const unresolvedPending = document.getElementById('cd-document')?.dataset.unresolvedValue;
+    const documentStatus = unresolvedPending || (selectedPending === 'unreported' ? null : (selectedPending || car.documentStatus || null));
     const type = document.getElementById("cd-type")?.value || car.type || "convencional";
     const status = document.getElementById("cd-status-select")?.value || car.status || "disponivel";
     const fipeCode = document.getElementById("cd-fipe-code")?.value.trim() || "";
