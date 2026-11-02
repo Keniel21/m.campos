@@ -31,7 +31,7 @@ Nao ha recuperacao automatica de senha por e-mail; o mantenedor faz o atendiment
 ## Armazenamento S3
 
 `app.storage-mode=s3` e o padrao de web. Configure endpoint HTTPS do Neon,
-regiao, bucket privado e credencial com storage:write (inclui leitura).
+regiao, bucket privado e credencial com os escopos explicitos storage:read e storage:write.
 Use credencial separada da usada para manutencao. As chaves nunca chegam ao front.
 
 O Java usa o SDK AWS v2, path-style, TLS, limites de tempo e tamanho. PDF/JPEG

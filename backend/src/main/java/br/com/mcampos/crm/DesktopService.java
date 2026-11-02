@@ -44,7 +44,10 @@ public class DesktopService {
     }
     public Map<String,Object> snapshot() {
         Map<String,Object> result = new LinkedHashMap<>();
-        for (String module : CrmService.MODULES) result.put(module, list(module));
+        // Populate the persistence context once before resolving vehicle aliases on linked records.
+        // Avoid hundreds of individual vehicle queries over the remote database connection.
+        result.put("estoque",list("estoque"));
+        for (String module : CrmService.MODULES) if(!module.equals("estoque")) result.put(module, list(module));
         result.put("serverDate", java.time.LocalDate.now().toString());
         return result;
     }

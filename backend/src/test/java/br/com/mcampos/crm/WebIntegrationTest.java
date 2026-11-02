@@ -44,4 +44,12 @@ class WebIntegrationTest {
         for(int attempt=0;attempt<10;attempt++)mvc.perform(post("/api/web/login").with(csrf()).with(r->{r.setRemoteAddr("192.0.2.55");return r;}).param("email","absent@example.com").param("password","wrong")).andExpect(status().isUnauthorized());
         mvc.perform(post("/api/web/login").with(csrf()).with(r->{r.setRemoteAddr("192.0.2.55");return r;})).andExpect(status().isTooManyRequests()).andExpect(header().string("Retry-After","60"));
     }
+    @Test void publicConfigurationCannotDisableHttpsCookieOrUseLocalStorage() {
+        var env=new org.springframework.core.env.StandardEnvironment();
+        assertThrows(IllegalArgumentException.class,()->new WebSecurity("https://shop.example",false,"0.0.0.0","s3",env));
+        assertThrows(IllegalArgumentException.class,()->new WebSecurity("https://shop.example",true,"0.0.0.0","local",env));
+        assertThrows(IllegalArgumentException.class,()->new WebSecurity("http://127.0.0.1:8080",false,"0.0.0.0","s3",env));
+        env.setActiveProfiles("desktop");
+        assertThrows(IllegalArgumentException.class,()->new WebSecurity("https://shop.example",true,"127.0.0.1","s3",env));
+    }
 }

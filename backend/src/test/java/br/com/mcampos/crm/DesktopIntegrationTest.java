@@ -24,6 +24,8 @@ class DesktopIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
     @Autowired RecordRepository records;
+    @Autowired DesktopService desktop;
+    @Autowired jakarta.persistence.EntityManagerFactory entityManagerFactory;
     static final java.nio.file.Path documentDirectory;
     static { try { documentDirectory=java.nio.file.Files.createTempDirectory("mcampos-documents-test-"); }
         catch(java.io.IOException e) { throw new ExceptionInInitializerError(e); } }
@@ -46,6 +48,18 @@ class DesktopIntegrationTest {
         mvc.perform(get("/api/crm/estoque")).andExpect(status().isForbidden());
         mvc.perform(get("/.env.neon")).andExpect(status().isNotFound());
         mvc.perform(get("/database/estoque.json")).andExpect(status().isNotFound());
+    }
+    @Test void snapshotLoadsVehicleAliasesWithoutOneQueryPerLinkedRecord() {
+        for(int index=0;index<6;index++) {
+            var car=records.saveAndFlush(new CrmRecord("estoque",java.util.Map.of("model","Vehicle "+index,"status","disponivel")));
+            var expense=new CrmRecord("despesas",java.util.Map.of("desc","Expense","val",1));expense.setVehicle(car);records.saveAndFlush(expense);
+        }
+        var statistics=entityManagerFactory.unwrap(org.hibernate.SessionFactory.class).getStatistics();
+        statistics.setStatisticsEnabled(true);statistics.clear();
+        try {
+            var snapshot=desktop.snapshot();assertEquals(6,((java.util.List<?>)snapshot.get("estoque")).size());
+            assertTrue(statistics.getPrepareStatementCount()<=CrmService.MODULES.size()+1,"Snapshot must not query each linked vehicle separately");
+        }finally{statistics.setStatisticsEnabled(false);}
     }
     @Test void persistsUploadedDocumentOutsideDatabaseAndServesVerifiedBytes() throws Exception {
         String carResponse=mvc.perform(post("/api/desktop/crm/estoque").with(csrf()).contentType(MediaType.APPLICATION_JSON)

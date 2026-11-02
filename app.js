@@ -384,6 +384,8 @@ window.calculateClientesKPIs = calculateClientesKPIs;
 // Authentication
 window.loadProfiles = loadProfiles;
 window.handleLogin = handleLogin;
+// Bind before asynchronous startup so a login never becomes a native GET navigation.
+document.getElementById("form-login")?.addEventListener("submit", handleLogin);
 window.handleLogout = handleLogout;
 window.handleSignup = handleSignup;
 window.bypassLoginForDemo = bypassLoginForDemo;
@@ -395,6 +397,10 @@ window.filterUsuariosTable = filterUsuariosTable;
 
 // DOM Initialization Sequence
 document.addEventListener("DOMContentLoaded", async () => {
+    initSupabase();
+    await checkActiveSession();
+    const readyLoginButton = document.querySelector('#form-login button[type="submit"]');
+    if (readyLoginButton) readyLoginButton.disabled = false;
     setupHeaderDate();
     initAppTheme();
     updateSellerCnpjDatalists();
@@ -432,11 +438,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (_) {}
     }
 
-    // Initialize Supabase client
-    initSupabase();
-
-    // Validate active session (synchronizes central cloud data)
-    await checkActiveSession();
     updatePeriodUI();
 
     // Setup toggling links inside login modal overlay
@@ -470,10 +471,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Bind auth forms submit listeners
-    const loginForm = document.getElementById("form-login");
-    if (loginForm) {
-        loginForm.addEventListener("submit", handleLogin);
-    }
     const signupForm = document.getElementById("form-signup");
     if (signupForm) {
         signupForm.addEventListener("submit", handleSignup);
