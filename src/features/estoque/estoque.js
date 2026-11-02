@@ -359,8 +359,8 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
                 <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
                     <button class="btn btn-secondary" style="padding:6px; border-radius:8px;" onclick="window.openCarDetails(${car.id})" title="Ficha Técnica / Editar"><i data-lucide="pencil" style="width:14px;height:14px;"></i></button>
                     ${car.status !== 'vendido' 
-                        ? `<button class="btn btn-success" style="padding:6px; border-radius:8px;" onclick="window.openCarDetailsForSale(${car.id})" title="Registrar Venda"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>` 
-                        : `<button class="btn btn-secondary" style="padding:6px; border-radius:8px; color:var(--blue-primary);" onclick="window.openCarDetailsForSale(${car.id});" title="Ver venda na ficha do veículo"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>`}
+                        ? `<button class="btn btn-success" style="padding:6px; border-radius:8px;" onclick="event.stopPropagation(); window.openCarDetailsForSale(${car.id})" title="Registrar Venda"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>` 
+                        : `<button class="btn btn-secondary" style="padding:6px; border-radius:8px; color:var(--blue-primary);" onclick="event.stopPropagation(); window.openCarDetailsForSale(${car.id});" title="Ver venda na ficha do veículo"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>`}
                     <button class="btn" style="padding:6px; border-radius:8px; background-color:rgba(239,68,68,0.12); color:var(--red-alert); border:1px solid rgba(239,68,68,0.18)" onclick="window.deleteCarConfirm(${car.id})" title="Excluir"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
                 </div>
             </div>
@@ -408,8 +408,8 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
                     <div style="display:flex; gap:6px;">
                         <button class="btn btn-secondary btn-sm" onclick="window.openCarDetails(${car.id})"><i data-lucide="pencil" style="width:12px; height:12px; margin-right:4px;"></i> Editar</button>
                         ${car.status !== 'vendido' 
-                            ? `<button class="btn btn-success btn-sm" onclick="window.openCarDetailsForSale(${car.id})"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Vender</button>` 
-                            : `<button class="btn btn-secondary btn-sm" style="color:var(--blue-primary);" onclick="window.openCarDetailsForSale(${car.id});"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Ver Venda</button>`}
+                            ? `<button class="btn btn-success btn-sm" onclick="event.stopPropagation(); window.openCarDetailsForSale(${car.id})"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Vender</button>` 
+                            : `<button class="btn btn-secondary btn-sm" style="color:var(--blue-primary);" onclick="event.stopPropagation(); window.openCarDetailsForSale(${car.id});"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Ver Venda</button>`}
                     </div>
                 </div>
             </div>
