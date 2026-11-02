@@ -24,16 +24,32 @@ function renderPendingSelect(value) {
     if (value !== 'none' && !options.some(option => option.code === value))
         select.add(new Option(pendingLabel(value, options), value || 'unreported'));
     select.value = value || 'unreported';
-    const editable = options.some(option => option.code === select.value);
-    document.getElementById('pending-edit').disabled = !editable;
-    document.getElementById('pending-delete').disabled = !editable;
     select.onchange = () => renderPendingSelect(select.value);
+}
+
+export function openPendingManager(selectedCode) {
+    let dialog = document.getElementById('pending-options-dialog');
+    if (!dialog) {
+        dialog = document.createElement('dialog');
+        dialog.id = 'pending-options-dialog';
+        dialog.innerHTML = '<h3>Gerenciar pendências</h3><p>Editar atualiza o nome em todos os veículos. Para excluir, a opção não pode estar em uso.</p><label for="pending-catalog">Opção cadastrada</label><select id="pending-catalog" class="premium-select-field"></select><div class="pending-options-actions"><button type="button" class="btn btn-secondary" data-pending-action onclick="managePending(\'create\')">Nova opção</button><button type="button" class="btn btn-secondary" data-pending-action id="pending-edit" onclick="managePending(\'edit\')">Editar opção</button><button type="button" class="btn btn-secondary" data-pending-action id="pending-delete" onclick="managePending(\'delete\')">Excluir opção</button><button type="button" class="btn btn-secondary" onclick="document.getElementById(\'pending-options-dialog\').close()">Fechar</button></div>';
+        document.body.appendChild(dialog);
+    }
+    const catalog = document.getElementById('pending-catalog');
+    const previous = selectedCode || catalog.value;
+    catalog.replaceChildren();
+    for (const option of state.pendencias || []) catalog.add(new Option(option.name, option.code));
+    if ([...catalog.options].some(option => option.value === previous)) catalog.value = previous;
+    document.getElementById('pending-edit').disabled = !catalog.value;
+    document.getElementById('pending-delete').disabled = !catalog.value;
+    if (!dialog.open) dialog.showModal();
 }
 
 export async function managePending(action) {
     const select = document.getElementById('cd-document');
     const previous = select.value;
-    const option = (state.pendencias || []).find(item => item.code === previous);
+    const managing = document.getElementById('pending-options-dialog')?.open;
+    const option = (state.pendencias || []).find(item => item.code === (managing ? document.getElementById('pending-catalog').value : previous));
     if (action !== 'create' && !option) return;
     let name;
     if (action !== 'delete') {
@@ -52,12 +68,13 @@ export async function managePending(action) {
         });
         const saved = action === 'delete' ? null : await response.json();
         await fetchCloudData();
-        renderPendingSelect(action === 'create' ? (saved.item || saved).code : action === 'delete' ? 'none' : previous);
+        renderPendingSelect(action === 'create' && !managing ? (saved.item || saved).code : previous);
+        if (managing) openPendingManager(saved ? (saved.item || saved).code : null);
         renderEstoque();
-        if (action === 'create') triggerCarDetailsAutoSave(0);
+        if (action === 'create' && !managing) triggerCarDetailsAutoSave(0);
         window.showToast(action === 'delete' ? 'Opção excluída.' : 'Pendência salva.', 'success');
-    } catch (error) { renderPendingSelect(previous); window.showToast(error.message, 'error'); }
-    finally { buttons[0].disabled = false; }
+    } catch (error) { renderPendingSelect(previous); if (managing) openPendingManager(); window.showToast(error.message, 'error'); }
+    finally { buttons.forEach(button => button.disabled = false); if (managing) openPendingManager(); }
 }
 
 // Select stock visual view: List vs Grid
