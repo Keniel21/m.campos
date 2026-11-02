@@ -57,6 +57,8 @@ Nao exponha diretamente a porta HTTP do Java na internet.
 `/healthz` confirma que a instancia subiu e nao consulta o banco a cada ping,
 permitindo que o Neon suspenda quando ocioso. Nao comprova disponibilidade dos
 documentos ou do banco. Use a leitura autenticada para homologar essas dependencias.
+O health check aceita HTTP interno. As demais leituras HTTP sao redirecionadas
+para APP_ORIGIN HTTPS; gravacoes HTTP sem TLS/proxy confiavel recebem 403.
 
 Para teste local, use APP_ORIGIN=http://127.0.0.1:18086, APP_BIND=127.0.0.1 e
 server.servlet.session.cookie.secure=false como propriedade explicita de teste.

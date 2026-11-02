@@ -38,7 +38,6 @@ class WebSecurity {
             .orElseThrow(()->new UsernameNotFoundException("Credenciais inválidas."));
     }
     @Bean SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
-        if(https)http.requiresChannel(c->c.anyRequest().requiresSecure());
         return http.headers(h->h.frameOptions(f->f.sameOrigin()))
             .requestCache(c->c.disable())
             .authorizeHttpRequests(a->a.requestMatchers("/","/index.html","/app.js","/style.css","/src/**","/manifest.json","/service-worker.js","/healthz","/api/desktop/session","/api/web/login").permitAll()
@@ -67,6 +66,11 @@ class WebSecurity {
         }
         @Override protected void doFilterInternal(HttpServletRequest req,HttpServletResponse res,FilterChain chain) throws ServletException,IOException {
             res.setHeader("Cache-Control","no-store");res.setHeader("Referrer-Policy","same-origin");
+            if(origin.startsWith("https://")&&!req.isSecure()&&!"/healthz".equals(req.getRequestURI())) {
+                if(!Set.of("GET","HEAD").contains(req.getMethod())){res.sendError(403);return;}
+                // Redirect to the configured public origin, independently of internal proxy ports.
+                res.setStatus(302);res.setHeader("Location",origin+req.getRequestURI());return;
+            }
             String supplied=req.getHeader("Origin");
             if(!Set.of("GET","HEAD","OPTIONS").contains(req.getMethod())&&supplied!=null&&!origin.equals(supplied)){res.sendError(403);return;}
             if("POST".equals(req.getMethod())&&(req.getContextPath()+"/api/web/login").equals(req.getRequestURI())&&!allow(req.getRemoteAddr())){res.setHeader("Retry-After","60");res.sendError(429);return;}

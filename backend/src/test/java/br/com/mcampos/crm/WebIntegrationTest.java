@@ -52,4 +52,13 @@ class WebIntegrationTest {
         env.setActiveProfiles("desktop");
         assertThrows(IllegalArgumentException.class,()->new WebSecurity("https://shop.example",true,"127.0.0.1","s3",env));
     }
+    @Test void httpsRedirectUsesConfiguredOriginRatherThanInternalServerPort() throws Exception {
+        var filter=new WebSecurity.WebRequestFilter("https://shop.example");
+        var get=new org.springframework.mock.web.MockHttpServletRequest("GET","/api/desktop/session");get.setServerPort(18087);
+        var response=new org.springframework.mock.web.MockHttpServletResponse();
+        filter.doFilter(get,response,(req,res)->fail("Insecure request reached the application"));
+        assertEquals(302,response.getStatus());assertEquals("https://shop.example/api/desktop/session",response.getHeader("Location"));
+        var post=new org.springframework.mock.web.MockHttpServletRequest("POST","/api/web/login");
+        var denied=new org.springframework.mock.web.MockHttpServletResponse();filter.doFilter(post,denied,(req,res)->fail("Insecure login reached authentication"));assertEquals(403,denied.getStatus());
+    }
 }
