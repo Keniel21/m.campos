@@ -1,0 +1,19 @@
+# Activated explicitly by scripts/start-neon.ps1; never uses the local DB fallback.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 0
+      idle-timeout: 60000
+      connection-timeout: 30000
+      data-source-properties:
+        sslmode: verify-full
+        sslfactory: org.postgresql.ssl.DefaultJavaSSLFactory
+  flyway:
+    enabled: ${DB_MIGRATE:false}
+server:
+  address: 127.0.0.1
+  port: ${APP_PORT:8080}

@@ -34,6 +34,9 @@ npm run build
 
 ## Backend Java do roadmap
 
+Para preparar PostgreSQL remoto no Neon, siga [o guia de configuração e importação](docs/neon.md).
+O perfil `neon` mantém as credenciais fora do código e restringe a API a `127.0.0.1`.
+
 O diretório `backend/` contém a primeira etapa da API Java 21/Spring Boot, com PostgreSQL 17, JPA/Hibernate, Flyway, Spring Security/JWT, OpenAPI e testes JUnit/Mockito/MockMvc. Essa API ainda é independente do servidor usado pelo front original: a integração será feita progressivamente, preservando a interface e seus contratos.
 
 A conversão para React/TypeScript deverá reutilizar o layout e os comportamentos existentes; não há mais uma interface React alternativa nesta branch.

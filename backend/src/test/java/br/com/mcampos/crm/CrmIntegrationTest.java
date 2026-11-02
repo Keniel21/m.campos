@@ -86,6 +86,20 @@ class CrmIntegrationTest {
             mvc.perform(get("/api/crm/estoque").header("Authorization", token)).andExpect(jsonPath("$[0].status").value("vendido"));
         } finally { target.directory = ""; }
     }
+    @Test void invalidImportRollsBackAllRecords(@org.junit.jupiter.api.io.TempDir java.nio.file.Path folder) throws Exception {
+        java.nio.file.Files.writeString(folder.resolve("estoque.json"), "[{\"id\":1,\"model\":\"Carro\",\"status\":\"disponivel\"}]");
+        java.nio.file.Files.writeString(folder.resolve("vendas.json"), "[{\"id\":1,\"carId\":999}]");
+        Bootstrap target = org.springframework.test.util.AopTestUtils.getTargetObject(bootstrap);
+        target.directory = folder.toString();
+        try {
+            assertThrows(IllegalArgumentException.class, () -> bootstrap.run(new org.springframework.boot.DefaultApplicationArguments(new String[0])));
+            assertEquals(0, records.count());
+            java.nio.file.Files.writeString(folder.resolve("vendas.json"), "[]");
+            java.nio.file.Files.writeString(folder.resolve("estoque.json"), "[{\"id\":1},{\"id\":1}]");
+            assertThrows(IllegalArgumentException.class, () -> bootstrap.run(new org.springframework.boot.DefaultApplicationArguments(new String[0])));
+            assertEquals(0, records.count());
+        } finally { target.directory = ""; }
+    }
     private String create(String module, Map<String, Object> data) throws Exception {
         var response = mvc.perform(post("/api/crm/" + module).header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(data))).andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();

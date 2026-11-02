@@ -28,20 +28,33 @@ public class Bootstrap implements ApplicationRunner {
         String normalized = email.trim().toLowerCase(Locale.ROOT);
         if (users.findByEmail(normalized).isEmpty()) users.save(new AppUser(normalized, passwords.encode(password)));
         if (directory.isBlank()) return;
+        Path importPath = Path.of(directory);
+        if (!Files.isDirectory(importPath) || !Files.isRegularFile(importPath.resolve("estoque.json")))
+            throw new IllegalArgumentException("Pasta de importação inválida ou estoque.json ausente.");
         // Explicit opt-in, transactional and idempotent; source files are never changed.
         for (String module : List.of("estoque", "clientes", "leads", "despesas", "agenda", "documentos", "company_cnpjs", "vendas")) {
             Path file = Path.of(directory, module + ".json");
             if (!Files.exists(file)) continue;
             List<Map<String, Object>> data = mapper.readValue(Files.readString(file), new TypeReference<>() {});
+            Set<String> seen = new HashSet<>();
             for (var payload : data) {
+                if (payload == null) throw new IllegalArgumentException("Registro inválido em " + module);
                 String legacyId = Objects.toString(payload.get("id"), "");
                 if (legacyId.isBlank()) throw new IllegalArgumentException("Registro sem id em " + module);
+                if (!seen.add(legacyId)) throw new IllegalArgumentException("Id duplicado em " + module);
                 if (records.findByModuleAndLegacyId(module, legacyId).isPresent()) continue;
                 var record = new CrmRecord(module, payload);
                 record.legacyId = legacyId;
                 Object carId = payload.getOrDefault("carId", payload.get("car_id"));
                 if (module.equals("leads")) carId = payload.get("interestCarId");
-                if (carId != null) record.vehicle = records.findByModuleAndLegacyId("estoque", carId.toString()).orElse(null);
+                if (carId != null && !carId.toString().isBlank()) {
+                    record.vehicle = records.findByModuleAndLegacyId("estoque", carId.toString()).orElse(null);
+                    // Archived modules retain the original reference in the untouched payload.
+                    if (record.vehicle == null && !Set.of("leads", "agenda").contains(module))
+                        throw new IllegalArgumentException("Vínculo de veículo inexistente em " + module);
+                } else if (module.equals("vendas")) {
+                    throw new IllegalArgumentException("Venda sem veículo na importação.");
+                }
                 records.saveAndFlush(record);
             }
         }
