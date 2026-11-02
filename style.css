@@ -8320,3 +8320,10 @@ body.dark-mode .emerald-glow-card {
 .stock-filter-values input { margin-top: 2px; flex-shrink: 0; accent-color: var(--blue-primary); }
 
 .pending-menu [role="status"] { font-size: 11px; color: var(--red-alert); padding: 0 6px; }
+
+.cd-right-column-premium { min-width: 0; }
+.cd-right-column-premium .premium-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cd-right-column-premium .premium-form-group { min-width: 0; }
+#pending-toggle, .catalog-toggle { min-width: 0; max-width: 100%; }
+#pending-toggle-label, .catalog-toggle > span:first-child { min-width: 0; flex: 1; }
+.catalog-toggle > span:last-child { flex-shrink: 0; }
