@@ -24,6 +24,7 @@ foreach ($asset in @('index.html','style.css','app.js','service-worker.js','mani
 }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'windows/Start-Mcampos.ps1') -Destination $bundle
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'windows/Iniciar.cmd') -Destination $bundle
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'windows/Install-Mcampos.ps1') -Destination $bundle
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'windows/config.env.example') -Destination $bundle
 Copy-Item -LiteralPath (Join-Path $repo 'docs/windows.md') -Destination (Join-Path $bundle 'LEIA-ME.md')
 $Version | Set-Content -LiteralPath (Join-Path $bundle 'VERSION') -Encoding ascii

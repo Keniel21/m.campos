@@ -16,6 +16,8 @@ O script inclui todos os modulos do runtime para compatibilidade e preserva os a
 
 ## Configurar e iniciar
 
+Para a instalacao inicial, o mantenedor pode usar `Install-Mcampos.ps1`, informando `-PackageDirectory`, `-PrivateConfigFile` (credencial limitada de producao) e `-DocumentsDirectory`. O instalador valida os hashes dos documentos, recusa sobrescrever dados existentes, restringe as permissoes da pasta e cria o atalho. Use `-DataDirectory` e `-NoShortcut` em ensaios isolados. O banco definitivo foi preparado separadamente; o instalador nao restaura nem migra o PostgreSQL.
+
 1. Extraia o ZIP em uma pasta nova.
 2. Crie `%LOCALAPPDATA%\Mcampos` e copie `config.env.example` para `config.env` nessa pasta.
 3. O responsavel tecnico configura a conexao e os segredos, usando a credencial limitada do aplicativo. Nao enviar esse arquivo por chat nem inclui-lo no Git.
