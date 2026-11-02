@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-@Service
 public class DocumentStorage {
     static final int MAX_BYTES = 20 * 1024 * 1024;
     private final Path root;
@@ -33,13 +32,19 @@ public class DocumentStorage {
         throw CrmService.bad("Anexe um PDF ou imagem JPEG válido.");
     }
     public byte[] read(String digest) {
+        path(digest); // Validate the key before either local or remote access.
+        byte[] bytes=readBytes(digest);
+        if(bytes.length==0||bytes.length>MAX_BYTES)throw new ResponseStatusException(HttpStatus.CONFLICT,"Tamanho do documento inválido.");
+        if(!hash(bytes).equals(digest))throw new ResponseStatusException(HttpStatus.CONFLICT,"A integridade do documento não confere.");
+        mediaType(bytes);
+        return bytes;
+    }
+    protected byte[] readBytes(String digest) {
         try {
             Path file = path(digest);
             if (!Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS) || Files.size(file) > MAX_BYTES)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Arquivo local indisponível. Confira o backup dos documentos.");
             byte[] bytes = Files.readAllBytes(file);
-            if (!hash(bytes).equals(digest)) throw new ResponseStatusException(HttpStatus.CONFLICT,"A integridade do arquivo local não confere.");
-            mediaType(bytes);
             return bytes;
         } catch (IOException e) { throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Arquivo local indisponível."); }
     }
@@ -58,6 +63,10 @@ public class DocumentStorage {
         String mime = mediaType(bytes);
         if (!dataUrl.startsWith("data:"+mime+";base64,")) throw CrmService.bad("O tipo informado não corresponde ao conteúdo do arquivo.");
         String digest = hash(bytes);
+        writeBytes(digest,bytes,mime);
+        return inspect(digest);
+    }
+    protected void writeBytes(String digest,byte[] bytes,String mime) {
         try {
             Files.createDirectories(root);
             Path destination = path(digest);
@@ -70,7 +79,6 @@ public class DocumentStorage {
                     catch (FileAlreadyExistsException ignored) {}
                 } finally { Files.deleteIfExists(temporary); }
             }
-            return inspect(digest);
         } catch (IOException e) { throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"Não foi possível gravar o documento local. Confira o disco."); }
     }
 }

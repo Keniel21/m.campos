@@ -7,7 +7,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-@RestController @Profile("desktop") @RequestMapping("/api/desktop/documents")
+@RestController @Profile({"desktop", "web"}) @RequestMapping("/api/desktop/documents")
 class DocumentController {
     private final DesktopService service;
     private final DocumentStorage storage;

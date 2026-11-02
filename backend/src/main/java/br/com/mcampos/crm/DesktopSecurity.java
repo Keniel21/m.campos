@@ -10,7 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Configuration @Profile("desktop")
+@Configuration @Profile("desktop & !web")
 class DesktopSecurity {
     @Bean SecurityFilterChain desktopFilterChain(HttpSecurity http) throws Exception {
         return http.headers(h -> h.frameOptions(f -> f.sameOrigin()))

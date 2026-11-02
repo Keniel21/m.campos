@@ -3,6 +3,8 @@ import { state } from './state.js';
 const rawFetch = window.fetch.bind(window);
 let session;
 let installed = false;
+let signingIn = false;
+let expired = false;
 export const cachedProfiles = [];
 function report(error) {
     if (window.showToast) window.showToast(error.message, 'error');
@@ -10,7 +12,7 @@ function report(error) {
 }
 export function initSupabase() {
     state.isCloudActive = true;
-    state.sessionUser = { id: 'adm-master-session', name: 'Operador', role: 'admin' };
+    state.sessionUser = null;
     state.supabaseClient = { from: table => new LocalQuery(table) };
     if (installed) return;
     installed = true;
@@ -24,6 +26,10 @@ export function initSupabase() {
         if (write && session) headers.set(session.header, session.token);
         try {
             const response = await rawFetch(url, { ...options, headers, credentials: 'same-origin', cache: 'no-store' });
+            if (response.status === 401 && session?.mode === 'web') {
+                if (!expired) { expired = true; location.reload(); }
+                throw new Error('Sua sessão expirou. Entre novamente.');
+            }
             if (!response.ok) {
                 const body = await response.json().catch(() => ({}));
                 throw new Error(body.error || body.message || 'Não foi possível salvar. Confira a conexão e tente novamente.');
@@ -79,33 +85,73 @@ export async function checkActiveSession() {
     let stage = 'session';
     try {
         const response = await rawFetch('/api/desktop/session', { credentials: 'same-origin', cache: 'no-store' });
-        if (!response.ok) throw new Error('O servidor local não está disponível. Inicie o backend Java.');
+        if (!response.ok) throw new Error('Não foi possível acessar o sistema. Confira a conexão e tente novamente.');
         session = await response.json();
+        const logout = document.getElementById('btn-web-logout');
+        if (logout) logout.style.display = 'none';
+        if (session.mode === 'web' && !session.authenticated) {
+            document.getElementById('login-overlay')?.classList.add('active');
+            return false;
+        }
+        state.sessionUser = { id: 'adm-master-session', name: session.userName || 'Operador', role: 'admin' };
         stage = 'data';
         await fetchCloudData();
         stage = 'render';
-        document.getElementById('login-overlay')?.classList.remove('active');
         window.updateApplicationState?.();
+        document.getElementById('login-overlay')?.classList.remove('active');
+        if (logout && session.mode === 'web') logout.style.display = 'inline-flex';
         window.initCharts?.();
+        return true;
     } catch (error) {
         console.error(`Falha ao iniciar a aplicação (${stage}):`, error.message);
         const overlay = document.getElementById('login-overlay');
         if (overlay) {
             overlay.classList.add('active');
-            overlay.innerHTML = '<div class="login-card"><h2>Conexão indisponível</h2><p>Confira o servidor local e a internet. Os dados não foram alterados.</p><button onclick="location.reload()">Tentar novamente</button></div>';
-            if (stage === 'render') {
-                overlay.querySelector('h2').textContent = 'Erro ao carregar a tela';
-                overlay.querySelector('p').textContent = 'Os dados foram carregados, mas não foi possível exibir a tela. Tente novamente.';
-            }
+            loginError(stage === 'render' ? 'Os dados foram carregados, mas houve um erro ao exibir a tela. Atualize a página.' : error.message);
         }
         report(error);
+        return false;
     }
 }
 // Old localStorage and outbox data are never automatically uploaded.
 export function persistLocalData() {}
 export const connectAdminCockpit = checkActiveSession;
-export const handleLogin = async event => { event?.preventDefault(); await checkActiveSession(); };
-export const handleLogout = () => location.reload();
+function loginError(message) {
+    const box = document.getElementById('login-error-message');
+    if (box) { box.textContent = message; box.style.display = message ? 'block' : 'none'; }
+}
+export async function handleLogin(event) {
+    event?.preventDefault();
+    if (signingIn) return;
+    signingIn = true;
+    const button = document.querySelector('#form-login button[type="submit"]');
+    if (button) button.disabled = true;
+    loginError('');
+    try {
+        const response = await rawFetch('/api/desktop/session', { credentials: 'same-origin', cache: 'no-store' });
+        if (!response.ok) throw new Error('Não foi possível acessar o sistema. Tente novamente.');
+        session = await response.json();
+        if (session.mode === 'web') {
+            const body = new URLSearchParams({ email: document.getElementById('login-email').value.trim(), password: document.getElementById('login-password').value });
+            const result = await rawFetch('/api/web/login', { method: 'POST', credentials: 'same-origin', cache: 'no-store',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', [session.header]: session.token }, body });
+            if (!result.ok) throw new Error(result.status === 429 ? 'Muitas tentativas. Aguarde um minuto e tente novamente.' : result.status === 401 ? 'E-mail ou senha inválidos.' : 'Não foi possível entrar. Atualize a página e tente novamente.');
+            document.getElementById('login-password').value = '';
+        }
+        await checkActiveSession(); // Login rotates the CSRF token and the session id.
+    } catch (error) { loginError(error.message); }
+    finally { signingIn = false; if (button) button.disabled = false; }
+}
+export async function handleLogout() {
+    try {
+        if (session?.mode === 'web') {
+            const response = await rawFetch('/api/web/logout', { method: 'POST', credentials: 'same-origin',
+                headers: { [session.header]: session.token }, cache: 'no-store' });
+            if (!response.ok) throw new Error('Não foi possível sair. Tente novamente.');
+        }
+        location.reload(); // Drop all private in-memory data and rendered forms.
+    } catch (error) { report(error); }
+}
 export const handleSignup = event => event?.preventDefault();
 export const bypassLoginForDemo = checkActiveSession;
 export const loadProfiles = async () => [];
