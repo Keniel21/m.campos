@@ -313,8 +313,7 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
         const listDiv = document.createElement("div");
         listDiv.className = "estoque-modern-row";
         listDiv.style.cursor = "pointer";
-        listDiv.onclick = (e) => {
-            if (e.target.closest('button')) return;
+        listDiv.onclick = () => {
             openCarDetails(car.id);
         };
         listDiv.innerHTML = `
@@ -353,23 +352,13 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
             <div class="col-status">
                 <span class="badge ${car.status}">${car.status}</span>
             </div>
-            <div class="col-actions" style="text-align: center;">
-                <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
-                    <button class="btn btn-secondary" style="padding:6px; border-radius:8px;" onclick="window.openCarDetails(${car.id})" title="Ficha Técnica / Editar"><i data-lucide="pencil" style="width:14px;height:14px;"></i></button>
-                    ${car.status !== 'vendido' 
-                        ? `<button class="btn btn-success" style="padding:6px; border-radius:8px;" onclick="event.stopPropagation(); window.openCarDetailsForSale(${car.id})" title="Registrar Venda"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>`
-                        : `<button class="btn btn-secondary" style="padding:6px; border-radius:8px; color:var(--blue-primary);" onclick="event.stopPropagation(); window.openCarDetailsForSale(${car.id});" title="Ver venda na ficha do veículo"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>`}
-                    <button class="btn" style="padding:6px; border-radius:8px; background-color:rgba(239,68,68,0.12); color:var(--red-alert); border:1px solid rgba(239,68,68,0.18)" onclick="window.deleteCarConfirm(${car.id})" title="Excluir"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
-                </div>
-            </div>
         `;
         listBody.appendChild(listDiv);
 
         // --- CARD (GRID) ---
         const gridDiv = document.createElement("div");
         gridDiv.className = `estoque-grid-card ${car.status}`;
-        gridDiv.onclick = (e) => {
-            if (e.target.closest('button')) return;
+        gridDiv.onclick = () => {
             openCarDetails(car.id);
         };
         gridDiv.innerHTML = `
@@ -402,12 +391,6 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-color);">
                     <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:${docColor}; font-weight:500;">
                         <i data-lucide="${docIcon}" style="width:16px; height:16px;"></i> ${docTitle}
-                    </div>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn btn-secondary btn-sm" onclick="window.openCarDetails(${car.id})"><i data-lucide="pencil" style="width:12px; height:12px; margin-right:4px;"></i> Editar</button>
-                        ${car.status !== 'vendido' 
-                            ? `<button class="btn btn-success btn-sm" onclick="event.stopPropagation(); window.openCarDetailsForSale(${car.id})"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Vender</button>`
-                            : `<button class="btn btn-secondary btn-sm" style="color:var(--blue-primary);" onclick="event.stopPropagation(); window.openCarDetailsForSale(${car.id});"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Ver Venda</button>`}
                     </div>
                 </div>
             </div>
@@ -1506,34 +1489,6 @@ export function switchDetailsTab(view) {
         const btn = document.querySelector('.cd-nav-item[onclick*="car-edit"]');
         if (btn) btn.classList.add("active");
     }
-}
-
-// Delete confirm dialog
-export async function deleteCarConfirm(id) {
-    showCustomConfirm(
-        "Excluir Veículo",
-        "Tem certeza que deseja excluir permanentemente este veículo do sistema?",
-        async () => {
-            try {
-                await fetch(`/api/crm/estoque/${id}`, { method: 'DELETE' });
-            } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
-
-            if (state.supabaseClient && state.sessionUser && state.sessionUser.id !== 'adm-master-session') {
-                try {
-                    await state.supabaseClient.from('estoque').delete().eq('id', id);
-                } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
-            }
-
-            state.estoque = state.estoque.filter(c => String(c.id) !== String(id));
-            persistLocalData();
-            closeCarDetails();
-            window.updateApplicationState();
-            if (window.showToast) {
-                window.showToast("Veículo removido com sucesso!", "success");
-            }
-        },
-        "Excluir Veículo"
-    );
 }
 
 // Render sub-expenses for spec page
@@ -2804,3 +2759,4 @@ export async function saveCarDetailsSale(vendaId) {
     window.updateApplicationState();
     if (carId) openCarDetails(carId);
 }
+

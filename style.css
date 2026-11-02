@@ -5134,7 +5134,7 @@ body.dark-mode .search-result-item:hover, body.dark-mode .search-result-item.sel
 
 .estoque-modern-header {
     display: grid;
-    grid-template-columns: 2.3fr 0.6fr 0.6fr 0.8fr 1fr 1fr 1.2fr 0.9fr 0.8fr 1fr 1.2fr;
+    grid-template-columns: 2.3fr 0.6fr 0.6fr 0.8fr 1fr 1fr 1.2fr 0.9fr 0.8fr 1fr;
     min-width: 1100px;
     padding: 12px 24px;
     color: var(--text-muted);
@@ -5182,7 +5182,7 @@ body.dark-mode .search-result-item:hover, body.dark-mode .search-result-item.sel
 
 .estoque-modern-row {
     display: grid;
-    grid-template-columns: 2.3fr 0.6fr 0.6fr 0.8fr 1fr 1fr 1.2fr 0.9fr 0.8fr 1fr 1.2fr;
+    grid-template-columns: 2.3fr 0.6fr 0.6fr 0.8fr 1fr 1fr 1.2fr 0.9fr 0.8fr 1fr;
     align-items: center;
     background-color: var(--card-bg);
     border: 1px solid var(--border-subtle);
