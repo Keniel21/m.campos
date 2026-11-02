@@ -10,7 +10,7 @@ function report(error) {
 }
 export function initSupabase() {
     state.isCloudActive = true;
-    state.sessionUser = { id: 'adm-master-session', role: 'admin' };
+    state.sessionUser = { id: 'adm-master-session', name: 'Operador', role: 'admin' };
     state.supabaseClient = { from: table => new LocalQuery(table) };
     if (installed) return;
     installed = true;
@@ -76,19 +76,27 @@ export async function fetchCloudData() {
     return data;
 }
 export async function checkActiveSession() {
+    let stage = 'session';
     try {
         const response = await rawFetch('/api/desktop/session', { credentials: 'same-origin', cache: 'no-store' });
         if (!response.ok) throw new Error('O servidor local não está disponível. Inicie o backend Java.');
         session = await response.json();
+        stage = 'data';
         await fetchCloudData();
+        stage = 'render';
         document.getElementById('login-overlay')?.classList.remove('active');
         window.updateApplicationState?.();
         window.initCharts?.();
     } catch (error) {
+        console.error(`Falha ao iniciar a aplicação (${stage}):`, error.message);
         const overlay = document.getElementById('login-overlay');
         if (overlay) {
             overlay.classList.add('active');
             overlay.innerHTML = '<div class="login-card"><h2>Conexão indisponível</h2><p>Confira o servidor local e a internet. Os dados não foram alterados.</p><button onclick="location.reload()">Tentar novamente</button></div>';
+            if (stage === 'render') {
+                overlay.querySelector('h2').textContent = 'Erro ao carregar a tela';
+                overlay.querySelector('p').textContent = 'Os dados foram carregados, mas não foi possível exibir a tela. Tente novamente.';
+            }
         }
         report(error);
     }
