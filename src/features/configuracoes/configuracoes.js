@@ -78,7 +78,7 @@ export function toggleSidebar() {
 
 // Main Tab Navigation Switcher
 export function switchTab(tabId) {
-    if (['dashboard', 'vendas', 'leads', 'agenda', 'usuarios'].includes(tabId)) {
+    if (['dashboard', 'vendas', 'leads', 'agenda', 'usuarios', 'configuracoes'].includes(tabId)) {
         if (tabId === 'vendas') {
             const statusFilter = document.getElementById('filter-estoque-status');
             if (statusFilter) statusFilter.value = 'vendido';

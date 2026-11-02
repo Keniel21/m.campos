@@ -10,6 +10,7 @@ A interface oficial é o front original do AutoDrive, em `index.html`, `style.cs
 - Busca combinada com a situação e contagem dos veículos encontrados.
 - Lista, grade e exportação CSV respeitam o filtro selecionado.
 - Dados da venda acessíveis na ficha original do veículo. Após registrar a venda, a tela retorna ao Estoque com o filtro Vendido.
+- Removidos o botão flutuante e o atalho do cabeçalho do Auto Agente, seus atalhos de teclado, o painel de perfil/configurações e a edição de perfil.
 - Os registros e históricos são preservados; a remoção de menus não exclui dados.
 
 ## Executar a aplicação com o front original

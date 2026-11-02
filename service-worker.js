@@ -1,7 +1,7 @@
 // ==========================================================================
 // AUTO DRIVE CRM - SERVICE WORKER (PWA OFFLINE)
 // ==========================================================================
-const CACHE_NAME = 'autodrive-crm-v6';
+const CACHE_NAME = 'autodrive-crm-v7';
 
 const ASSETS_TO_CACHE = [
     './',

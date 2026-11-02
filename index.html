@@ -90,80 +90,12 @@
                     </button>
                     <input type="text" id="navbar-search-input" class="navbar-search-input" placeholder="Buscar menu..." oninput="handleMenuSearch(this.value)" onkeydown="handleMenuSearchKey(event)">
                     <div class="search-results-dropdown" id="search-results-dropdown"></div>
-                    <button class="navbar-util-btn auto-agente-nav-btn" id="btn-open-auto-agente-nav" title="Auto Agente AI - Assistente Integrado (Ctrl+Espaço)" onclick="window.toggleAutoAgente()">
-                        <i data-lucide="sparkles"></i>
-                    </button>
+
                     <button class="navbar-util-btn theme-toggle-btn active" title="Alternar Tema" onclick="toggleAppTheme()">
                         <i data-lucide="sun"></i>
                     </button>
                 </div>
-                <div class="navbar-user-profile" id="navbar-user-profile" onclick="window.toggleUserProfileMenu(event)" title="Clique para abrir as configurações do perfil">
-                    <div class="user-avatar" id="footer-avatar">AD</div>
-                    <div class="user-info">
-                        <h4 id="footer-username">Marcelo Motors</h4>
-                        <p id="footer-userrole">Operador Único</p>
-                    </div>
-                    <i data-lucide="chevron-down" style="width:14px; height:14px; color:var(--text-muted); margin-left:2px; transition: transform 0.2s;" id="profile-chevron"></i>
 
-                    <!-- Dropdown Menu do Perfil & Configurações -->
-                    <div class="user-profile-dropdown" id="user-profile-dropdown" onclick="event.stopPropagation()">
-                        <div class="profile-dropdown-header">
-                            <div class="user-avatar large" id="dropdown-avatar">AD</div>
-                            <div class="profile-dropdown-user-details">
-                                <h4 id="dropdown-username">Marcelo Motors</h4>
-                                <span class="user-role-badge"><i data-lucide="shield-check" style="width:12px;height:12px;"></i> Administrador</span>
-                                <span class="user-email-text" id="dropdown-user-email">operador@autodrive.com</span>
-                            </div>
-                        </div>
-
-                        <div class="profile-dropdown-divider"></div>
-
-                        <div class="profile-dropdown-menu">
-                            <a class="profile-dropdown-item" onclick="switchTab('configuracoes'); window.closeUserProfileMenu();">
-                                <div class="dropdown-item-icon blue"><i data-lucide="building-2"></i></div>
-                                <div class="dropdown-item-content">
-                                    <strong>Dados da Empresa & CNPJs</strong>
-                                    <span>Cadastrar CNPJs emissores e matriz/filiais</span>
-                                </div>
-                                <i data-lucide="chevron-right" class="arrow-icon"></i>
-                            </a>
-
-                            <a class="profile-dropdown-item" onclick="window.openEditProfileModal(); window.closeUserProfileMenu();">
-                                <div class="dropdown-item-icon purple"><i data-lucide="user-cog"></i></div>
-                                <div class="dropdown-item-content">
-                                    <strong>Meu Perfil & Conta</strong>
-                                    <span>Alterar nome de exibição, cargo e foto</span>
-                                </div>
-                                <i data-lucide="chevron-right" class="arrow-icon"></i>
-                            </a>
-
-                            <a class="profile-dropdown-item" onclick="switchTab('usuarios'); window.closeUserProfileMenu();">
-                                <div class="dropdown-item-icon green"><i data-lucide="shield-check"></i></div>
-                                <div class="dropdown-item-content">
-                                    <strong>Aprovações & Usuários</strong>
-                                    <span>Gerenciar acessos e permissões</span>
-                                </div>
-                                <i data-lucide="chevron-right" class="arrow-icon"></i>
-                            </a>
-
-                            <a class="profile-dropdown-item" onclick="toggleAppTheme();">
-                                <div class="dropdown-item-icon yellow"><i data-lucide="moon"></i></div>
-                                <div class="dropdown-item-content">
-                                    <strong>Alternar Tema</strong>
-                                    <span>Mudar para Modo Escuro / Claro</span>
-                                </div>
-                            </a>
-                        </div>
-
-                        <div class="profile-dropdown-divider"></div>
-
-                        <div class="profile-dropdown-footer">
-                            <button class="btn-logout-dropdown" onclick="handleLogout()">
-                                <i data-lucide="log-out"></i> Sair do Sistema
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </header>
 
@@ -1593,92 +1525,7 @@
         <!-- ==========================================
              ABA 8: CONFIGURAÇÕES & DADOS DA EMPRESA
              ========================================== -->
-        <section id="configuracoes-tab" class="tab-pane">
-            <div class="section-header">
-                <div>
-                    <h2>Configurações & Dados da Empresa</h2>
-                    <p>Cadastre os CNPJs e filiais do seu grupo comercial para emissão e controle de vendas</p>
-                </div>
-            </div>
 
-            <!-- CARD: Cadastro de CNPJs / Filiais -->
-            <div class="saas-card" style="margin-top: 20px; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
-                <div class="panel-header" style="margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                    <div class="panel-title" style="display:flex; align-items:center; gap:10px;">
-                        <div style="background: rgba(59, 130, 246, 0.1); color: var(--blue-primary); padding: 8px; border-radius: 8px; display: flex; align-items: center;">
-                            <i data-lucide="building-2"></i>
-                        </div>
-                        <div>
-                            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-light);">CNPJs da Empresa & Filiais Vendedoras</h3>
-                            <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted);">Os CNPJs cadastrados aqui estarão disponíveis para escolha no momento do registro de venda e emissão de recibo.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Formulário de adição rápida de CNPJ -->
-                <form id="form-add-company-cnpj" onsubmit="event.preventDefault(); window.handleAddCompanyCnpj();" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto; gap: 12px; align-items: end; background: var(--bg-hover, rgba(255,255,255,0.02)); padding: 16px; border-radius: 12px; border: 1px dashed var(--border-color); margin-bottom: 24px;">
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Razão Social / Apelido da Loja</label>
-                        <input type="text" id="config-cnpj-name" class="form-control" placeholder="Ex: AutoDrive Motors Matriz" required style="margin-bottom:0;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Número do CNPJ</label>
-                        <input type="text" id="config-cnpj-number" class="form-control" placeholder="00.000.000/0001-00" required style="margin-bottom:0;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Inscrição Estadual (Opcional)</label>
-                        <input type="text" id="config-cnpj-ie" class="form-control" placeholder="Ex: 123.456.789.110" style="margin-bottom:0;">
-                    </div>
-                    <div>
-                        <button type="submit" class="btn btn-primary" style="height: 42px; display: flex; align-items: center; gap: 6px;">
-                            <i data-lucide="plus-circle"></i> Cadastrar CNPJ
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Tabela de CNPJs cadastrados -->
-                <div class="table-responsive">
-                    <table class="table" style="width:100%; border-collapse:collapse;">
-                        <thead>
-                            <tr style="border-bottom:1px solid var(--border-color); text-align:left;">
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600;">Empresa / Apelido</th>
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600;">CNPJ</th>
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600;">Inscrição Estadual</th>
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600;">Status</th>
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600; text-align:center;">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="company-cnpjs-table-body">
-                            <!-- Inserido dinamicamente -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- CARD: Aparência e Preferências -->
-            <div class="saas-card" style="margin-top: 24px; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
-                <div class="panel-header" style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
-                    <div class="panel-title" style="display:flex; align-items:center; gap:10px;">
-                        <div style="background: rgba(168, 85, 247, 0.1); color: #a855f7; padding: 8px; border-radius: 8px; display: flex; align-items: center;">
-                            <i data-lucide="palette"></i>
-                        </div>
-                        <div>
-                            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-light);">Preferências da Interface</h3>
-                            <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted);">Personalize o tema e atalhos visuais</p>
-                        </div>
-                    </div>
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 0;">
-                    <div>
-                        <strong style="color:var(--text-light); font-size:14px; display:block;">Modo Escuro / Claro (Dark Mode)</strong>
-                        <span style="font-size:12px; color:var(--text-muted);">Alterne entre a interface moderna em tom escuro ou claro</span>
-                    </div>
-                    <button class="btn btn-secondary theme-toggle-btn" onclick="toggleAppTheme()">
-                        <i data-lucide="moon"></i> Alternar Tema
-                    </button>
-                </div>
-            </div>
-        </section>
 
     </main>
 
@@ -2435,59 +2282,7 @@
     </div>
 
     <!-- EDITAR PERFIL DO OPERADOR -->
-    <div class="modal-overlay" id="modal-edit-profile">
-        <div class="modal-content" style="max-width: 520px;">
-            <div class="modal-header">
-                <h2><i data-lucide="user-cog" style="width:20px;height:20px;color:var(--blue-primary);margin-right:8px;vertical-align:middle;"></i> Editar Perfil do Operador</h2>
-                <button class="close-modal-btn" onclick="window.closeEditProfileModal()"><i data-lucide="x"></i></button>
-            </div>
-            <div class="modal-body">
-                <form id="form-edit-profile" onsubmit="window.saveUserProfile(event)">
-                    <div class="form-group">
-                        <label for="edit-profile-name">Nome de Exibição *</label>
-                        <input type="text" id="edit-profile-name" class="form-control" placeholder="Ex: Marcelo Motors" required>
-                    </div>
-                    <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                        <div>
-                            <label for="edit-profile-email">E-mail do Operador</label>
-                            <input type="email" id="edit-profile-email" class="form-control" placeholder="operador@autodrive.com">
-                        </div>
-                        <div>
-                            <label for="edit-profile-role">Cargo / Função</label>
-                            <input type="text" id="edit-profile-role" class="form-control" placeholder="Ex: Administrador">
-                        </div>
-                    </div>
 
-                    <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--border-color);">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <label style="font-weight:600; font-size:13px; color:var(--text-light); margin:0; display:flex; align-items:center; gap:6px;">
-                                <i data-lucide="building-2" style="width:15px;height:15px;color:var(--blue-primary);"></i>
-                                CNPJs da Empresa & Filiais Vendedoras
-                            </label>
-                            <div style="display:flex; gap:6px;">
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="window.quickAddSellerCnpjPrompt()" style="font-size:11px; padding:4px 8px;">
-                                    <i data-lucide="plus" style="width:12px;height:12px;margin-right:2px;"></i> Adicionar
-                                </button>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="switchTab('configuracoes'); window.closeEditProfileModal();" style="font-size:11px; padding:4px 8px;">
-                                    <i data-lucide="settings" style="width:12px;height:12px;margin-right:2px;"></i> Gerenciar
-                                </button>
-                            </div>
-                        </div>
-                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
-                            Estes CNPJs ficam disponíveis nas telas de venda e relatórios de veículos.
-                        </p>
-                        <div id="profile-cnpjs-quick-list" style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto;">
-                            <!-- Preenchido dinamicamente -->
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="window.closeEditProfileModal()">Cancelar</button>
-                <button class="btn btn-primary" type="submit" form="form-edit-profile"><i data-lucide="save"></i> Salvar Perfil</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal Busca Fipe -->
     <div class="modal-overlay" id="modal-fipe">
@@ -2680,97 +2475,9 @@
         </div>
     </div>
 
-    <!-- ==========================================================================
-         AUTO AGENTE (LLM CO-PILOT GEMINI 3.7 FLASH)
-         ========================================================================== -->
-    <!-- Floating Launcher Button -->
-    <div id="auto-agente-fab" class="auto-agente-fab" onclick="window.toggleAutoAgente()" title="Auto Agente AI - Assistente Inteligente (Ctrl+Espaço)">
-        <div class="auto-agente-fab-glow"></div>
-        <div class="auto-agente-fab-icon">
-            <i data-lucide="sparkles"></i>
-        </div>
-        <span class="auto-agente-fab-label">Auto Agente</span>
-        <span class="auto-agente-fab-shortcut">Ctrl+Espaço</span>
-    </div>
 
-    <!-- Slide-over Drawer / Panel -->
-    <div id="auto-agente-drawer" class="auto-agente-drawer">
-        <!-- Backdrop for mobile / outside click -->
-        <div class="auto-agente-backdrop" onclick="window.closeAutoAgente()"></div>
 
-        <div class="auto-agente-panel">
-            <!-- Header -->
-            <div class="auto-agente-header">
-                <div class="auto-agente-header-title">
-                    <div class="auto-agente-avatar">
-                        <i data-lucide="sparkles"></i>
-                        <span class="auto-agente-pulse-ring"></span>
-                    </div>
-                    <div>
-                        <div class="auto-agente-name-row">
-                            <h3>Auto Agente</h3>
-                            <span class="auto-agente-model-badge">Gemini AI</span>
-                        </div>
-                        <p class="auto-agente-status-text">
-                            <span class="status-dot online"></span> Conectado ao Pátio & CRM
-                        </p>
-                    </div>
-                </div>
-                <div class="auto-agente-header-actions">
-                    <button class="auto-agente-icon-btn" onclick="window.clearAutoAgenteHistory()" title="Limpar conversa">
-                        <i data-lucide="trash-2"></i>
-                    </button>
-                    <button class="auto-agente-icon-btn" onclick="window.closeAutoAgente()" title="Fechar (Esc)">
-                        <i data-lucide="x"></i>
-                    </button>
-                </div>
-            </div>
 
-            <!-- Quick Capabilities Banner -->
-            <div class="auto-agente-capabilities-bar">
-                <span><i data-lucide="zap"></i> Executa ações reais: cadastra leads, agendas, despesas e busca no estoque</span>
-            </div>
-
-            <!-- Messages Body -->
-            <div id="auto-agente-chat-body" class="auto-agente-chat-body">
-                <!-- Messages rendered dynamically -->
-            </div>
-
-            <!-- Input Area -->
-            <div class="auto-agente-input-wrapper">
-                <div class="auto-agente-input-box">
-                    <textarea 
-                        id="auto-agente-input" 
-                        class="auto-agente-textarea" 
-                        placeholder="Peça algo em linguagem natural... (ex: Cadastra o lead João no Corolla)"
-                        rows="1"
-                        onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); window.sendAutoAgenteMessage(); }"></textarea>
-                    
-                    <div class="auto-agente-input-actions">
-                        <button 
-                            id="auto-agente-mic-btn" 
-                            class="auto-agente-mic-btn" 
-                            type="button"
-                            onclick="window.toggleVoiceInput()" 
-                            title="Falar por voz (Microfone)">
-                            <i data-lucide="mic"></i>
-                        </button>
-                        <button 
-                            id="auto-agente-send-btn" 
-                            class="auto-agente-send-btn" 
-                            type="button"
-                            onclick="window.sendAutoAgenteMessage()" 
-                            title="Enviar comando (Enter)">
-                            <i data-lucide="send"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="auto-agente-input-hint">
-                    Pressione <strong>Enter</strong> para enviar ou use o <strong>microfone</strong> para falar.
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- JS Principal da Aplicação -->
     <script type="module" src="app.js"></script>

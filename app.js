@@ -46,7 +46,6 @@ import {
     getFilteredDates,
     updateSellerCnpjDatalists,
     renderCompanyCnpjsTable,
-    syncUserProfileHeaderDetails,
     updatePeriodUI
 } from './src/features/configuracoes/configuracoes.js';
 
@@ -225,16 +224,6 @@ import {
     calculateClientesKPIs 
 } from './src/features/clientes/clientes.js';
 
-import {
-    initAutoAgente,
-    toggleAutoAgente,
-    openAutoAgente,
-    closeAutoAgente,
-    sendAutoAgenteMessage,
-    sendQuickPrompt,
-    clearAutoAgenteHistory,
-    toggleVoiceInput
-} from './src/features/autoagente/autoagente.js';
 
 // Global state updater that cascades across all features
 export function updateApplicationState() {
@@ -463,7 +452,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupHeaderDate();
     initAppTheme();
     updateSellerCnpjDatalists();
-    syncUserProfileHeaderDetails();
 
     // Register Service Worker for PWA Offline functionality
     if ('serviceWorker' in navigator) {
@@ -485,7 +473,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const cacheKeys = await caches.keys();
             for (const key of cacheKeys) {
-                if (key !== 'autodrive-crm-v6') {
+                if (key !== 'autodrive-crm-v7') {
                     await caches.delete(key);
                 } else {
                     const c = await caches.open(key);
@@ -598,6 +586,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Initialize Google Calendar state
     initGoogleCalendar();
 
-    // Initialize Auto Agente AI Co-Pilot
-    initAutoAgente();
 });
