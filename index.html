@@ -499,16 +499,11 @@
                                     </div>
 
                                     <div class="premium-form-group">
-                                        <label class="premium-input-label" for="cd-document">Pendência</label>
-                                        <div class="input-with-icon-wrapper">
-                                            <i data-lucide="file-check"></i>
-                                            <select class="premium-select-field" id="cd-document">
-                                                <option value="none">Sem pendência</option>
-                                            </select>
-                                        </div>
-                                        <div class="pending-options-actions">
-                                            <button type="button" class="btn btn-secondary" data-pending-action onclick="managePending('create')">Nova opção</button>
-                                            <button type="button" class="btn btn-secondary" onclick="openPendingManager()">Gerenciar opções</button>
+                                        <label class="premium-input-label" for="pending-toggle">Pendência</label>
+                                        <div id="pending-field" class="pending-field">
+                                            <select id="cd-document" hidden aria-hidden="true" tabindex="-1"><option value="none">Sem pendência</option></select>
+                                            <button type="button" id="pending-toggle" class="premium-select-field" aria-expanded="false" aria-controls="pending-menu"><span id="pending-toggle-label">Sem pendência</span><span aria-hidden="true">⌄</span></button>
+                                            <div id="pending-menu" class="pending-menu" hidden role="group" aria-label="Opções de pendência"></div>
                                         </div>
                                     </div>
 

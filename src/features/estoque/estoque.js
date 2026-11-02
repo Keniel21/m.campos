@@ -4,6 +4,7 @@
 
 import { filterStock } from '../../utils/stock.js';
 import { pendingLabel, escapePending } from '../../utils/pendencias.js';
+import { renderPendingField } from './pending-field.js';
 import { state } from '../../services/state.js';
 import { formatCurrency, calcDaysInStock, parseCurrencyBR } from '../../utils/helpers.js';
 import { persistLocalData, fetchCloudData } from '../../services/supabase.js';
@@ -16,65 +17,7 @@ export let currentCdCarId = null;
 export let carDetailsOriginTab = 'estoque';
 
 function renderPendingSelect(value) {
-    const select = document.getElementById('cd-document');
-    if (!select) return;
-    const options = state.pendencias || [];
-    select.replaceChildren(new Option('Sem pendência', 'none'));
-    for (const option of options) select.add(new Option(option.name, option.code));
-    if (value !== 'none' && !options.some(option => option.code === value))
-        select.add(new Option(pendingLabel(value, options), value || 'unreported'));
-    select.value = value || 'unreported';
-    select.onchange = () => renderPendingSelect(select.value);
-}
-
-export function openPendingManager(selectedCode) {
-    let dialog = document.getElementById('pending-options-dialog');
-    if (!dialog) {
-        dialog = document.createElement('dialog');
-        dialog.id = 'pending-options-dialog';
-        dialog.innerHTML = '<h3>Gerenciar pendências</h3><p>Editar atualiza o nome em todos os veículos. Para excluir, a opção não pode estar em uso.</p><label for="pending-catalog">Opção cadastrada</label><select id="pending-catalog" class="premium-select-field"></select><div class="pending-options-actions"><button type="button" class="btn btn-secondary" data-pending-action onclick="managePending(\'create\')">Nova opção</button><button type="button" class="btn btn-secondary" data-pending-action id="pending-edit" onclick="managePending(\'edit\')">Editar opção</button><button type="button" class="btn btn-secondary" data-pending-action id="pending-delete" onclick="managePending(\'delete\')">Excluir opção</button><button type="button" class="btn btn-secondary" onclick="document.getElementById(\'pending-options-dialog\').close()">Fechar</button></div>';
-        document.body.appendChild(dialog);
-    }
-    const catalog = document.getElementById('pending-catalog');
-    const previous = selectedCode || catalog.value;
-    catalog.replaceChildren();
-    for (const option of state.pendencias || []) catalog.add(new Option(option.name, option.code));
-    if ([...catalog.options].some(option => option.value === previous)) catalog.value = previous;
-    document.getElementById('pending-edit').disabled = !catalog.value;
-    document.getElementById('pending-delete').disabled = !catalog.value;
-    if (!dialog.open) dialog.showModal();
-}
-
-export async function managePending(action) {
-    const select = document.getElementById('cd-document');
-    const previous = select.value;
-    const managing = document.getElementById('pending-options-dialog')?.open;
-    const option = (state.pendencias || []).find(item => item.code === (managing ? document.getElementById('pending-catalog').value : previous));
-    if (action !== 'create' && !option) return;
-    let name;
-    if (action !== 'delete') {
-        name = window.prompt(action === 'create' ? 'Qual é a pendência? (até 100 caracteres)' : 'Editar pendência (atualiza todos os veículos que a utilizam):', option?.name || '');
-        if (name === null) return;
-        name = name.trim();
-        if (!name || name.length > 100) { window.showToast('Informe uma pendência com até 100 caracteres.', 'error'); return; }
-    } else if (!window.confirm(`Excluir a opção “${option.name}”? Opções utilizadas por veículos não podem ser excluídas.`)) return;
-    const buttons = [...document.querySelectorAll('[data-pending-action]')];
-    buttons.forEach(button => button.disabled = true);
-    try {
-        const response = await fetch('/api/crm/pendencias' + (option && action !== 'create' ? '/' + option.id : ''), {
-            method: action === 'delete' ? 'DELETE' : action === 'create' ? 'POST' : 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            ...(action === 'delete' ? {} : { body: JSON.stringify({ name }) })
-        });
-        const saved = action === 'delete' ? null : await response.json();
-        await fetchCloudData();
-        renderPendingSelect(action === 'create' && !managing ? (saved.item || saved).code : previous);
-        if (managing) openPendingManager(saved ? (saved.item || saved).code : null);
-        renderEstoque();
-        if (action === 'create' && !managing) triggerCarDetailsAutoSave(0);
-        window.showToast(action === 'delete' ? 'Opção excluída.' : 'Pendência salva.', 'success');
-    } catch (error) { renderPendingSelect(previous); if (managing) openPendingManager(); window.showToast(error.message, 'error'); }
-    finally { buttons.forEach(button => button.disabled = false); if (managing) openPendingManager(); }
+    renderPendingField(value, renderEstoque);
 }
 
 // Select stock visual view: List vs Grid
