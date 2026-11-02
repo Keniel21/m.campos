@@ -56,6 +56,10 @@ e o backup do banco; o Neon não guarda os bytes locais.
 
 ## Validação
 
+Para criar, verificar e ensaiar a recuperação do banco e dos documentos, siga
+[o guia de backup](docs/backup.md). O pacote inclui o dump PostgreSQL e a pasta de
+arquivos; credenciais e configurações privadas ficam de fora.
+
 Execute mvn -f backend/pom.xml verify, node --test scripts/audit-legacy.test.cjs e,
 em frontend/, npm ci seguido de npm run build. O build copia os arquivos originais
 sem redesenhar a interface. GitHub Actions verifica o backend com PostgreSQL 17.
