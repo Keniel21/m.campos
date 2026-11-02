@@ -1213,6 +1213,7 @@ export function setAutoSaveStatus(status) {
     const icon = document.getElementById("cd-autosave-icon");
     const text = document.getElementById("cd-autosave-text");
     if (!indicator || !text || !icon) return;
+    indicator.dataset.state = status;
 
     if (status === 'saving') {
         icon.setAttribute('data-lucide', 'refresh-cw');
@@ -1220,10 +1221,10 @@ export function setAutoSaveStatus(status) {
         icon.style.color = 'var(--blue-primary)';
         text.innerText = 'Salvando...';
     } else if (status === 'saved') {
-        icon.setAttribute('data-lucide', 'cloud-check');
+        icon.setAttribute('data-lucide', 'check');
         icon.classList.remove('spin-animation');
         icon.style.color = 'var(--green-profit)';
-        text.innerText = 'Salvo automaticamente';
+        text.innerText = 'Salvo';
     } else if (status === 'error') {
         icon.setAttribute('data-lucide', 'alert-circle');
         icon.classList.remove('spin-animation');

@@ -5499,19 +5499,20 @@ body.dark-mode .estoque-modern-row .car-sub-item {
 .cd-autosave-indicator {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 11.5px;
-    font-weight: 500;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 400;
     color: var(--text-muted);
-    background: var(--body-bg, #f8fafc);
-    border: 1px solid var(--border-subtle);
-    border-radius: 20px;
-    padding: 5px 12px;
+    background: transparent;
+    border: none;
+    padding: 2px 0;
     user-select: none;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease;
     white-space: nowrap;
     flex-shrink: 0;
 }
+.cd-autosave-indicator[data-state="error"] { color: var(--red-alert); font-weight: 500; }
+.cd-autosave-indicator[data-state="saving"] { color: var(--blue-primary); }
 
 @media (max-width: 1024px) {
     .car-details-header-bar-premium {
