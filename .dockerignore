@@ -6,3 +6,12 @@ frontend/dist
 storage
 .env.neon*
 *.log
+**/.env*
+backups
+database
+docs
+.aistudio
+**/*.zip
+**/*.dump
+*.sql
+**/storage

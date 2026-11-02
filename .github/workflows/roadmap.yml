@@ -1,6 +1,20 @@
 name: Stack roadmap
 on: [push, pull_request]
 jobs:
+  render-image:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Render web image
+        run: docker build --file Dockerfile.render --tag mcampos-render:test .
+      - name: Verify packaged frontend and runtime
+        run: >-
+          docker run --rm --entrypoint sh mcampos-render:test -c
+          'test -s /app/app.jar && test -s /app/web/index.html &&
+          test -s /app/web/src/services/supabase.js &&
+          test ! -e /app/web/database && test ! -e /app/.env.neon.web &&
+          test "$(id -u)" = 10001 && sh -n /app/start-render.sh'
   storage-tools:
     runs-on: ubuntu-latest
     steps:
