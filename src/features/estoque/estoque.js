@@ -520,7 +520,7 @@ export async function handleAddCar(event) {
     const color = colorInput ? colorInput.value.trim() : "";
     const chassis = chassisInput ? chassisInput.value.trim().toUpperCase() : "";
     const renavam = renavamInput ? renavamInput.value.trim() : "";
-    const documentStatus = documentStatusInput ? documentStatusInput.value : "pendente";
+    const documentStatus = documentStatusInput ? documentStatusInput.value : null;
     
     const imagesUrl = photoInput ? photoInput.getAttribute('data-base64') || null : null;
 
@@ -537,7 +537,7 @@ export async function handleAddCar(event) {
         fipe_code: null,
         fipe_price: 0,
         notes: null,
-        document_status: documentStatus || 'pendente',
+        document_status: documentStatus || null,
         image_url: imagesUrl || null
     };
 
@@ -553,7 +553,7 @@ export async function handleAddCar(event) {
         fipeCode: "",
         fipePrice: 0,
         notes: "",
-        documentStatus: documentStatus || 'pendente',
+        documentStatus: documentStatus || null,
         image_url: imagesUrl || null
     };
 
