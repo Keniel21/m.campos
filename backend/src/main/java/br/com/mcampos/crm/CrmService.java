@@ -41,6 +41,7 @@ public class CrmService {
     public Map<String, Object> save(String module, String id, Map<String, Object> input) {
         module(module);
         var record = id == null ? new CrmRecord(module, Map.of()) : get(module, id);
+        var previousVehicle = record.getVehicle();
         var data = new LinkedHashMap<>(record.getPayload());
         data.putAll(input);
         data.remove("id");
@@ -80,7 +81,14 @@ public class CrmService {
             } else record.setVehicle(null);
         }
         record.setPayload(data);
-        return view(records.saveAndFlush(record));
+        records.saveAndFlush(record);
+        if (module.equals("estoque")) recalculateSales(record);
+        if (module.equals("despesas")) {
+            if (previousVehicle != null) recalculateSales(previousVehicle);
+            if (record.getVehicle() != null && (previousVehicle == null || !previousVehicle.getId().equals(record.getVehicle().getId())))
+                recalculateSales(record.getVehicle());
+        }
+        return view(record);
     }
     public void delete(String module, String id) {
         var record = get(module, id);
@@ -95,6 +103,27 @@ public class CrmService {
             car.setPayload(payload);
         }
         records.delete(record);
+        if (module.equals("despesas") && record.getVehicle() != null) {
+            records.flush();
+            recalculateSales(record.getVehicle());
+        }
+    }
+    void recalculateSales(CrmRecord vehicle) {
+        BigDecimal cost = new BigDecimal(Objects.toString(vehicle.getPayload().get("buyPrice"), "0"));
+        BigDecimal expenses = records.findByModuleOrderByIdAsc("despesas").stream()
+            .filter(r -> r.getVehicle() != null && r.getVehicle().getId().equals(vehicle.getId()))
+            .map(r -> new BigDecimal(Objects.toString(r.getPayload().get("val"), "0")))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        for (var sale : records.findByModuleOrderByIdAsc("vendas")) {
+            if (sale.getVehicle() == null || !sale.getVehicle().getId().equals(vehicle.getId())) continue;
+            BigDecimal price = new BigDecimal(Objects.toString(sale.getPayload().getOrDefault("sellPrice", sale.getPayload().get("sell_price")), "0"));
+            if (price.signum() <= 0) continue;
+            var payload = new LinkedHashMap<>(sale.getPayload());
+            BigDecimal profit = price.subtract(cost).subtract(expenses).setScale(2, java.math.RoundingMode.HALF_UP);
+            payload.put("profit", profit);
+            payload.put("margin", profit.multiply(BigDecimal.valueOf(100)).divide(price, 2, java.math.RoundingMode.HALF_UP));
+            sale.setPayload(payload);
+        }
     }
     void validate(String module, Map<String, Object> data) {
         String required = switch (module) {

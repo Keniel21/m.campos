@@ -87,6 +87,7 @@ export async function confirmDocUpload() {
             fileDataUrl = await readFileAsDataURL(file);
         } catch (e) {
             console.error("Erro ao ler arquivo como DataURL:", e);
+            return;
         }
 
         let effectiveUrl = fileDataUrl;
@@ -152,14 +153,11 @@ export async function confirmDocUpload() {
             }
         } catch (err) {
             console.error("Erro ao enviar documento para API central:", err);
+            return;
+            return;
         }
 
-        if (!savedDoc) {
-            const newId = (state.documentosVeiculo && state.documentosVeiculo.length > 0)
-                ? Math.max(...state.documentosVeiculo.map(d => Number(d.id) || 0)) + 1
-                : Date.now();
-            savedDoc = { id: newId, ...docPayload };
-        }
+        if (!savedDoc) { return; }
 
         // 4. Update in-memory state immediately
         if (!state.documentosVeiculo) state.documentosVeiculo = [];
@@ -540,21 +538,14 @@ export async function handleAddCar(event) {
                 state.estoque.unshift(savedCar);
             }
         }
-    } catch (_) {}
+    } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
 
-    if (!savedCar) {
-        const newId = state.estoque.length > 0 ? Math.max(...state.estoque.map(c => Number(c.id) || 0)) + 1 : 1;
-        savedCar = { id: newId, ...newCarLocal };
-        state.estoque.unshift(savedCar);
-        if (!state.pendingOutbox) state.pendingOutbox = [];
-        state.pendingOutbox.push({ type: 'carro', data: savedCar });
-        try { localStorage.setItem('crm_pending_outbox', JSON.stringify(state.pendingOutbox)); } catch (_) {}
-    }
+    if (!savedCar) { return; }
 
     if (state.supabaseClient && state.sessionUser && state.sessionUser.id !== 'adm-master-session') {
         try {
             await state.supabaseClient.from('estoque').insert([carData]);
-        } catch (_) {}
+        } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
     }
 
     persistLocalData();
@@ -1043,6 +1034,7 @@ export function removeSinglePhoto(idx) {
             state.supabaseClient.from('estoque').update({ image_url: car.image_url }).eq('id', currentCdCarId)
                 .then(() => window.fetchCloudData && window.fetchCloudData())
                 .catch(err => console.error("Erro ao atualizar fotos na nuvem:", err));
+            return;
         }
     }
 }
@@ -1144,6 +1136,7 @@ export function previewDetailsPhotos(input) {
                             if (window.fetchCloudData) window.fetchCloudData();
                         })
                         .catch(err => console.error(err));
+            return;
                 }
                 input.value = '';
             }
@@ -1167,6 +1160,7 @@ export function clearCarPhotos() {
                 state.supabaseClient.from('estoque').update({ image_url: null }).eq('id', currentCdCarId)
                     .then(() => window.fetchCloudData())
                     .catch(err => console.error(err));
+            return;
             }
         },
         "Remover"
@@ -1204,6 +1198,7 @@ export async function quickFipeSearch() {
         }
     } catch (e) {
         console.error("FIPE lookup failed", e);
+            return;
     }
 }
 
@@ -1408,7 +1403,7 @@ export async function saveCarDetails(options = { silent: true }) {
                     date: sellDate,
                     type: sellType
                 })
-            }).catch(() => {});
+            }).catch(error => { window.showToast?.(error.message, 'error'); });
 
             if (state.isCloudActive && state.supabaseClient && state.sessionUser && state.sessionUser.id !== 'adm-master-session') {
                 try {
@@ -1418,6 +1413,7 @@ export async function saveCarDetails(options = { silent: true }) {
                     state.supabaseClient.from('vendas').update(saleUpdateData).eq('id', existingSale.id).then(() => {});
                 } catch (e) {
                     console.error("Erro ao auto-salvar venda:", e);
+            return;
                 }
             }
         }
@@ -1520,12 +1516,12 @@ export async function deleteCarConfirm(id) {
         async () => {
             try {
                 await fetch(`/api/crm/estoque/${id}`, { method: 'DELETE' });
-            } catch (_) {}
+            } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
 
             if (state.supabaseClient && state.sessionUser && state.sessionUser.id !== 'adm-master-session') {
                 try {
                     await state.supabaseClient.from('estoque').delete().eq('id', id);
-                } catch (_) {}
+                } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
             }
 
             state.estoque = state.estoque.filter(c => String(c.id) !== String(id));
@@ -1639,6 +1635,7 @@ export async function addCarExpenseInline() {
             }
         } catch (e) {
             console.error("Erro ao salvar despesa na nuvem:", e);
+            return;
         }
     }
 
@@ -1834,6 +1831,7 @@ export async function downloadCarDoc(docId) {
         }
     } catch (e) {
         console.error("Erro ao baixar documento:", e);
+            return;
     }
 }
 window.downloadCarDoc = downloadCarDoc;
@@ -2045,17 +2043,7 @@ export async function deleteCarDoc(docId) {
                 await fetch(`/api/crm/documentos/${docId}`, { method: 'DELETE' });
             } catch (err) {
                 console.warn("Erro ao deletar documento na API central:", err);
-            }
-
-            // 5. Se a nuvem estiver ativa, tentar deletar no Supabase
-            if (state.isCloudActive && state.supabaseClient) {
-                try {
-                    const numericId = !isNaN(Number(docId)) ? Number(docId) : docId;
-                    await state.supabaseClient.from('documentos_veiculo').delete().eq('id', numericId);
-                    await state.supabaseClient.from('documentos_veiculo').delete().eq('id', docIdStr);
-                } catch (e) {
-                    console.error("Erro ao excluir documento na nuvem:", e);
-                }
+                return;
             }
 
             if (window.showToast) {
@@ -2480,7 +2468,7 @@ export async function confirmCarSale(event) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newClientObj)
             }).catch(() => {});
-        } catch (_) {}
+        } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
         if (window.renderClientesTable) window.renderClientesTable();
     }
 
@@ -2532,15 +2520,10 @@ export async function confirmCarSale(event) {
         }
     } catch (err) {
         console.warn("Falha ao registrar venda no servidor:", err);
+        return;
     }
 
-    if (!savedSale) {
-        const fallbackId = state.vendas.length > 0 ? Math.max(...state.vendas.map(v => Number(v.id) || 0)) + 1 : 1;
-        savedSale = { id: fallbackId, ...saleData };
-        if (!state.pendingOutbox) state.pendingOutbox = [];
-        state.pendingOutbox.push({ type: 'venda', data: savedSale });
-        try { localStorage.setItem('crm_pending_outbox', JSON.stringify(state.pendingOutbox)); } catch (_) {}
-    }
+    if (!savedSale) { return; }
 
     // 2. Add to in-memory state
     state.vendas = state.vendas.filter(v => String(v.id) !== String(savedSale.id));
@@ -2567,7 +2550,7 @@ export async function confirmCarSale(event) {
             if (documentStr) supaSaleData.client_document = documentStr;
             if (sellerCnpj) supaSaleData.seller_cnpj = sellerCnpj;
             await state.supabaseClient.from('vendas').insert(supaSaleData);
-        } catch (_) {}
+        } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
     }
 
     // 6. Persist local storage and refresh state
@@ -2821,4 +2804,3 @@ export async function saveCarDetailsSale(vendaId) {
     window.updateApplicationState();
     if (carId) openCarDetails(carId);
 }
-

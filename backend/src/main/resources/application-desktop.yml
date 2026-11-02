@@ -1,0 +1,14 @@
+server:
+  address: 127.0.0.1
+  servlet:
+    session:
+      cookie:
+        same-site: strict
+        http-only: true
+app:
+  frontend-directory: ${FRONTEND_DIRECTORY:.}
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

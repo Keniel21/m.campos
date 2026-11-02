@@ -100,6 +100,20 @@ class CrmIntegrationTest {
             assertEquals(0, records.count());
         } finally { target.directory = ""; }
     }
+    @Test void recalculatesProfitWhenExpenseOrPurchaseCostChanges() throws Exception {
+        String car = create("estoque", Map.of("model", "Teste", "status", "disponivel", "buyPrice", 1000));
+        String sale = create("vendas", Map.of("client", "Teste", "carId", car, "sellPrice", 1500, "date", "2026-11-01"));
+        String expense = create("despesas", Map.of("desc", "Teste", "carId", car, "val", 100, "date", "2026-11-01"));
+        mvc.perform(get("/api/crm/vendas").header("Authorization", token)).andExpect(jsonPath("$[0].profit").value(400));
+        mvc.perform(put("/api/crm/despesas/"+expense).header("Authorization",token).contentType(MediaType.APPLICATION_JSON).content("{\"val\":200}"))
+            .andExpect(status().isOk());
+        mvc.perform(get("/api/crm/vendas").header("Authorization", token)).andExpect(jsonPath("$[0].profit").value(300));
+        mvc.perform(put("/api/crm/estoque/"+car).header("Authorization",token).contentType(MediaType.APPLICATION_JSON).content("{\"buyPrice\":1100}"))
+            .andExpect(status().isOk());
+        mvc.perform(get("/api/crm/vendas").header("Authorization", token)).andExpect(jsonPath("$[0].profit").value(200));
+        mvc.perform(delete("/api/crm/despesas/"+expense).header("Authorization",token)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/crm/vendas").header("Authorization", token)).andExpect(jsonPath("$[0].profit").value(400));
+    }
     private String create(String module, Map<String, Object> data) throws Exception {
         var response = mvc.perform(post("/api/crm/" + module).header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(data))).andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();

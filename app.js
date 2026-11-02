@@ -179,37 +179,6 @@ import {
     initFinanceChart
 } from './src/features/financeiro/financeiro.js';
 
-import { 
-    calendarPrevMonth, 
-    calendarNextMonth, 
-    renderCalendar, 
-    renderAgendaTimeline, 
-    openAddAgendaModal, 
-    closeAddAgendaModal, 
-    saveNewAgenda, 
-    openEditAgendaModal, 
-    closeEditAgendaModal, 
-    saveEditAgenda, 
-    deleteAgendaConfirm,
-    initGoogleCalendar,
-    renderGoogleCalendarApp,
-    renderGoogleCalendarBanner,
-    connectGoogleCalendar,
-    disconnectGoogleCalendar,
-    syncGoogleCalendarEvents,
-    loadDemoGoogleEvents,
-    openGoogleCalendarConfigModal,
-    closeGoogleCalendarConfigModal,
-    saveGoogleCalendarConfig,
-    switchGcalView,
-    gcalGoToToday,
-    gcalNavPrev,
-    gcalNavNext,
-    toggleGcalLayer,
-    gcalFilterEvents,
-    openGcalEventPopover,
-    closeGcalEventPopover
-} from './src/features/agenda/agenda.js';
 
 import { 
     renderClientesTable, 
@@ -235,7 +204,6 @@ export function updateApplicationState() {
     renderLeadsList();
     renderVendasTable();
     renderFinanceiro();
-    renderGoogleCalendarApp();
     calculateClientesKPIs();
     renderClientesTable();
     updateSellerCnpjDatalists();
@@ -401,28 +369,6 @@ window.deleteDespesaConfirm = deleteDespesaConfirm;
 window.deleteDespesaFromDetails = deleteDespesaFromDetails;
 window.initFinanceChart = initFinanceChart;
 
-// Scheduling & Calendar
-window.calendarPrevMonth = calendarPrevMonth;
-window.calendarNextMonth = calendarNextMonth;
-window.renderCalendar = renderCalendar;
-window.renderAgendaTimeline = renderAgendaTimeline;
-window.openAddAgendaModal = openAddAgendaModal;
-window.closeAddAgendaModal = closeAddAgendaModal;
-window.saveNewAgenda = saveNewAgenda;
-window.openEditAgendaModal = openEditAgendaModal;
-window.closeEditAgendaModal = closeEditAgendaModal;
-window.saveEditAgenda = saveEditAgenda;
-window.deleteAgendaConfirm = deleteAgendaConfirm;
-window.initGoogleCalendar = initGoogleCalendar;
-window.renderGoogleCalendarBanner = renderGoogleCalendarBanner;
-window.connectGoogleCalendar = connectGoogleCalendar;
-window.disconnectGoogleCalendar = disconnectGoogleCalendar;
-window.syncGoogleCalendarEvents = syncGoogleCalendarEvents;
-window.loadDemoGoogleEvents = loadDemoGoogleEvents;
-window.openGoogleCalendarConfigModal = openGoogleCalendarConfigModal;
-window.closeGoogleCalendarConfigModal = closeGoogleCalendarConfigModal;
-window.saveGoogleCalendarConfig = saveGoogleCalendarConfig;
-
 // Customers Profiles
 window.renderClientesTable = renderClientesTable;
 window.openAddClientModal = openAddClientModal;
@@ -473,7 +419,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const cacheKeys = await caches.keys();
             for (const key of cacheKeys) {
-                if (key !== 'autodrive-crm-v7') {
+                if (key !== 'mcampos-desktop-v8') {
                     await caches.delete(key);
                 } else {
                     const c = await caches.open(key);
@@ -584,6 +530,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Initialize Google Calendar state
-    initGoogleCalendar();
 
 });

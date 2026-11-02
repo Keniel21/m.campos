@@ -148,6 +148,7 @@ export async function saveClient(event) {
             await fetchCloudData();
         } catch (e) {
             console.error(e);
+            return;
         }
     } else {
         if (id) {
@@ -170,6 +171,7 @@ export async function deleteClient(id) {
                 await fetchCloudData();
             } catch (e) {
                 console.error(e);
+            return;
             }
         } else {
             state.clientes = state.clientes.filter(c => String(c.id) !== String(id));

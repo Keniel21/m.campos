@@ -39,7 +39,9 @@ try {
         [Environment]::SetEnvironmentVariable($key, $settings[$key], 'Process')
     }
     # Credentials stay in the child environment, never in command-line arguments.
-    & java -jar $jarPath '--spring.profiles.active=neon'
+    Push-Location $repoPath
+    try { & java -jar $jarPath '--spring.profiles.active=neon,desktop' }
+    finally { Pop-Location }
     if ($LASTEXITCODE -ne 0) { throw 'A API encerrou com erro. Confira o log local.' }
 } finally {
     foreach ($key in $previous.Keys) { [Environment]::SetEnvironmentVariable($key, $previous[$key], 'Process') }

@@ -9,6 +9,8 @@ import java.util.*;
 @Table(name = "crm_records")
 public class CrmRecord {
     @Id String id = UUID.randomUUID().toString();
+    @org.hibernate.annotations.Generated(event = org.hibernate.generator.EventType.INSERT)
+    @Column(name = "public_id", insertable = false, updatable = false) Long publicId;
     @Column(nullable = false) String module;
     String legacyId;
     @JdbcTypeCode(SqlTypes.JSON) @Column(nullable = false, columnDefinition = "jsonb")

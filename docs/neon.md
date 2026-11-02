@@ -1,9 +1,9 @@
 # Preparação do Neon para uma loja
 
-Esta etapa prepara **a API Java** para o PostgreSQL remoto. O front original ainda
-usa Express/JSON e não deve ser colocado em produção com a expectativa de gravar
-no Neon. A troca do adaptador do front e a modelagem relacional por domínio ainda
-precisam ser concluídas. Nenhum dado foi enviado ao Neon por estes scripts.
+O perfil desktop serve o front original e a API Java juntos no computador da loja.
+O iniciador usa os perfis neon,desktop. O banco PostgreSQL fica no Neon, e as
+credenciais ficam apenas no arquivo local ignorado pelo Git. A conta Windows e a
+segurança do computador controlam o acesso local. Não exponha essa porta na rede.
 
 ## 1. Criar o projeto
 
@@ -46,9 +46,9 @@ Referências antigas de leads e agenda sem veículo correspondente são avisos:
 esses módulos removidos ficam arquivados com o identificador original no JSONB,
 sem inventar um vínculo com outro veículo.
 
-A API inicia em `http://127.0.0.1:8080`. Faça login em `/api/auth/login` e consulte
-os módulos autenticados para conferir as contagens e valores, inclusive despesas,
-documentos e histórico de vendas. A importação preserva os campos antigos em JSONB,
+A aplicação inicia em http://127.0.0.1:8080 (ou APP_PORT). No perfil desktop,
+GET /api/desktop/session fornece o token CSRF usado nas gravações; a API JWT fica
+bloqueada. Confira as contagens na tela e no banco. A importação preserva os campos antigos em JSONB,
 com IDs internos UUID e FK para veículos. Reexecutar não duplica nem atualiza
 registros já importados: corrija dados importados pela API ou em uma nova branch de ensaio.
 
@@ -91,3 +91,14 @@ em um banco separado. Proteja os backups, pois contêm dados de clientes.
 Referências oficiais: [conectar Java](https://neon.com/docs/guides/java),
 [permissões de banco](https://neon.com/docs/manage/database-access),
 [conexões seguras](https://neon.com/docs/connect/connect-securely).
+
+## Ambiente de desenvolvimento conectado
+
+Projeto existente: mcampos-gestao-teste, região São Paulo, PostgreSQL 18. Banco
+mcampos, branch dev-migracao-mcampos. O banco neondb da branch production foi
+preservado. As migrações V1/V2 e a importação foram ensaiadas na branch de
+desenvolvimento. O arquivo local desta instalação usa APP_PORT=18080 para não
+conflitar com um serviço existente na porta 8080.
+
+A importação de documentos preserva os links dos arquivos no Supabase; ainda é
+necessário migrar os arquivos físicos antes de desligar esse armazenamento.

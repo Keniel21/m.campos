@@ -13,73 +13,54 @@ A interface oficial é o front original do AutoDrive, em `index.html`, `style.cs
 - Removidos o botão flutuante e o atalho do cabeçalho do Auto Agente, seus atalhos de teclado, o painel de perfil/configurações e a edição de perfil.
 - Os registros e históricos são preservados; a remoção de menus não exclui dados.
 
-## Executar a aplicação com o front original
+## Executar com Java e Neon
 
-Na raiz do repositório, com Node.js instalado:
+O perfil desktop serve o front original e a API no mesmo endereço local. Não requer
+login na interface: o acesso fica restrito ao computador (127.0.0.1), com sessão
+HTTP, token CSRF e validação de Host/Origin. A API JWT continua disponível no perfil
+padrão para estudo e testes, e fica bloqueada no perfil desktop.
 
-```sh
-npm install
-npm start
-```
+1. Instale Java 21, Maven e Node.js (Node é usado pela auditoria e pelo empacotamento).
+2. Configure .env.neon a partir de .env.neon.example, conforme [o guia Neon](docs/neon.md).
+3. Na raiz, compile: mvn -f backend/pom.xml verify.
+4. Execute: powershell -File scripts/start-neon.ps1.
+5. Abra http://127.0.0.1:8080 (ou a porta APP_PORT configurada).
 
-Abra `http://localhost:3000`. Esse comando executa o servidor Express e os módulos originais. A configuração e as integrações existentes continuam pertencendo a esse aplicativo.
+O iniciador mantém a raiz do projeto como diretório de execução, onde estão os
+arquivos originais do front. Não abra o HTML diretamente nem use npm start para
+essa configuração: o Express antigo permanece apenas como referência de migração.
+O Compose ainda representa a arquitetura anterior e não é o instalador desktop.
 
-O diretório `frontend/` contém somente o empacotamento dos arquivos originais. O comando abaixo prepara `frontend/dist` copiando o HTML, CSS e módulos, sem redesenhar a interface:
+## Persistência e importação
 
-```sh
-cd frontend
-npm ci
-npm run build
-```
+Java 21/Spring Boot, JPA/Hibernate, PostgreSQL, Flyway e validações transacionais
+substituem as gravações no Express/JSON e no Supabase. Os módulos originais chamam
+uma camada local de compatibilidade. UUIDs continuam internos; a migração V2 gera
+identificadores numéricos para os controles existentes.
 
-## Backend Java do roadmap
+O importador é explícito, transacional e idempotente. Ele preserva os campos legados
+em JSONB, com FK de veículo, inclusive as vendas históricas repetidas. Novas vendas
+duplicadas são bloqueadas. A evolução para tabelas tipadas por domínio continua
+pendente; os valores financeiros nas regras Java usam BigDecimal.
 
-Para preparar PostgreSQL remoto no Neon, siga [o guia de configuração e importação](docs/neon.md).
-O perfil `neon` mantém as credenciais fora do código e restringe a API a `127.0.0.1`.
+O navegador começa com listas vazias e recebe o estado do banco, inclusive quando
+ele está vazio. Não há gravação offline, carga automática de dados de demonstração
+ou envio automático de outboxes antigas. Internet é necessária para usar o Neon.
+Despesas e alterações de custo recalculam os lucros das vendas vinculadas.
 
-O diretório `backend/` contém a primeira etapa da API Java 21/Spring Boot, com PostgreSQL 17, JPA/Hibernate, Flyway, Spring Security/JWT, OpenAPI e testes JUnit/Mockito/MockMvc. Essa API ainda é independente do servidor usado pelo front original: a integração será feita progressivamente, preservando a interface e seus contratos.
+Os documentos antigos foram importados como cadastros com seus links existentes.
+Os arquivos desses links ainda estão no Supabase; eles não foram copiados para outro
+armazenamento. Não encerre o armazenamento antigo antes da migração dos arquivos.
+Novos anexos podem ser persistidos como data URLs no JSONB; limite seu uso até
+implementar armazenamento de arquivos separado e controlar o espaço disponível.
 
-A conversão para React/TypeScript deverá reutilizar o layout e os comportamentos existentes; não há mais uma interface React alternativa nesta branch.
+## Validação
 
-Para executar a API, configure `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET` (mínimo de 32 bytes), `ADMIN_EMAIL` e `ADMIN_PASSWORD` (mínimo de 12 caracteres e máximo de 72 bytes):
+Execute mvn -f backend/pom.xml verify, node --test scripts/audit-legacy.test.cjs e,
+em frontend/, npm ci seguido de npm run build. O build copia os arquivos originais
+sem redesenhar a interface. GitHub Actions verifica o backend com PostgreSQL 17.
+Use um banco exclusivo de testes: as suítes limpam os registros de CRM.
 
-```sh
-cd backend
-mvn spring-boot:run
-```
-
-API em `http://localhost:8080`; Swagger em `http://localhost:8080/swagger-ui/index.html`.
-
-### Docker Compose
-
-Copie `.env.roadmap.example` para `.env`, preencha as variáveis e execute:
-
-```sh
-docker compose up --build
-```
-
-O serviço `frontend` executa o aplicativo original em `http://localhost:3000`. O backend Java é disponibilizado separadamente em `http://localhost:8080`, com PostgreSQL. O frontend original continua usando seu servidor Express até a migração dos contratos da API ser concluída.
-
-O Compose está configurado, mas ainda precisa ser validado em um ambiente com Docker.
-
-## Importação dos JSONs para a API Java
-
-A importação é explícita: configure `IMPORT_DIRECTORY` com a pasta de JSONs; no Compose, use `/legacy-data`. O importador lê estoque, clientes, leads, despesas, agenda, documentos, empresas e vendas, dentro de uma transação, sem alterar os arquivos originais.
-
-Cada registro recebe UUID interno e mantém o id legado. A combinação módulo/id legado evita duplicação em reinícios; registros já importados não são sobrescritos. O histórico existente de vendas duplicadas é preservado, e novas vendas duplicadas são bloqueadas. Depois de conferir a importação, limpe `IMPORT_DIRECTORY`.
-
-A modelagem usa temporariamente JSONB para preservar todos os campos, com FK/JPA para os veículos. A evolução para entidades tipadas por domínio e constraints específicas faz parte da migração. Dados exclusivos de Supabase, Firebase ou localStorage não são importados automaticamente.
-
-## Validação e próximas etapas
-
-```sh
-cd backend
-mvn verify
-cd ../frontend
-npm ci
-npm run build
-```
-
-Sem `TEST_DB_URL`, os testes Java usam H2 em modo PostgreSQL. No GitHub Actions, usam PostgreSQL 17. Use um banco exclusivo de testes, pois a suíte limpa os registros de CRM.
-
-As próximas etapas são integrar os contratos do front original à API Java, migrar autenticação e usuários, extrair entidades tipadas e validar integrações, relatórios, uploads e PWA sem alterações visuais não solicitadas. MongoDB permanece um exercício opcional do roadmap, sem dividir o núcleo financeiro entre bancos desnecessariamente.
+Os testes cobrem autenticação JWT, isolamento desktop, CSRF, Host/Origin,
+identificadores numéricos, importação com rollback, preservação do histórico,
+venda/estoque na mesma transação e recálculo de lucro por custo e despesa.

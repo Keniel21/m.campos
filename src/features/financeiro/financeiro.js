@@ -152,6 +152,7 @@ export async function saveNewDespesa(event) {
             }
         } catch (e) {
             console.error("Erro ao salvar despesa na nuvem:", e);
+            return;
         }
     }
 
@@ -203,6 +204,7 @@ export async function saveEditDespesa(event) {
             await state.supabaseClient.from('despesas').update({ description: desc, val, date, car_id: carId, category }).eq('id', despesaId);
         } catch (e) {
             console.error("Erro ao atualizar despesa na nuvem:", e);
+            return;
         }
     }
 
@@ -220,6 +222,7 @@ export async function deleteDespesaConfirm(despesaId) {
                 await state.supabaseClient.from('despesas').delete().eq('id', despesaId);
             } catch (e) {
                 console.error("Erro ao deletar despesa na nuvem:", e);
+            return;
             }
         }
 
@@ -244,6 +247,7 @@ export async function deleteDespesaFromDetails(despesaId) {
                 await state.supabaseClient.from('despesas').delete().eq('id', despesaId);
             } catch (e) {
                 console.error("Erro ao deletar despesa na nuvem:", e);
+            return;
             }
         }
         

@@ -288,7 +288,7 @@ export async function saveEditVenda(event) {
                 type
             })
         });
-    } catch (_) {}
+    } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
 
     // Persist to Supabase if authenticated
     if (state.supabaseClient && state.sessionUser && state.sessionUser.id !== 'adm-master-session') {
@@ -300,7 +300,7 @@ export async function saveEditVenda(event) {
                 delete updateData.seller_cnpj;
                 await state.supabaseClient.from('vendas').update(updateData).eq('id', vendaId);
             }
-        } catch (_) {}
+        } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
     }
 
     persistLocalData();
@@ -320,7 +320,7 @@ export async function deleteVendaConfirm(vendaId) {
 
         try {
             await fetch(`/api/crm/vendas/${vendaId}`, { method: 'DELETE' });
-        } catch (_) {}
+        } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
 
         if (state.supabaseClient && state.sessionUser && state.sessionUser.id !== 'adm-master-session') {
             try {
@@ -328,13 +328,13 @@ export async function deleteVendaConfirm(vendaId) {
                 if (carId) {
                     await state.supabaseClient.from('estoque').update({ status: 'disponivel' }).eq('id', carId);
                 }
-            } catch (_) {}
+            } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
         }
 
         state.vendas = state.vendas.filter(v => String(v.id) !== String(vendaId));
         if (carId) {
             const car = state.estoque.find(c => String(c.id) === String(carId));
-            if (car) car.status = 'disponivel';
+            if (car) await fetchCloudData();
         }
         persistLocalData();
         window.updateApplicationState();
@@ -762,13 +762,7 @@ export async function saveSale(event) {
         console.warn("Falha ao registrar venda no servidor central:", err);
     }
 
-    if (!savedSale) {
-        const fallbackId = state.vendas.length > 0 ? Math.max(...state.vendas.map(v => Number(v.id) || 0)) + 1 : 1;
-        savedSale = { id: fallbackId, ...saleData };
-        if (!state.pendingOutbox) state.pendingOutbox = [];
-        state.pendingOutbox.push({ type: 'venda', data: savedSale });
-        try { localStorage.setItem('crm_pending_outbox', JSON.stringify(state.pendingOutbox)); } catch (_) {}
-    }
+    if (!savedSale) { return; }
 
     // 2. Add to in-memory state
     state.vendas = state.vendas.filter(v => String(v.id) !== String(savedSale.id));
@@ -801,7 +795,7 @@ export async function saveSale(event) {
                 type,
                 seller_cnpj: defaultCnpj
             });
-        } catch (_) {}
+        } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
     }
 
     persistLocalData();
@@ -857,5 +851,3 @@ export async function syncVendasFromCloud() {
 if (typeof window !== 'undefined') {
     window.syncVendasFromCloud = syncVendasFromCloud;
 }
-
-

@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
 @Configuration
+@org.springframework.context.annotation.Profile("!desktop")
 public class SecurityConfig {
     @Bean SecretKeySpec jwtKey(@Value("${app.jwt-secret}") String secret) {
         if (secret.getBytes(StandardCharsets.UTF_8).length < 32) throw new IllegalArgumentException("JWT_SECRET precisa ter pelo menos 32 bytes.");
@@ -24,7 +25,6 @@ public class SecurityConfig {
         decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer("mcampos-crm"));
         return decoder;
     }
-    @Bean BCryptPasswordEncoder passwords() { return new BCryptPasswordEncoder(); }
     @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
         return http.csrf(c -> c.disable())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

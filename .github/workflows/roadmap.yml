@@ -26,6 +26,11 @@ jobs:
           TEST_DB_URL: jdbc:postgresql://localhost:5432/mcampos_test
           TEST_DB_USER: mcampos
           TEST_DB_PASSWORD: test-password
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcampos-backend
+          path: backend/target/crm-*.jar
+          retention-days: 7
   frontend:
     runs-on: ubuntu-latest
     steps:

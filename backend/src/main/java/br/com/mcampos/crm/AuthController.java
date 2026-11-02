@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.*;
 
 @RestController @RequestMapping("/api/auth")
+@org.springframework.context.annotation.Profile("!desktop")
 public class AuthController {
     private final UserRepository users;
     private final BCryptPasswordEncoder passwords;
