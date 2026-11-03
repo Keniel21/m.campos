@@ -5140,9 +5140,9 @@ body.dark-mode .search-result-item:hover, body.dark-mode .search-result-item.sel
 
 .estoque-modern-header {
     display: grid;
-    grid-template-columns: minmax(250px, 2.2fr) minmax(170px, 1.5fr) minmax(110px, .9fr) minmax(80px, .6fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(130px, 1fr);
+    grid-template-columns: minmax(250px, 2.2fr) minmax(170px, 1.5fr) minmax(110px, .9fr) minmax(80px, .6fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(160px, 1.2fr) minmax(130px, 1fr);
     column-gap: 24px;
-    min-width: 1230px;
+    min-width: 1414px;
     padding: 12px 24px;
     color: var(--text-muted);
     font-size: 11px;
@@ -5183,13 +5183,13 @@ body.dark-mode .search-result-item:hover, body.dark-mode .search-result-item.sel
     display: flex;
     flex-direction: column;
     gap: 12px;
-    min-width: 1230px;
+    min-width: 1414px;
     padding: 2px 0 10px 0;
 }
 
 .estoque-modern-row {
     display: grid;
-    grid-template-columns: minmax(250px, 2.2fr) minmax(170px, 1.5fr) minmax(110px, .9fr) minmax(80px, .6fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(130px, 1fr);
+    grid-template-columns: minmax(250px, 2.2fr) minmax(170px, 1.5fr) minmax(110px, .9fr) minmax(80px, .6fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(160px, 1.2fr) minmax(130px, 1fr);
     column-gap: 24px;
     align-items: center;
     background-color: var(--card-bg);
@@ -8326,10 +8326,11 @@ body.dark-mode .emerald-glow-card {
 .stock-filter-values input { margin-top: 2px; flex-shrink: 0; accent-color: var(--blue-primary); }
 
 .pending-menu [role="status"] { font-size: 11px; color: var(--red-alert); padding: 0 6px; }
-
 .cd-right-column-premium { min-width: 0; }
 .cd-right-column-premium .premium-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .cd-right-column-premium .premium-form-group { min-width: 0; }
 #pending-toggle, .catalog-toggle { min-width: 0; max-width: 100%; }
 #pending-toggle-label, .catalog-toggle > span:first-child { min-width: 0; flex: 1; }
 .catalog-toggle > span:last-child { flex-shrink: 0; }
+
+#purchase-store-menu { left: auto; right: 0; }

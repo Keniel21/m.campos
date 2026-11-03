@@ -11,8 +11,8 @@ import java.util.*;
 @Service
 @Transactional
 public class CrmService {
-    static final Set<String> MODULES = Set.of("estoque", "vendas", "clientes", "leads", "despesas", "agenda", "documentos", "company_cnpjs", "pendencias", "status_mc_options", "status_options");
-    static final Map<String,String> CATALOG_FIELDS = Map.of("pendencias", "documentStatus", "status_mc_options", "statusMc", "status_options", "customStatus");
+    static final Set<String> MODULES = Set.of("estoque", "vendas", "clientes", "leads", "despesas", "agenda", "documentos", "company_cnpjs", "pendencias", "status_mc_options", "status_options", "purchase_store_options");
+    static final Map<String,String> CATALOG_FIELDS = Map.of("pendencias", "documentStatus", "status_mc_options", "statusMc", "status_options", "customStatus", "purchase_store_options", "purchaseStore");
     private final RecordRepository records;
     public CrmService(RecordRepository records) { this.records = records; }
 
@@ -150,7 +150,7 @@ public class CrmService {
         String required = switch (module) {
             case "estoque" -> "model";
             case "vendas" -> "client";
-            case "clientes", "leads", "company_cnpjs", "pendencias", "status_mc_options", "status_options" -> "name";
+            case "clientes", "leads", "company_cnpjs", "pendencias", "status_mc_options", "status_options", "purchase_store_options" -> "name";
             case "agenda" -> "title";
             case "despesas" -> "desc";
             default -> "fileName";
@@ -168,12 +168,12 @@ public class CrmService {
             if (!Objects.equals(option.getPayload().get("code"), data.get("documentStatus"))) throw bad("Pendência inválida.");
         }
         if (module.equals("estoque")) {
-            for (String catalog : List.of("status_mc_options", "status_options")) {
+            for (String catalog : List.of("status_mc_options", "status_options", "purchase_store_options")) {
                 String value = Objects.toString(data.get(CATALOG_FIELDS.get(catalog)), "");
                 if (value.isBlank()) continue;
-                if (!value.startsWith("catalog:")) throw bad("Selecione um status do catálogo correspondente.");
+                if (!value.startsWith("catalog:")) throw bad("Selecione uma opção do catálogo correspondente.");
                 var option = get(catalog, value.substring(8));
-                if (!value.equals(option.getPayload().get("code"))) throw bad("Status inválido.");
+                if (!value.equals(option.getPayload().get("code"))) throw bad("Opção inválida.");
             }
         }
         for (String key : List.of("buyPrice", "sellPrice", "val", "km")) {

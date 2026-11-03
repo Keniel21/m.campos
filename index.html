@@ -248,6 +248,7 @@
                     </div>
 <div class="col-status-mc stock-column-heading"><button type="button" class="sortable-header" onclick="sortEstoque('status_mc')">Status MC <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status_mc"></i></button><button type="button" class="stock-column-filter" data-stock-filter="status_mc" aria-label="Filtrar Status MC"><i data-lucide="filter"></i></button></div>
 <div class="col-custom-status stock-column-heading"><button type="button" class="sortable-header" onclick="sortEstoque('custom_status')">Status <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-custom_status"></i></button><button type="button" class="stock-column-filter" data-stock-filter="custom_status" aria-label="Filtrar Status"><i data-lucide="filter"></i></button></div>
+<div class="col-purchase-store stock-column-heading"><button type="button" class="sortable-header" onclick="sortEstoque('purchase_store')">Loja de compra <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-purchase_store"></i></button><button type="button" class="stock-column-filter" data-stock-filter="purchase_store" aria-label="Filtrar Loja de compra"><i data-lucide="filter"></i></button></div>
                     <div class="col-status stock-column-heading">
                         <button type="button" class="sortable-header" onclick="sortEstoque('status')">Situação no pátio <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status"></i></button>
                         <button type="button" class="stock-column-filter" data-stock-filter="status" aria-label="Filtrar Status"><i data-lucide="filter"></i></button>
@@ -537,6 +538,13 @@
                                             <select id="cd-custom-status" hidden aria-hidden="true" tabindex="-1"><option value="unreported">Não informado</option></select>
                                             <button type="button" id="custom-status-toggle" class="premium-select-field catalog-toggle" aria-expanded="false" aria-controls="custom-status-menu"><span id="custom-status-toggle-label">Não informado</span><span aria-hidden="true">⌄</span></button>
                                             <div id="custom-status-menu" class="pending-menu" hidden role="group" aria-label="Opções de Status"></div>
+                                        </div>
+<div class="premium-form-group">
+                                        <label class="premium-input-label" for="purchase-store-toggle">Loja de compra</label>
+                                        <div id="purchase-store-field" class="pending-field">
+                                            <select id="cd-purchase-store" hidden aria-hidden="true" tabindex="-1"><option value="unreported">Não informado</option></select>
+                                            <button type="button" id="purchase-store-toggle" class="premium-select-field catalog-toggle" aria-expanded="false" aria-controls="purchase-store-menu"><span id="purchase-store-toggle-label">Não informado</span><span aria-hidden="true">⌄</span></button>
+                                            <div id="purchase-store-menu" class="pending-menu" hidden role="group" aria-label="Opções de Loja de compra"></div>
                                         </div>
                                     </div>
                                 </div>

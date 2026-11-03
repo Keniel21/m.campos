@@ -5,7 +5,7 @@
 import { filterStock } from '../../utils/stock.js';
 import { filterInventoryColumns } from './inventory-filters.js';
 import { pendingLabel, escapePending } from '../../utils/pendencias.js';
-import { renderPendingField, renderStatusMcField, renderCustomStatusField } from './pending-field.js';
+import { renderPendingField, renderStatusMcField, renderCustomStatusField, renderPurchaseStoreField } from './pending-field.js';
 import { state } from '../../services/state.js';
 import { formatCurrency, calcDaysInStock, parseCurrencyBR } from '../../utils/helpers.js';
 import { persistLocalData, fetchCloudData } from '../../services/supabase.js';
@@ -234,6 +234,7 @@ function inventoryCell(car, column) {
         case 'document_status': return { value: car.documentStatus || 'unreported', label: pendingLabel(car.documentStatus, state.pendencias) };
         case 'status_mc': return { value: car.statusMc || 'unreported', label: pendingLabel(car.statusMc, state.status_mc_options) };
         case 'custom_status': return { value: car.customStatus || 'unreported', label: pendingLabel(car.customStatus, state.status_options) };
+        case 'purchase_store': return { value: car.purchaseStore || 'unreported', label: pendingLabel(car.purchaseStore, state.purchase_store_options) };
         case 'days': { const days = calcDaysInStock(car.purchaseDate); return { value: String(days), label: days + ' dias' }; }
         case 'type': return { value: car.type === 'repasse' ? 'repasse' : car.type === 'outros' ? 'outros' : 'varejo', label: car.type === 'repasse' ? 'Repasse' : car.type === 'outros' ? 'Outros' : 'Varejo' };
         case 'status': return { value: car.status || '', label: ({ disponivel: 'Disponível', vendido: 'Vendido', preparacao: 'Em preparação', reservado: 'Reservado' })[car.status] || car.status || 'Não informado' };
@@ -271,6 +272,7 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
                 break;
             case 'status_mc': valA = pendingLabel(a.statusMc, state.status_mc_options); valB = pendingLabel(b.statusMc, state.status_mc_options); break;
             case 'custom_status': valA = pendingLabel(a.customStatus, state.status_options); valB = pendingLabel(b.customStatus, state.status_options); break;
+            case 'purchase_store': valA = pendingLabel(a.purchaseStore, state.purchase_store_options); valB = pendingLabel(b.purchaseStore, state.purchase_store_options); break;
             case 'days':
                 valA = a.purchaseDate ? calcDaysInStock(a.purchaseDate) : 0;
                 valB = b.purchaseDate ? calcDaysInStock(b.purchaseDate) : 0;
@@ -352,6 +354,7 @@ export function renderEstoqueTable(searchQuery = document.getElementById('search
             </div>
             <div class="col-status-mc"><span class="pending-cell">${escapePending(pendingLabel(car.statusMc, state.status_mc_options))}</span></div>
             <div class="col-custom-status"><span class="pending-cell">${escapePending(pendingLabel(car.customStatus, state.status_options))}</span></div>
+            <div class="col-purchase-store"><span class="pending-cell">${escapePending(pendingLabel(car.purchaseStore, state.purchase_store_options))}</span></div>
             <div class="col-status">
                 <span class="badge ${car.status}">${car.status}</span>
             </div>
@@ -674,6 +677,7 @@ export function openCarDetails(id, originTab = null) {
     if (cdDocument) renderPendingSelect(car.documentStatus);
     renderStatusMcField(car.statusMc, renderEstoque);
     renderCustomStatusField(car.customStatus, renderEstoque);
+    renderPurchaseStoreField(car.purchaseStore, renderEstoque);
 
     const cdType = document.getElementById("cd-type");
     if (cdType) cdType.value = car.type || "convencional";
@@ -1244,6 +1248,7 @@ export async function saveCarDetails(options = { silent: true }) {
     const readStatus = (id, fallback) => { const input = document.getElementById(id); return input?.dataset.unresolvedValue || (input?.value === 'unreported' ? null : input?.value || fallback || null); };
     const statusMc = readStatus('cd-status-mc', car.statusMc);
     const customStatus = readStatus('cd-custom-status', car.customStatus);
+    const purchaseStore = readStatus('cd-purchase-store', car.purchaseStore);
 
     const type = document.getElementById("cd-type")?.value || car.type || "convencional";
     const status = document.getElementById("cd-status-select")?.value || car.status || "disponivel";
@@ -1269,6 +1274,7 @@ export async function saveCarDetails(options = { silent: true }) {
         document_status: documentStatus,
         statusMc,
         customStatus,
+        purchaseStore,
         image_url: car.image_url
     };
 
@@ -1285,6 +1291,7 @@ export async function saveCarDetails(options = { silent: true }) {
     car.documentStatus = documentStatus;
     car.statusMc = statusMc;
     car.customStatus = customStatus;
+    car.purchaseStore = purchaseStore;
     car.type = type;
     car.status = status;
     car.purchaseDate = purchaseDate;

@@ -87,6 +87,25 @@ class DesktopIntegrationTest {
         desktop.delete("status_mc_options", ((Number)mc.get("id")).longValue());
         desktop.delete("status_options", ((Number)custom.get("id")).longValue());
     }
+    @Test void purchaseStoreCatalogIsSharedAndProtectsVehicleReferences() throws Exception {
+        var option = desktop.save("purchase_store_options", null, java.util.Map.of("name", "Loja de origem"));
+        long optionId = ((Number)option.get("id")).longValue();
+        var first = desktop.save("estoque", null, java.util.Map.of("model", "Primeiro", "status", "disponivel", "purchaseStore", option.get("code")));
+        var second = desktop.save("estoque", null, java.util.Map.of("model", "Segundo", "status", "vendido", "purchaseStore", option.get("code")));
+        desktop.save("purchase_store_options", optionId, java.util.Map.of("name", "Loja renomeada"));
+        assertEquals(option.get("code"), desktop.list("purchase_store_options").getFirst().get("code"));
+        assertEquals("Loja renomeada", desktop.list("purchase_store_options").getFirst().get("name"));
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> desktop.delete("purchase_store_options", optionId));
+        var foreign = desktop.save("status_options", null, java.util.Map.of("name", "Outro catálogo"));
+        long id = ((Number)first.get("id")).longValue();
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> desktop.save("estoque", id, java.util.Map.of("purchaseStore", foreign.get("code"))));
+        var clear = new java.util.HashMap<String,Object>(); clear.put("purchaseStore", null);
+        assertEquals("disponivel", desktop.save("estoque", id, clear).get("status"));
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> desktop.delete("purchase_store_options", optionId));
+        assertEquals("vendido", desktop.save("estoque", ((Number)second.get("id")).longValue(), clear).get("status"));
+        desktop.delete("purchase_store_options", optionId);
+        assertTrue(desktop.list("purchase_store_options").isEmpty());
+    }
     @Test void pendingOptionsCanBeRenamedButNotDeletedWhileLinked() throws Exception {
         var option = desktop.save("pendencias", null, java.util.Map.of("name", "Transferência"));
         long optionId = ((Number)option.get("id")).longValue();

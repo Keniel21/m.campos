@@ -56,7 +56,7 @@ class LocalQuery {
     then(resolve, reject) { return this.execute().then(resolve, reject); }
     catch(reject) { return this.execute().catch(reject); }
     async execute() {
-        if (!['estoque','vendas','clientes','despesas','documentos','company_cnpjs','pendencias','status_mc_options','status_options'].includes(this.module)) throw new Error('Cadastro indisponível.');
+        if (!['estoque','vendas','clientes','despesas','documentos','company_cnpjs','pendencias','status_mc_options','status_options','purchase_store_options'].includes(this.module)) throw new Error('Cadastro indisponível.');
         if (['PUT','DELETE'].includes(this.method) && this.id == null) throw new Error('Selecione um registro.');
         const url = `/api/crm/${this.module}` + (this.id == null ? '' : `/${encodeURIComponent(this.id)}`);
         const bodies = Array.isArray(this.body) ? this.body : [this.body];
@@ -80,6 +80,7 @@ export async function fetchCloudData() {
     state.pendencias = data.pendencias || [];
     state.status_mc_options = data.status_mc_options || [];
     state.status_options = data.status_options || [];
+    state.purchase_store_options = data.purchase_store_options || [];
     state.serverDate = data.serverDate;
     state.operationalDate = data.serverDate;
     return data;
