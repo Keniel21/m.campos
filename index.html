@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoDrive CRM</title>
+    <title>M.camposoffroad</title>
     <meta name="description" content="AutoDrive CRM - Gestão Automotiva Premium com Dashboard, Estoque, CRM, Vendas e Financeiro.">
-    <meta property="og:title" content="AutoDrive CRM">
+    <meta property="og:title" content="M.camposoffroad">
     <meta property="og:description" content="AutoDrive CRM - Gestão Automotiva Premium com Dashboard, Estoque, CRM, Vendas e Financeiro.">
     <meta name="theme-color" content="#3b82f6">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,7 +20,6 @@
     <!-- Lucide Icons para vetores de alta qualidade -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Supabase Client SDK (PostgreSQL Nuvem) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -32,37 +31,18 @@
                 <i data-lucide="car"></i>
             </div>
             <div class="logo-text">
-                <h1>AutoDrive</h1>
+                <h1>M.camposoffroad</h1>
                 <span>CRM & Estoque</span>
             </div>
         </div>
 
         <ul class="sidebar-menu">
             <span class="menu-category">Navegação</span>
-            <li class="menu-item active" data-tab="dashboard">
-                <a onclick="switchTab('dashboard')">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="menu-item" data-tab="estoque">
+            <li class="menu-item active" data-tab="estoque">
                 <a onclick="switchTab('estoque')">
                     <i data-lucide="package"></i>
                     <span>Estoque</span>
                     <span class="menu-badge red" id="badge-estoque-alert">0</span>
-                </a>
-            </li>
-            <li class="menu-item" data-tab="leads">
-                <a onclick="switchTab('leads')">
-                    <i data-lucide="users"></i>
-                    <span>Leads / CRM</span>
-                    <span class="menu-badge blue" id="badge-leads-active">0</span>
-                </a>
-            </li>
-            <li class="menu-item" data-tab="vendas">
-                <a onclick="switchTab('vendas')">
-                    <i data-lucide="banknote"></i>
-                    <span>Vendas</span>
                 </a>
             </li>
             <li class="menu-item" data-tab="clientes">
@@ -72,26 +52,14 @@
                 </a>
             </li>
 
-            <span class="menu-category">Financeiro & Agenda</span>
+            <span class="menu-category">Financeiro</span>
             <li class="menu-item" data-tab="financeiro">
                 <a onclick="switchTab('financeiro')">
                     <i data-lucide="wallet"></i>
                     <span>Financeiro</span>
                 </a>
             </li>
-            <li class="menu-item" data-tab="agenda">
-                <a onclick="switchTab('agenda')">
-                    <i data-lucide="calendar"></i>
-                    <span>Agenda</span>
-                </a>
-            </li>
 
-            <li class="menu-item" data-tab="usuarios" id="menu-item-usuarios" style="display:none;">
-                <a onclick="switchTab('usuarios')">
-                    <i data-lucide="shield-check"></i>
-                    <span>Aprovações</span>
-                </a>
-            </li>
         </ul>
     </aside>
 
@@ -103,14 +71,11 @@
                 <i data-lucide="menu"></i>
             </button>
             <div class="header-title-area">
-                <h2 id="current-tab-title">Dashboard Operacional</h2>
-                <p id="current-tab-subtitle">Visão unificada das vendas, estoque e lucratividade</p>
+                <h2 id="current-tab-title">Gestão de Estoque</h2>
+                <p id="current-tab-subtitle">Veículos disponíveis e vendidos, conforme a situação selecionada</p>
             </div>
             <div class="header-actions">
-                <div class="cloud-sync-badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); color:#10b981; padding:5px 12px; border-radius:9999px; font-size:11px; font-weight:600;" title="Sincronização centralizada na nuvem ativa">
-                    <span style="width:7px; height:7px; background:#10b981; border-radius:50%; box-shadow:0 0 6px #10b981; display:inline-block;"></span>
-                    Nuvem Conectada
-                </div>
+                <button id="btn-web-logout" class="btn btn-secondary btn-sm" type="button" style="display:none" onclick="handleLogout()">Sair</button>
                 <div class="current-date">
                     <i data-lucide="calendar-days"></i>
                     <span id="date-display">Carregando...</span>
@@ -121,87 +86,19 @@
                     </button>
                     <input type="text" id="navbar-search-input" class="navbar-search-input" placeholder="Buscar menu..." oninput="handleMenuSearch(this.value)" onkeydown="handleMenuSearchKey(event)">
                     <div class="search-results-dropdown" id="search-results-dropdown"></div>
-                    <button class="navbar-util-btn auto-agente-nav-btn" id="btn-open-auto-agente-nav" title="Auto Agente AI - Assistente Integrado (Ctrl+Espaço)" onclick="window.toggleAutoAgente()">
-                        <i data-lucide="sparkles"></i>
-                    </button>
+
                     <button class="navbar-util-btn theme-toggle-btn active" title="Alternar Tema" onclick="toggleAppTheme()">
                         <i data-lucide="sun"></i>
                     </button>
                 </div>
-                <div class="navbar-user-profile" id="navbar-user-profile" onclick="window.toggleUserProfileMenu(event)" title="Clique para abrir as configurações do perfil">
-                    <div class="user-avatar" id="footer-avatar">AD</div>
-                    <div class="user-info">
-                        <h4 id="footer-username">Marcelo Motors</h4>
-                        <p id="footer-userrole">Operador Único</p>
-                    </div>
-                    <i data-lucide="chevron-down" style="width:14px; height:14px; color:var(--text-muted); margin-left:2px; transition: transform 0.2s;" id="profile-chevron"></i>
 
-                    <!-- Dropdown Menu do Perfil & Configurações -->
-                    <div class="user-profile-dropdown" id="user-profile-dropdown" onclick="event.stopPropagation()">
-                        <div class="profile-dropdown-header">
-                            <div class="user-avatar large" id="dropdown-avatar">AD</div>
-                            <div class="profile-dropdown-user-details">
-                                <h4 id="dropdown-username">Marcelo Motors</h4>
-                                <span class="user-role-badge"><i data-lucide="shield-check" style="width:12px;height:12px;"></i> Administrador</span>
-                                <span class="user-email-text" id="dropdown-user-email">operador@autodrive.com</span>
-                            </div>
-                        </div>
-
-                        <div class="profile-dropdown-divider"></div>
-
-                        <div class="profile-dropdown-menu">
-                            <a class="profile-dropdown-item" onclick="switchTab('configuracoes'); window.closeUserProfileMenu();">
-                                <div class="dropdown-item-icon blue"><i data-lucide="building-2"></i></div>
-                                <div class="dropdown-item-content">
-                                    <strong>Dados da Empresa & CNPJs</strong>
-                                    <span>Cadastrar CNPJs emissores e matriz/filiais</span>
-                                </div>
-                                <i data-lucide="chevron-right" class="arrow-icon"></i>
-                            </a>
-
-                            <a class="profile-dropdown-item" onclick="window.openEditProfileModal(); window.closeUserProfileMenu();">
-                                <div class="dropdown-item-icon purple"><i data-lucide="user-cog"></i></div>
-                                <div class="dropdown-item-content">
-                                    <strong>Meu Perfil & Conta</strong>
-                                    <span>Alterar nome de exibição, cargo e foto</span>
-                                </div>
-                                <i data-lucide="chevron-right" class="arrow-icon"></i>
-                            </a>
-
-                            <a class="profile-dropdown-item" onclick="switchTab('usuarios'); window.closeUserProfileMenu();">
-                                <div class="dropdown-item-icon green"><i data-lucide="shield-check"></i></div>
-                                <div class="dropdown-item-content">
-                                    <strong>Aprovações & Usuários</strong>
-                                    <span>Gerenciar acessos e permissões</span>
-                                </div>
-                                <i data-lucide="chevron-right" class="arrow-icon"></i>
-                            </a>
-
-                            <a class="profile-dropdown-item" onclick="toggleAppTheme();">
-                                <div class="dropdown-item-icon yellow"><i data-lucide="moon"></i></div>
-                                <div class="dropdown-item-content">
-                                    <strong>Alternar Tema</strong>
-                                    <span>Mudar para Modo Escuro / Claro</span>
-                                </div>
-                            </a>
-                        </div>
-
-                        <div class="profile-dropdown-divider"></div>
-
-                        <div class="profile-dropdown-footer">
-                            <button class="btn-logout-dropdown" onclick="handleLogout()">
-                                <i data-lucide="log-out"></i> Sair do Sistema
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </header>
 
         <!-- ==========================================
              ABA 1: HOME / DASHBOARD
              ========================================== -->
-        <section id="dashboard-tab" class="tab-pane active">
+        <section id="dashboard-tab" class="tab-pane">
             <!-- Barra de Filtro de Período -->
             <div class="period-filter-bar">
                 <span class="period-filter-label"><i data-lucide="calendar-range"
@@ -295,14 +192,26 @@
         <!-- ==========================================
              ABA 2: ESTOQUE (PRODUTO E TABELAS)
              ========================================== -->
-        <section id="estoque-tab" class="tab-pane">
+        <section id="estoque-tab" class="tab-pane active">
             <div class="table-controls">
                 <div class="search-wrapper">
                     <i data-lucide="search"></i>
-                    <input type="text" class="search-input" id="search-estoque"
-                        placeholder="Buscar por modelo, placa, cor, chassi..." oninput="filterEstoqueTable()">
+                    <input type="search" class="search-input" id="search-estoque" name="inventory-search"
+                        autocomplete="off" autocapitalize="off" spellcheck="false" readonly aria-label="Buscar veículos no estoque"
+                        placeholder="Buscar por modelo, placa, cor, chassi...">
                 </div>
+                <label class="stock-status-filter" for="filter-estoque-status">Situação dos veículos
+                    <select id="filter-estoque-status" class="form-control" onchange="filterEstoqueStatus()">
+                        <option value="todos">Todos os veículos</option>
+                        <option value="disponivel">Disponível</option>
+                        <option value="vendido">Vendido</option>
+                        <option value="preparacao">Em preparação</option>
+                        <option value="reservado">Reservado</option>
+                    </select>
+                </label>
+                <span id="estoque-filter-count" aria-live="polite"></span>
                 <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary" id="open-vehicle-trash">Lixeira</button>
                     <div class="view-toggle" style="margin-right: 8px;">
                         <button class="view-toggle-btn active" id="toggle-estoque-lista"
                             onclick="setEstoqueView('lista')" title="Visualização em Lista">
@@ -320,39 +229,52 @@
                 </div>
             </div>
 
+            <div class="stock-period-controls" aria-label="Filtro por período do estoque">
+                <label for="stock-period-mode">Filtrar por
+                    <select id="stock-period-mode" class="form-control">
+                        <option value="none">Sem período</option>
+                        <option value="sale">Data da venda</option>
+                        <option value="entry">Data de entrada</option>
+                    </select>
+                </label>
+                <div id="stock-period-range" class="stock-period-range" hidden>
+                    <label for="stock-period-start">De <input id="stock-period-start" type="date" class="form-control"></label>
+                    <label for="stock-period-end">Até <input id="stock-period-end" type="date" class="form-control"></label>
+                    <div class="stock-period-shortcuts" aria-label="Atalhos de período">
+                        <button type="button" class="btn btn-secondary" data-stock-period-preset="month">Este mês</button>
+                        <button type="button" class="btn btn-secondary" data-stock-period-preset="last-month">Mês passado</button>
+                        <button type="button" class="btn btn-secondary" data-stock-period-preset="year">Este ano</button>
+                    </div>
+                </div>
+                <button type="button" id="stock-period-clear" class="btn btn-secondary" hidden>Limpar período</button>
+                <p id="stock-period-note" role="status" aria-live="polite" hidden></p>
+            </div>
+            <div class="stock-column-filter-summary"><button type="button" id="clear-stock-column-filters" hidden>Limpar filtros de coluna</button></div>
             <div class="estoque-modern-container" id="estoque-list-view">
                 <div class="estoque-modern-header">
-                    <div class="col-veh sortable-header" onclick="sortEstoque('model')">
-                        Veículo <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-model"></i>
+                    <div class="col-veh stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('model')">Veículo <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-model"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="model" aria-label="Filtrar Veículo"><i data-lucide="filter"></i></button>
                     </div>
-                    <div class="col-doc sortable-header" onclick="sortEstoque('document_status')">
-                        Doc <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-document_status"></i>
+                    <div class="col-doc stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('document_status')">Pendência <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-document_status"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="document_status" aria-label="Filtrar Pendência"><i data-lucide="filter"></i></button>
                     </div>
-                    <div class="col-year sortable-header" onclick="sortEstoque('year')">
-                        Ano <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-year"></i>
+                    <div class="col-days stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('days')">Tempo no pátio <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-days"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="days" aria-label="Filtrar Tempo no pátio"><i data-lucide="filter"></i></button>
                     </div>
-                    <div class="col-km sortable-header" onclick="sortEstoque('km')">
-                        KM <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-km"></i>
+                    <div class="col-type stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('type')">Tipo <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-type"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="type" aria-label="Filtrar Tipo"><i data-lucide="filter"></i></button>
                     </div>
-                    <div class="col-buy sortable-header" onclick="sortEstoque('buyPrice')">
-                        Compra <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-buyPrice"></i>
+<div class="col-status-mc stock-column-heading"><button type="button" class="sortable-header" onclick="sortEstoque('status_mc')">Status MC <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status_mc"></i></button><button type="button" class="stock-column-filter" data-stock-filter="status_mc" aria-label="Filtrar Status MC"><i data-lucide="filter"></i></button></div>
+<div class="col-custom-status stock-column-heading"><button type="button" class="sortable-header" onclick="sortEstoque('custom_status')">Status <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-custom_status"></i></button><button type="button" class="stock-column-filter" data-stock-filter="custom_status" aria-label="Filtrar Status"><i data-lucide="filter"></i></button></div>
+<div class="col-purchase-store stock-column-heading"><button type="button" class="sortable-header" onclick="sortEstoque('purchase_store')">Loja de compra <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-purchase_store"></i></button><button type="button" class="stock-column-filter" data-stock-filter="purchase_store" aria-label="Filtrar Loja de compra"><i data-lucide="filter"></i></button></div>
+                    <div class="col-status stock-column-heading">
+                        <button type="button" class="sortable-header" onclick="sortEstoque('status')">Situação no pátio <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status"></i></button>
+                        <button type="button" class="stock-column-filter" data-stock-filter="status" aria-label="Filtrar Status"><i data-lucide="filter"></i></button>
                     </div>
-                    <div class="col-sell sortable-header" onclick="sortEstoque('sellPrice')">
-                        Venda <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-sellPrice"></i>
-                    </div>
-                    <div class="col-margin sortable-header" onclick="sortEstoque('margin')">
-                        Margem / Lucro <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-margin"></i>
-                    </div>
-                    <div class="col-days sortable-header" onclick="sortEstoque('days')">
-                        Tempo Pátio <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-days"></i>
-                    </div>
-                    <div class="col-type sortable-header" onclick="sortEstoque('type')">
-                        Tipo <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-type"></i>
-                    </div>
-                    <div class="col-status sortable-header" onclick="sortEstoque('status')">
-                        Status <i data-lucide="chevrons-up-down" class="sort-icon" id="sort-icon-status"></i>
-                    </div>
-                    <div class="col-actions" style="text-align: center;">Ações</div>
                 </div>
                 <div id="estoque-modern-list-body" class="estoque-modern-list-body">
                     <!-- Gerado Dinamicamente por app.js -->
@@ -403,9 +325,9 @@
                             <span class="cd-price-label-premium">Preço de Venda</span>
                             <span class="cd-price-val-premium" id="cd-summary-price">R$ 0,00</span>
                         </div>
-                        <div class="cd-autosave-indicator" id="cd-autosave-status" title="Todas as alterações são salvas automaticamente">
-                            <i data-lucide="cloud-check" id="cd-autosave-icon" style="width:14px; height:14px; color:var(--green-profit);"></i>
-                            <span id="cd-autosave-text">Salvo automaticamente</span>
+                        <div class="cd-autosave-indicator" id="cd-autosave-status" data-state="saved" role="status" aria-live="polite" title="As alterações são salvas automaticamente">
+                            <i data-lucide="check" id="cd-autosave-icon" style="width:12px; height:12px; color:var(--green-profit);"></i>
+                            <span id="cd-autosave-text">Salvo</span>
                         </div>
                     </div>
                 </div>
@@ -508,6 +430,11 @@
                             </div>
                         </div>
 
+                        <div class="cd-delete-vehicle-action">
+                            <button type="button" id="cd-delete-vehicle" class="btn"><i data-lucide="trash-2" aria-hidden="true"></i> Excluir veículo</button>
+                            <small>A ficha e seus vínculos serão preservados na lixeira.</small>
+                        </div>
+
                     </div>
 
                     <!-- COLUNA DA DIREITA (Tab-swapped modular widgets) -->
@@ -593,14 +520,11 @@
                                     </div>
 
                                     <div class="premium-form-group">
-                                        <label class="premium-input-label">Documento Físico</label>
-                                        <div class="input-with-icon-wrapper">
-                                            <i data-lucide="file-check"></i>
-                                            <select class="premium-select-field" id="cd-document">
-                                                <option value="sim">Sim, na Loja</option>
-                                                <option value="nao">Não Possui</option>
-                                                <option value="pendente">Pendente de Entrega</option>
-                                            </select>
+                                        <label class="premium-input-label" for="pending-toggle">Pendência</label>
+                                        <div id="pending-field" class="pending-field">
+                                            <select id="cd-document" hidden aria-hidden="true" tabindex="-1"><option value="none">Sem pendência</option></select>
+                                            <button type="button" id="pending-toggle" class="premium-select-field" aria-expanded="false" aria-controls="pending-menu"><span id="pending-toggle-label">Sem pendência</span><span aria-hidden="true">⌄</span></button>
+                                            <div id="pending-menu" class="pending-menu" hidden role="group" aria-label="Opções de pendência"></div>
                                         </div>
                                     </div>
 
@@ -627,22 +551,28 @@
                                         </div>
                                     </div>
 
-                                    <div class="premium-form-group full-row-grid">
-                                        <label class="premium-input-label">Código & Preço de Referência FIPE</label>
-                                        <div class="fipe-premium-inputs-row">
-                                            <div class="input-with-icon-wrapper" style="flex:1;">
-                                                <i data-lucide="key"></i>
-                                                <input type="text" class="premium-input-field" id="cd-fipe-code"
-                                                    placeholder="Código Fipe" onblur="quickFipeSearch()" title="Código Fipe">
-                                            </div>
-                                            <div class="input-with-icon-wrapper" style="flex:1.2;">
-                                                <i data-lucide="dollar-sign"></i>
-                                                <input type="text" class="premium-input-field" id="cd-fipe-price"
-                                                    placeholder="Valor Fipe" title="Valor Fipe">
-                                            </div>
-                                            <button class="btn btn-secondary fipe-search-premium-btn" onclick="openFipeSearchModal()" title="Buscar na Tabela Fipe">
-                                                <i data-lucide="search"></i> Buscar
-                                            </button>
+                                    <div class="premium-form-group">
+                                        <label class="premium-input-label" for="status-mc-toggle">Status MC</label>
+                                        <div id="status-mc-field" class="pending-field">
+                                            <select id="cd-status-mc" hidden aria-hidden="true" tabindex="-1"><option value="unreported">Não informado</option></select>
+                                            <button type="button" id="status-mc-toggle" class="premium-select-field catalog-toggle" aria-expanded="false" aria-controls="status-mc-menu"><span id="status-mc-toggle-label">Não informado</span><span aria-hidden="true">⌄</span></button>
+                                            <div id="status-mc-menu" class="pending-menu" hidden role="group" aria-label="Opções de Status MC"></div>
+                                        </div>
+                                    </div>
+                                    <div class="premium-form-group">
+                                        <label class="premium-input-label" for="custom-status-toggle">Status</label>
+                                        <div id="custom-status-field" class="pending-field">
+                                            <select id="cd-custom-status" hidden aria-hidden="true" tabindex="-1"><option value="unreported">Não informado</option></select>
+                                            <button type="button" id="custom-status-toggle" class="premium-select-field catalog-toggle" aria-expanded="false" aria-controls="custom-status-menu"><span id="custom-status-toggle-label">Não informado</span><span aria-hidden="true">⌄</span></button>
+                                            <div id="custom-status-menu" class="pending-menu" hidden role="group" aria-label="Opções de Status"></div>
+                                        </div>
+                                    </div>
+                                    <div class="premium-form-group">
+                                        <label class="premium-input-label" for="purchase-store-toggle">Loja de compra</label>
+                                        <div id="purchase-store-field" class="pending-field">
+                                            <select id="cd-purchase-store" hidden aria-hidden="true" tabindex="-1"><option value="unreported">Não informado</option></select>
+                                            <button type="button" id="purchase-store-toggle" class="premium-select-field catalog-toggle" aria-expanded="false" aria-controls="purchase-store-menu"><span id="purchase-store-toggle-label">Não informado</span><span aria-hidden="true">⌄</span></button>
+                                            <div id="purchase-store-menu" class="pending-menu" hidden role="group" aria-label="Opções de Loja de compra"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1308,7 +1238,7 @@
                     <div class="finance-card-details">
                         <h4>Saídas (Aquisição)</h4>
                         <p id="fin-saidas">R$ 0,00</p>
-                        <span>Custo pago por veículos de estoque</span>
+                        <span>Compras pela data de aquisição</span>
                     </div>
                 </div>
 
@@ -1324,13 +1254,21 @@
                 <div class="finance-card net-profit">
                     <div class="finance-card-icon"><i data-lucide="coins"></i></div>
                     <div class="finance-card-details">
-                        <h4>Lucro Líquido Real</h4>
+                        <h4>Saldo do Período</h4>
                         <p id="fin-liquido">R$ 0,00</p>
-                        <span>Faturamento total livre de custos</span>
+                        <span>Vendas − compras − despesas do período</span>
+                        <h4 style="margin-top:12px">Lucro das Vendas</h4>
+                        <p id="fin-lucro-vendas" style="font-size:20px">R$ 0,00</p>
+                        <span>Resultado atualizado dos veículos vendidos</span>
                     </div>
                 </div>
             </div>
 
+            <p style="color:var(--text-muted);font-size:12px;margin:0 0 16px;line-height:1.5">
+                O saldo usa as datas cadastradas de venda, aquisição e despesa, sem conciliação de pagamentos ou parcelas.
+                O lucro das vendas desconta a compra e todas as despesas vinculadas ao veículo, mesmo de outros períodos; despesas gerais não são rateadas nesse indicador.
+            </p>
+            <p id="fin-data-notice" hidden role="status" style="color:var(--orange-warning,#b45309);font-size:12px;margin:0 0 16px"></p>
             <div class="charts-grid" style="grid-template-columns: 2fr 1fr; margin-bottom: 24px;">
                 <div class="dashboard-panel">
                     <div class="panel-header">
@@ -1614,92 +1552,7 @@
         <!-- ==========================================
              ABA 8: CONFIGURAÇÕES & DADOS DA EMPRESA
              ========================================== -->
-        <section id="configuracoes-tab" class="tab-pane">
-            <div class="section-header">
-                <div>
-                    <h2>Configurações & Dados da Empresa</h2>
-                    <p>Cadastre os CNPJs e filiais do seu grupo comercial para emissão e controle de vendas</p>
-                </div>
-            </div>
 
-            <!-- CARD: Cadastro de CNPJs / Filiais -->
-            <div class="saas-card" style="margin-top: 20px; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
-                <div class="panel-header" style="margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                    <div class="panel-title" style="display:flex; align-items:center; gap:10px;">
-                        <div style="background: rgba(59, 130, 246, 0.1); color: var(--blue-primary); padding: 8px; border-radius: 8px; display: flex; align-items: center;">
-                            <i data-lucide="building-2"></i>
-                        </div>
-                        <div>
-                            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-light);">CNPJs da Empresa & Filiais Vendedoras</h3>
-                            <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted);">Os CNPJs cadastrados aqui estarão disponíveis para escolha no momento do registro de venda e emissão de recibo.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Formulário de adição rápida de CNPJ -->
-                <form id="form-add-company-cnpj" onsubmit="event.preventDefault(); window.handleAddCompanyCnpj();" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto; gap: 12px; align-items: end; background: var(--bg-hover, rgba(255,255,255,0.02)); padding: 16px; border-radius: 12px; border: 1px dashed var(--border-color); margin-bottom: 24px;">
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Razão Social / Apelido da Loja</label>
-                        <input type="text" id="config-cnpj-name" class="form-control" placeholder="Ex: AutoDrive Motors Matriz" required style="margin-bottom:0;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Número do CNPJ</label>
-                        <input type="text" id="config-cnpj-number" class="form-control" placeholder="00.000.000/0001-00" required style="margin-bottom:0;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Inscrição Estadual (Opcional)</label>
-                        <input type="text" id="config-cnpj-ie" class="form-control" placeholder="Ex: 123.456.789.110" style="margin-bottom:0;">
-                    </div>
-                    <div>
-                        <button type="submit" class="btn btn-primary" style="height: 42px; display: flex; align-items: center; gap: 6px;">
-                            <i data-lucide="plus-circle"></i> Cadastrar CNPJ
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Tabela de CNPJs cadastrados -->
-                <div class="table-responsive">
-                    <table class="table" style="width:100%; border-collapse:collapse;">
-                        <thead>
-                            <tr style="border-bottom:1px solid var(--border-color); text-align:left;">
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600;">Empresa / Apelido</th>
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600;">CNPJ</th>
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600;">Inscrição Estadual</th>
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600;">Status</th>
-                                <th style="padding:12px; color:var(--text-muted); font-weight:600; text-align:center;">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="company-cnpjs-table-body">
-                            <!-- Inserido dinamicamente -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- CARD: Aparência e Preferências -->
-            <div class="saas-card" style="margin-top: 24px; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
-                <div class="panel-header" style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
-                    <div class="panel-title" style="display:flex; align-items:center; gap:10px;">
-                        <div style="background: rgba(168, 85, 247, 0.1); color: #a855f7; padding: 8px; border-radius: 8px; display: flex; align-items: center;">
-                            <i data-lucide="palette"></i>
-                        </div>
-                        <div>
-                            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-light);">Preferências da Interface</h3>
-                            <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted);">Personalize o tema e atalhos visuais</p>
-                        </div>
-                    </div>
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 0;">
-                    <div>
-                        <strong style="color:var(--text-light); font-size:14px; display:block;">Modo Escuro / Claro (Dark Mode)</strong>
-                        <span style="font-size:12px; color:var(--text-muted);">Alterne entre a interface moderna em tom escuro ou claro</span>
-                    </div>
-                    <button class="btn btn-secondary theme-toggle-btn" onclick="toggleAppTheme()">
-                        <i data-lucide="moon"></i> Alternar Tema
-                    </button>
-                </div>
-            </div>
-        </section>
 
     </main>
 
@@ -2327,117 +2180,47 @@
         </div>
     </div>
 
+
+    <dialog id="vehicle-trash-dialog" class="vehicle-delete-dialog vehicle-trash-dialog" aria-labelledby="vehicle-trash-title">
+        <h3 id="vehicle-trash-title">Lixeira de veículos</h3>
+        <p>Restaure um veículo para devolvê-lo ao estoque com sua ficha e vínculos. O histórico financeiro permanece preservado. Não há exclusão automática.</p>
+        <div id="vehicle-trash-items"></div>
+        <p id="vehicle-trash-error" role="alert" hidden></p>
+        <div class="vehicle-delete-actions"><button type="button" id="close-vehicle-trash" class="btn btn-secondary">Fechar</button></div>
+    </dialog>
+    <dialog id="vehicle-delete-dialog" class="vehicle-delete-dialog" aria-labelledby="vehicle-delete-title" aria-describedby="vehicle-delete-description vehicle-delete-identity">
+        <h3 id="vehicle-delete-title">Mover veículo para a lixeira?</h3>
+        <p id="vehicle-delete-identity"></p>
+        <p id="vehicle-delete-description">O veículo sairá da lista de estoque e poderá ser restaurado. Documentos, vendas e despesas serão preservados, inclusive no histórico financeiro. Não há exclusão automática da lixeira.</p>
+        <p id="vehicle-delete-error" role="alert" hidden></p>
+        <div class="vehicle-delete-actions">
+            <button type="button" id="vehicle-delete-cancel" class="btn btn-secondary">Cancelar</button>
+            <button type="button" id="vehicle-delete-confirm" class="btn btn-danger">Mover para a lixeira</button>
+        </div>
+    </dialog>
+
     <!-- TELA DE LOGIN (OVERLAY SAAS PREMIUM) -->
     <div class="modal-overlay active" id="login-overlay" style="z-index: 99999; backdrop-filter: blur(25px); background-color: rgba(15, 23, 42, 0.35);">
         <div class="login-split-card">
             <!-- LADO DO FORMULÁRIO -->
             <div class="login-form-side">
-                <!-- Cabeçalho do Card com Logo minimalista -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                    <span class="login-brand-logo">AUTODRIVE<span style="color: #f43f5e;">®</span></span>
-                    <span style="font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Gestão Premium</span>
+                <div style="margin-bottom:20px"><span class="login-brand-logo">M.camposoffroad</span></div>
+                <div style="margin-bottom:24px">
+                    <h2 style="font-size:26px;font-weight:800;letter-spacing:-0.8px;color:#0f172a;margin:0 0 4px">Acessar o sistema</h2>
+                    <p style="font-size:13px;color:var(--text-muted);margin:0">Entre com seu e-mail e senha.</p>
                 </div>
-
-                <div style="margin-bottom: 24px;">
-                    <h2 style="font-size: 26px; font-weight: 800; letter-spacing: -0.8px; color: #0f172a; margin: 0 0 4px 0;">Performance CRM</h2>
-                    <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Insira suas credenciais para acessar o painel</p>
-                </div>
-
-                <!-- Alerta de Conexão Nuvem / Administrador -->
-                <div id="login-demo-notice"
-                    style="background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 16px; padding: 14px; margin-bottom: 20px; font-size: 12px; line-height: 1.4; color: var(--text-light, #1e293b); position: relative;">
-                    <strong style="color:#10b981; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
-                        <span style="display:inline-block; width:8px; height:8px; background-color:#10b981; border-radius:50%; box-shadow:0 0 6px #10b981;"></span>
-                        Nuvem AutoDrive Sincronizada em Tempo Real
-                    </strong>
-                    O sistema sincroniza instantaneamente todos os CNPJs (Matriz e Filiais), entradas e saídas de veículos entre todos os computadores.
-                    <div style="margin-top: 10px;">
-                        <button class="btn btn-primary btn-sm" style="background-color: #059669 !important; color: #ffffff !important; border-radius: 9999px; padding: 8px 16px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" onclick="window.connectAdminCockpit()">
-                            <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> Entrar no Cockpit Conectado (Administrador)
-                        </button>
+                <div id="login-error-message" role="alert" style="display:none;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-md);padding:10px;margin-bottom:20px;font-size:12px;color:var(--red-alert)"></div>
+                <form id="form-login" method="post" action="/api/web/login" autocomplete="on" onsubmit="event.preventDefault()">
+                    <div class="form-group" style="margin-bottom:16px">
+                        <label for="login-email" style="font-size:11px;font-weight:600;margin-bottom:6px;display:block">E-mail</label>
+                        <input type="email" id="login-email" name="email" class="form-control" autocomplete="username" placeholder="Seu e-mail" required style="border-radius:12px;padding:11px 14px;font-size:13px">
                     </div>
-                </div>
-
-                <div id="login-error-message"
-                    style="display:none; background-color: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-md); padding: 10px; margin-bottom: 20px; font-size: 12px; color: var(--red-alert);">
-                    Credenciais incorretas ou erro de comunicação. Tente novamente.
-                </div>
-
-                <!-- Formulário de Login -->
-                <form id="form-login" onsubmit="handleLogin(event)">
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label for="login-email" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; margin-bottom: 6px; display: block;">E-mail Corporativo</label>
-                        <input type="email" id="login-email" class="form-control" placeholder="admin@autodrive.com.br" value="admin@autodrive.com.br" required style="border-radius: 12px; padding: 11px 14px; font-size: 13px;">
+                    <div class="form-group" style="margin-bottom:24px">
+                        <label for="login-password" style="font-size:11px;font-weight:600;margin-bottom:6px;display:block">Senha</label>
+                        <input type="password" id="login-password" name="password" class="form-control" autocomplete="current-password" required maxlength="72" style="border-radius:12px;padding:11px 14px;font-size:13px">
                     </div>
-                    <div class="form-group" style="margin-bottom: 24px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <label for="login-password" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; margin: 0; display: block;">Chave de Acesso</label>
-                            <a href="#" style="font-size: 11px; color: #64748b; text-decoration: none;" onclick="alert('Chave padrão de administrador configurada para acesso unificado.')">Acesso Administrador</a>
-                        </div>
-                        <input type="password" id="login-password" class="form-control" placeholder="••••••••" value="admin123" required style="border-radius: 12px; padding: 11px 14px; font-size: 13px;">
-                    </div>
-                    
-                    <button class="btn btn-primary" type="submit" style="width: 100%; padding: 14px; font-weight: 700; font-size: 14px; border-radius: 9999px; background-color: #0f172a !important; color: #ffffff !important; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15) !important;">
-                        Entrar no Cockpit Conectado
-                    </button>
-
-                    <!-- Divisor e Redes Sociais Decorativas (como na imagem de inspiração) -->
-                    <div style="display: flex; align-items: center; justify-content: center; margin: 20px 0; gap: 10px;">
-                        <span style="flex: 1; height: 1px; background-color: #f1f5f9;"></span>
-                        <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Ou acesse via</span>
-                        <span style="flex: 1; height: 1px; background-color: #f1f5f9;"></span>
-                    </div>
-
-                    <div class="login-social-container">
-                        <div class="login-social-btn google" onclick="window.connectAdminCockpit()" title="Acesso rápido conectado via Google">
-                            <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
-                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
-                            </svg>
-                        </div>
-                        <div class="login-social-btn apple" onclick="window.connectAdminCockpit()" title="Acesso rápido conectado via Apple ID">
-                            <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M18.71,19.5C17.88,20.74 17,21.95 15.66,21.97C14.32,22 13.89,21.18 12.37,21.18C10.84,21.18 10.37,21.95 9.1,22C7.79,22.05 6.8,20.68 5.96,19.47C4.25,17 2.94,12.45 4.7,9.39C5.57,7.87 7.13,6.91 8.82,6.88C10.1,6.86 11.32,7.75 12.11,7.75C12.89,7.75 14.37,6.68 15.92,6.84C16.57,6.87 18.39,7.1 19.56,8.82C19.47,8.88 17.39,10.1 17.41,12.63C17.44,15.65 20.06,16.66 20.1,16.67C20.08,16.74 19.67,18.11 18.71,19.5M15.97,4.17C16.63,3.37 17.07,2.28 16.95,1C16,1.04 14.9,1.6 14.24,2.38C13.68,3.04 13.19,4.14 13.34,5.39C14.39,5.47 15.4,4.88 15.97,4.17Z" />
-                            </svg>
-                        </div>
-                        <div class="login-social-btn facebook" onclick="window.connectAdminCockpit()" title="Acesso rápido conectado via Facebook">
-                            <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.95 14.22 5.95C15.31 5.95 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z" />
-                            </svg>
-                        </div>
-                    </div>
-
-                    <p style="margin-top:20px; text-align:center; font-size:13px; color:var(--text-muted);">
-                        Não tem credenciais? <a href="#" id="toggle-signup-link"
-                            style="color:#0f172a; font-weight:700; text-decoration:none;">Solicitar Acesso</a>
-                    </p>
-                </form>
-
-                <!-- Formulário de Cadastro -->
-                <form id="form-signup" style="display:none;" onsubmit="handleSignup(event)">
-                    <div class="form-group" style="margin-bottom: 12px;">
-                        <label for="signup-email" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; margin-bottom: 6px; display: block;">Seu E-mail</label>
-                        <input type="email" id="signup-email" class="form-control" placeholder="exemplo@email.com" required style="border-radius: 12px; padding: 11px 14px; font-size: 13px;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 12px;">
-                        <label for="signup-password" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; margin-bottom: 6px; display: block;">Senha de Acesso</label>
-                        <input type="password" id="signup-password" class="form-control" placeholder="Mínimo 6 caracteres" required style="border-radius: 12px; padding: 11px 14px; font-size: 13px;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label for="signup-confirm-password" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; margin-bottom: 6px; display: block;">Confirmar Senha</label>
-                        <input type="password" id="signup-confirm-password" class="form-control" placeholder="Repita a senha" required style="border-radius: 12px; padding: 11px 14px; font-size: 13px;">
-                    </div>
-                    
-                    <button class="btn btn-primary" type="submit" style="width: 100%; padding: 14px; font-weight: 700; font-size: 14px; border-radius: 9999px; background-color: #0f172a !important; color: #ffffff !important;">
-                        Solicitar Token de Acesso
-                    </button>
-                    
-                    <p style="margin-top:20px; text-align:center; font-size:13px; color:var(--text-muted);">
-                        Já possui registro? <a href="#" id="toggle-login-link"
-                            style="color:#0f172a; font-weight:700; text-decoration:none;">Fazer Login</a>
-                    </p>
+                    <button class="btn btn-primary" type="submit" disabled style="width:100%;padding:14px;font-weight:700;font-size:14px;border-radius:9999px;background-color:#0f172a!important;color:#fff!important">Entrar</button>
+                    <p style="margin-top:20px;font-size:12px;color:var(--text-muted)">Precisa de acesso ou esqueceu a senha? Fale com o responsável pelo sistema.</p>
                 </form>
             </div>
 
@@ -2446,126 +2229,17 @@
                 <div class="login-banner-content">
                     <div style="background-color: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); padding: 6px 14px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.25);">
                         <span style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; display: inline-block;"></span>
-                        <span style="font-size: 11px; font-weight: 600; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">AutoDrive 2.0 Ativo</span>
+                        <span style="font-size: 11px; font-weight: 600; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">M.camposoffroad</span>
                     </div>
                     <h3 class="login-banner-title">Muito Mais Que Gestão.<br>É Performance.</h3>
-                    <p class="login-banner-text">O ecossistema definitivo para controle de leads, estoques, test drives e fechamento de contratos para concessionárias de alta performance.</p>
+                    <p class="login-banner-text">Estoque, vendas e financeiro da sua loja em um só lugar.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- EDITAR PERFIL DO OPERADOR -->
-    <div class="modal-overlay" id="modal-edit-profile">
-        <div class="modal-content" style="max-width: 520px;">
-            <div class="modal-header">
-                <h2><i data-lucide="user-cog" style="width:20px;height:20px;color:var(--blue-primary);margin-right:8px;vertical-align:middle;"></i> Editar Perfil do Operador</h2>
-                <button class="close-modal-btn" onclick="window.closeEditProfileModal()"><i data-lucide="x"></i></button>
-            </div>
-            <div class="modal-body">
-                <form id="form-edit-profile" onsubmit="window.saveUserProfile(event)">
-                    <div class="form-group">
-                        <label for="edit-profile-name">Nome de Exibição *</label>
-                        <input type="text" id="edit-profile-name" class="form-control" placeholder="Ex: Marcelo Motors" required>
-                    </div>
-                    <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                        <div>
-                            <label for="edit-profile-email">E-mail do Operador</label>
-                            <input type="email" id="edit-profile-email" class="form-control" placeholder="operador@autodrive.com">
-                        </div>
-                        <div>
-                            <label for="edit-profile-role">Cargo / Função</label>
-                            <input type="text" id="edit-profile-role" class="form-control" placeholder="Ex: Administrador">
-                        </div>
-                    </div>
 
-                    <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--border-color);">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <label style="font-weight:600; font-size:13px; color:var(--text-light); margin:0; display:flex; align-items:center; gap:6px;">
-                                <i data-lucide="building-2" style="width:15px;height:15px;color:var(--blue-primary);"></i>
-                                CNPJs da Empresa & Filiais Vendedoras
-                            </label>
-                            <div style="display:flex; gap:6px;">
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="window.quickAddSellerCnpjPrompt()" style="font-size:11px; padding:4px 8px;">
-                                    <i data-lucide="plus" style="width:12px;height:12px;margin-right:2px;"></i> Adicionar
-                                </button>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="switchTab('configuracoes'); window.closeEditProfileModal();" style="font-size:11px; padding:4px 8px;">
-                                    <i data-lucide="settings" style="width:12px;height:12px;margin-right:2px;"></i> Gerenciar
-                                </button>
-                            </div>
-                        </div>
-                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
-                            Estes CNPJs ficam disponíveis nas telas de venda e relatórios de veículos.
-                        </p>
-                        <div id="profile-cnpjs-quick-list" style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto;">
-                            <!-- Preenchido dinamicamente -->
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="window.closeEditProfileModal()">Cancelar</button>
-                <button class="btn btn-primary" type="submit" form="form-edit-profile"><i data-lucide="save"></i> Salvar Perfil</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Busca Fipe -->
-    <div class="modal-overlay" id="modal-fipe">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2><i data-lucide="search" style="width:20px;height:20px;margin-right:8px;"></i> Consulta Tabela Fipe
-                </h2>
-                <button class="btn btn-secondary btn-icon" onclick="closeFipeSearchModal()"><i
-                        data-lucide="x"></i></button>
-            </div>
-            <div class="modal-body" style="display:flex; flex-direction:column; gap:16px;">
-                <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Selecione os dados do veículo
-                    para buscar o código e valor oficial na tabela Fipe. Esta busca usa a BrasilAPI.</p>
-                <div class="form-group">
-                    <label>Tipo de Veículo</label>
-                    <select id="fipe-type" class="form-control" onchange="fetchFipeBrands()">
-                        <option value="carros">Carros</option>
-                        <option value="motos">Motos</option>
-                        <option value="caminhoes">Caminhões</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Marca</label>
-                    <select id="fipe-brand" class="form-control" onchange="fetchFipeModels()" disabled>
-                        <option value="">Selecione...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Modelo</label>
-                    <select id="fipe-model" class="form-control" onchange="fetchFipeYears()" disabled>
-                        <option value="">Selecione...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Ano de Referência</label>
-                    <select id="fipe-year" class="form-control" onchange="fetchFipePrice()" disabled>
-                        <option value="">Selecione...</option>
-                    </select>
-                </div>
-
-                <div id="fipe-result"
-                    style="display:none; padding:16px; background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.3); border-radius:8px; margin-top:8px;">
-                    <div style="font-size:12px; color:var(--text-muted);">Mês de Referência: <span id="fipe-res-month"
-                            style="color:#FFF;">-</span></div>
-                    <div style="font-size:12px; color:var(--text-muted);">Código Fipe: <span id="fipe-res-code"
-                            style="color:#FFF;">-</span></div>
-                    <div style="font-size:20px; font-weight:700; color:var(--blue-primary); margin-top:8px;"
-                        id="fipe-res-price">R$ 0,00</div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeFipeSearchModal()">Cancelar</button>
-                <button class="btn btn-primary" id="btn-apply-fipe" onclick="applyFipeResult()" disabled>Aplicar
-                    Valor</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal Global de Confirmação (Substitui confirm() nativo do navegador) -->
     <div class="modal-overlay" id="modal-global-confirm" style="z-index: 100000;">
@@ -2701,97 +2375,9 @@
         </div>
     </div>
 
-    <!-- ==========================================================================
-         AUTO AGENTE (LLM CO-PILOT GEMINI 3.7 FLASH)
-         ========================================================================== -->
-    <!-- Floating Launcher Button -->
-    <div id="auto-agente-fab" class="auto-agente-fab" onclick="window.toggleAutoAgente()" title="Auto Agente AI - Assistente Inteligente (Ctrl+Espaço)">
-        <div class="auto-agente-fab-glow"></div>
-        <div class="auto-agente-fab-icon">
-            <i data-lucide="sparkles"></i>
-        </div>
-        <span class="auto-agente-fab-label">Auto Agente</span>
-        <span class="auto-agente-fab-shortcut">Ctrl+Espaço</span>
-    </div>
 
-    <!-- Slide-over Drawer / Panel -->
-    <div id="auto-agente-drawer" class="auto-agente-drawer">
-        <!-- Backdrop for mobile / outside click -->
-        <div class="auto-agente-backdrop" onclick="window.closeAutoAgente()"></div>
 
-        <div class="auto-agente-panel">
-            <!-- Header -->
-            <div class="auto-agente-header">
-                <div class="auto-agente-header-title">
-                    <div class="auto-agente-avatar">
-                        <i data-lucide="sparkles"></i>
-                        <span class="auto-agente-pulse-ring"></span>
-                    </div>
-                    <div>
-                        <div class="auto-agente-name-row">
-                            <h3>Auto Agente</h3>
-                            <span class="auto-agente-model-badge">Gemini AI</span>
-                        </div>
-                        <p class="auto-agente-status-text">
-                            <span class="status-dot online"></span> Conectado ao Pátio & CRM
-                        </p>
-                    </div>
-                </div>
-                <div class="auto-agente-header-actions">
-                    <button class="auto-agente-icon-btn" onclick="window.clearAutoAgenteHistory()" title="Limpar conversa">
-                        <i data-lucide="trash-2"></i>
-                    </button>
-                    <button class="auto-agente-icon-btn" onclick="window.closeAutoAgente()" title="Fechar (Esc)">
-                        <i data-lucide="x"></i>
-                    </button>
-                </div>
-            </div>
 
-            <!-- Quick Capabilities Banner -->
-            <div class="auto-agente-capabilities-bar">
-                <span><i data-lucide="zap"></i> Executa ações reais: cadastra leads, agendas, despesas e busca no estoque</span>
-            </div>
-
-            <!-- Messages Body -->
-            <div id="auto-agente-chat-body" class="auto-agente-chat-body">
-                <!-- Messages rendered dynamically -->
-            </div>
-
-            <!-- Input Area -->
-            <div class="auto-agente-input-wrapper">
-                <div class="auto-agente-input-box">
-                    <textarea 
-                        id="auto-agente-input" 
-                        class="auto-agente-textarea" 
-                        placeholder="Peça algo em linguagem natural... (ex: Cadastra o lead João no Corolla)"
-                        rows="1"
-                        onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); window.sendAutoAgenteMessage(); }"></textarea>
-                    
-                    <div class="auto-agente-input-actions">
-                        <button 
-                            id="auto-agente-mic-btn" 
-                            class="auto-agente-mic-btn" 
-                            type="button"
-                            onclick="window.toggleVoiceInput()" 
-                            title="Falar por voz (Microfone)">
-                            <i data-lucide="mic"></i>
-                        </button>
-                        <button 
-                            id="auto-agente-send-btn" 
-                            class="auto-agente-send-btn" 
-                            type="button"
-                            onclick="window.sendAutoAgenteMessage()" 
-                            title="Enviar comando (Enter)">
-                            <i data-lucide="send"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="auto-agente-input-hint">
-                    Pressione <strong>Enter</strong> para enviar ou use o <strong>microfone</strong> para falar.
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- JS Principal da Aplicação -->
     <script type="module" src="app.js"></script>

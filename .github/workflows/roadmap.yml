@@ -1,0 +1,106 @@
+name: Stack roadmap
+on: [push, pull_request]
+jobs:
+  render-image:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Render web image
+        run: docker build --file Dockerfile.render --tag mcampos-render:test .
+      - name: Verify packaged frontend and runtime
+        run: >-
+          docker run --rm --entrypoint sh mcampos-render:test -c
+          'test -s /app/app.jar && test -s /app/web/index.html &&
+          test -s /app/web/src/services/supabase.js &&
+          test ! -e /app/web/database && test ! -e /app/.env.neon.web &&
+          test "$(id -u)" = 10001 && sh -n /app/start-render.sh'
+  storage-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: tools/storage/package-lock.json
+      - run: npm ci --prefix tools/storage
+      - run: node --test tools/storage/migrate.test.cjs
+  windows-package:
+    needs: [backend, frontend]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/download-artifact@v4
+        with:
+          name: mcampos-backend
+          path: backend/target
+      - name: Package Windows with Java
+        shell: pwsh
+        run: ./scripts/package-windows.ps1 -Jar ./backend/target/crm-2.0.0-SNAPSHOT.jar -JavaHome $env:JAVA_HOME -Version "2.0.0-preview.${{ github.run_number }}" -OutputDirectory ./windows-dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcampos-windows
+          path: |
+            windows-dist/*.zip
+            windows-dist/*.sha256
+          retention-days: 7
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: mcampos_test
+          POSTGRES_USER: mcampos
+          POSTGRES_PASSWORD: test-password
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U mcampos -d mcampos_test" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      - run: mvn -B verify
+        working-directory: backend
+        env:
+          TEST_DB_URL: jdbc:postgresql://localhost:5432/mcampos_test
+          TEST_DB_USER: mcampos
+          TEST_DB_PASSWORD: test-password
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcampos-backend
+          path: backend/target/crm-*.jar
+          retention-days: 7
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: node --test scripts/audit-legacy.test.cjs
+      - run: node --test scripts/financeiro.test.cjs
+      - run: node --test scripts/pendencias.test.cjs
+      - run: node --test scripts/stock-column-filters.test.cjs
+      - run: node --test scripts/stock-period.test.cjs
+      - run: node --test scripts/user-search.test.cjs
+      - run: node --test scripts/vehicle-delete.test.cjs
+      - run: node --test scripts/vehicle-trash.test.cjs
+      - run: node --test scripts/migrate-documents.test.cjs
+      - run: node --test scripts/backup.test.cjs
+      - run: node --experimental-vm-modules --test scripts/desktop-startup.test.cjs
+      - run: node --experimental-vm-modules --test scripts/web-login.test.cjs
+      - run: npm run build
+        working-directory: frontend

@@ -1,0 +1,9 @@
+{
+  "name": "mcampos-storage-maintenance",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Verified document migration and independent backup for Neon Object Storage",
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1161.0"
+  }
+}

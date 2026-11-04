@@ -78,6 +78,13 @@ export function toggleSidebar() {
 
 // Main Tab Navigation Switcher
 export function switchTab(tabId) {
+    if (['dashboard', 'vendas', 'leads', 'agenda', 'usuarios', 'configuracoes'].includes(tabId)) {
+        if (tabId === 'vendas') {
+            const statusFilter = document.getElementById('filter-estoque-status');
+            if (statusFilter) statusFilter.value = 'vendido';
+        }
+        tabId = 'estoque';
+    }
     document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
     document.querySelectorAll(".sidebar-menu .menu-item").forEach(item => item.classList.remove("active"));
     
@@ -90,7 +97,7 @@ export function switchTab(tabId) {
     
     const titleObj = {
         'dashboard': { t: "Dashboard Operacional", s: "Visão unificada das vendas, estoque e lucratividade" },
-        'estoque': { t: "Gestão de Estoque", s: "Controle de margens, tempo de pátio e preparação de veículos" },
+        'estoque': { t: "Gestão de Estoque", s: "Veículos disponíveis e vendidos, conforme a situação selecionada" },
         'leads': { t: "Funil Comercial (CRM)", s: "Pipeline ativo de negociações e acompanhamento de contatos" },
         'vendas': { t: "Histórico de Fechamentos", s: "Registro financeiro de todos os veículos vendidos" },
         'financeiro': { t: "Fluxo de Caixa Operacional", s: "Demonstrativo financeiro simples de receitas e despesas" },
@@ -179,7 +186,6 @@ export function handleMenuSearch(query) {
     if (!query) {
         currentSearchResults = [
             { type: 'action', title: 'Adicionar Novo Veículo', sub: 'Cadastrar carro no estoque', icon: 'plus-circle', action: () => window.openAddCarModal() },
-            { type: 'action', title: 'Adicionar Novo Lead', sub: 'Registrar novo contato no funil', icon: 'user-plus', action: () => window.openAddLeadModal() },
             { type: 'action', title: 'Registrar Nova Despesa', sub: 'Lançar saída de caixa', icon: 'arrow-down-right', action: () => window.openAddDespesaModal() },
             { type: 'action', title: 'Consultar Tabela Fipe', sub: 'Buscar preço médio no BrasilAPI', icon: 'search', action: () => window.openFipeSearchModal() },
             { type: 'action', title: 'Consultar Placa (Demo)', sub: 'Simular consulta placa Sinesp', icon: 'shield', action: () => window.openPlacaDemoModal() }
@@ -201,18 +207,7 @@ export function handleMenuSearch(query) {
             }
         });
 
-        // Search in Leads
-        state.leads.forEach(lead => {
-            if (lead.name.toLowerCase().includes(q) || (lead.phone && lead.phone.toLowerCase().includes(q))) {
-                currentSearchResults.push({
-                    type: 'leads',
-                    title: lead.name,
-                    sub: `Lead: ${lead.status} | Tel: ${lead.phone || 'S/T'}`,
-                    icon: 'users',
-                    action: () => { window.switchTab('leads'); window.openEditLeadModal(lead.id); }
-                });
-            }
-        });
+
     }
 
     renderSearchResults();

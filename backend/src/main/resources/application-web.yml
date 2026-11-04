@@ -1,0 +1,27 @@
+server:
+  address: ${APP_BIND:127.0.0.1}
+  port: ${APP_PORT:8080}
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      timeout: 30m
+      tracking-modes: cookie
+      cookie:
+        name: MCAMPOS_SESSION
+        http-only: true
+        secure: true
+        same-site: strict
+app:
+  frontend-directory: ${FRONTEND_DIRECTORY:.}
+  storage-mode: s3
+  storage-endpoint: ${AWS_ENDPOINT_URL_S3}
+  storage-region: ${AWS_REGION}
+  storage-access-key: ${AWS_ACCESS_KEY_ID}
+  storage-secret-key: ${AWS_SECRET_ACCESS_KEY}
+  storage-bucket: ${STORAGE_BUCKET:documentos}
+  web-origin: ${APP_ORIGIN}
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

@@ -46,7 +46,6 @@ import {
     getFilteredDates,
     updateSellerCnpjDatalists,
     renderCompanyCnpjsTable,
-    syncUserProfileHeaderDetails,
     updatePeriodUI
 } from './src/features/configuracoes/configuracoes.js';
 
@@ -72,8 +71,7 @@ import {
     openCarDetails, 
     closeCarDetails, 
     editCarDetails, 
-    saveEditCarDetails, 
-    deleteCarConfirm, 
+    saveEditCarDetails,
     deleteCarDoc, 
     openCarDoc,
     closeDocPreviewModal,
@@ -85,13 +83,6 @@ import {
     cancelDocUpload,
     confirmDocUpload,
     openAddDespesaModalFromCar,
-    openFipeSearchModal, 
-    closeFipeSearchModal, 
-    fetchFipeBrands, 
-    fetchFipeModels, 
-    fetchFipeYears, 
-    fetchFipePrice, 
-    applyFipeResult, 
     openPlacaDemoModal, 
     closePlacaDemoModal, 
     runPlacaDemoSearch, 
@@ -105,7 +96,6 @@ import {
     previewDetailsPhotos,
     clearCarPhotos,
     updateSummaryFields,
-    quickFipeSearch,
     appendQuickNote,
     saveCarDetails,
     triggerCarDetailsAutoSave,
@@ -180,37 +170,6 @@ import {
     initFinanceChart
 } from './src/features/financeiro/financeiro.js';
 
-import { 
-    calendarPrevMonth, 
-    calendarNextMonth, 
-    renderCalendar, 
-    renderAgendaTimeline, 
-    openAddAgendaModal, 
-    closeAddAgendaModal, 
-    saveNewAgenda, 
-    openEditAgendaModal, 
-    closeEditAgendaModal, 
-    saveEditAgenda, 
-    deleteAgendaConfirm,
-    initGoogleCalendar,
-    renderGoogleCalendarApp,
-    renderGoogleCalendarBanner,
-    connectGoogleCalendar,
-    disconnectGoogleCalendar,
-    syncGoogleCalendarEvents,
-    loadDemoGoogleEvents,
-    openGoogleCalendarConfigModal,
-    closeGoogleCalendarConfigModal,
-    saveGoogleCalendarConfig,
-    switchGcalView,
-    gcalGoToToday,
-    gcalNavPrev,
-    gcalNavNext,
-    toggleGcalLayer,
-    gcalFilterEvents,
-    openGcalEventPopover,
-    closeGcalEventPopover
-} from './src/features/agenda/agenda.js';
 
 import { 
     renderClientesTable, 
@@ -225,16 +184,6 @@ import {
     calculateClientesKPIs 
 } from './src/features/clientes/clientes.js';
 
-import {
-    initAutoAgente,
-    toggleAutoAgente,
-    openAutoAgente,
-    closeAutoAgente,
-    sendAutoAgenteMessage,
-    sendQuickPrompt,
-    clearAutoAgenteHistory,
-    toggleVoiceInput
-} from './src/features/autoagente/autoagente.js';
 
 // Global state updater that cascades across all features
 export function updateApplicationState() {
@@ -246,7 +195,6 @@ export function updateApplicationState() {
     renderLeadsList();
     renderVendasTable();
     renderFinanceiro();
-    renderGoogleCalendarApp();
     calculateClientesKPIs();
     renderClientesTable();
     updateSellerCnpjDatalists();
@@ -308,7 +256,6 @@ window.openCarDetails = openCarDetails;
 window.closeCarDetails = closeCarDetails;
 window.editCarDetails = editCarDetails;
 window.saveEditCarDetails = saveEditCarDetails;
-window.deleteCarConfirm = deleteCarConfirm;
 window.deleteCarDoc = deleteCarDoc;
 window.openCarDoc = openCarDoc;
 window.closeDocPreviewModal = closeDocPreviewModal;
@@ -320,13 +267,6 @@ window.handleDocFileSelected = handleDocFileSelected;
 window.cancelDocUpload = cancelDocUpload;
 window.confirmDocUpload = confirmDocUpload;
 window.openAddDespesaModalFromCar = openAddDespesaModalFromCar;
-window.openFipeSearchModal = openFipeSearchModal;
-window.closeFipeSearchModal = closeFipeSearchModal;
-window.fetchFipeBrands = fetchFipeBrands;
-window.fetchFipeModels = fetchFipeModels;
-window.fetchFipeYears = fetchFipeYears;
-window.fetchFipePrice = fetchFipePrice;
-window.applyFipeResult = applyFipeResult;
 window.openPlacaDemoModal = openPlacaDemoModal;
 window.closePlacaDemoModal = closePlacaDemoModal;
 window.runPlacaDemoSearch = runPlacaDemoSearch;
@@ -340,7 +280,6 @@ window.calculateDetailsFinancials = calculateDetailsFinancials;
 window.previewDetailsPhotos = previewDetailsPhotos;
 window.clearCarPhotos = clearCarPhotos;
 window.updateSummaryFields = updateSummaryFields;
-window.quickFipeSearch = quickFipeSearch;
 window.appendQuickNote = appendQuickNote;
 window.saveCarDetails = saveCarDetails;
 window.triggerCarDetailsAutoSave = triggerCarDetailsAutoSave;
@@ -412,28 +351,6 @@ window.deleteDespesaConfirm = deleteDespesaConfirm;
 window.deleteDespesaFromDetails = deleteDespesaFromDetails;
 window.initFinanceChart = initFinanceChart;
 
-// Scheduling & Calendar
-window.calendarPrevMonth = calendarPrevMonth;
-window.calendarNextMonth = calendarNextMonth;
-window.renderCalendar = renderCalendar;
-window.renderAgendaTimeline = renderAgendaTimeline;
-window.openAddAgendaModal = openAddAgendaModal;
-window.closeAddAgendaModal = closeAddAgendaModal;
-window.saveNewAgenda = saveNewAgenda;
-window.openEditAgendaModal = openEditAgendaModal;
-window.closeEditAgendaModal = closeEditAgendaModal;
-window.saveEditAgenda = saveEditAgenda;
-window.deleteAgendaConfirm = deleteAgendaConfirm;
-window.initGoogleCalendar = initGoogleCalendar;
-window.renderGoogleCalendarBanner = renderGoogleCalendarBanner;
-window.connectGoogleCalendar = connectGoogleCalendar;
-window.disconnectGoogleCalendar = disconnectGoogleCalendar;
-window.syncGoogleCalendarEvents = syncGoogleCalendarEvents;
-window.loadDemoGoogleEvents = loadDemoGoogleEvents;
-window.openGoogleCalendarConfigModal = openGoogleCalendarConfigModal;
-window.closeGoogleCalendarConfigModal = closeGoogleCalendarConfigModal;
-window.saveGoogleCalendarConfig = saveGoogleCalendarConfig;
-
 // Customers Profiles
 window.renderClientesTable = renderClientesTable;
 window.openAddClientModal = openAddClientModal;
@@ -449,6 +366,8 @@ window.calculateClientesKPIs = calculateClientesKPIs;
 // Authentication
 window.loadProfiles = loadProfiles;
 window.handleLogin = handleLogin;
+// Bind before asynchronous startup so a login never becomes a native GET navigation.
+document.getElementById("form-login")?.addEventListener("submit", handleLogin);
 window.handleLogout = handleLogout;
 window.handleSignup = handleSignup;
 window.bypassLoginForDemo = bypassLoginForDemo;
@@ -460,10 +379,13 @@ window.filterUsuariosTable = filterUsuariosTable;
 
 // DOM Initialization Sequence
 document.addEventListener("DOMContentLoaded", async () => {
+    initSupabase();
+    await checkActiveSession();
+    const readyLoginButton = document.querySelector('#form-login button[type="submit"]');
+    if (readyLoginButton) readyLoginButton.disabled = false;
     setupHeaderDate();
     initAppTheme();
     updateSellerCnpjDatalists();
-    syncUserProfileHeaderDetails();
 
     // Register Service Worker for PWA Offline functionality
     if ('serviceWorker' in navigator) {
@@ -485,7 +407,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const cacheKeys = await caches.keys();
             for (const key of cacheKeys) {
-                if (key !== 'autodrive-crm-v5') {
+                if (key !== 'mcampos-desktop-v8') {
                     await caches.delete(key);
                 } else {
                     const c = await caches.open(key);
@@ -498,11 +420,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (_) {}
     }
 
-    // Initialize Supabase client
-    initSupabase();
-
-    // Validate active session (synchronizes central cloud data)
-    await checkActiveSession();
     updatePeriodUI();
 
     // Setup toggling links inside login modal overlay
@@ -536,10 +453,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Bind auth forms submit listeners
-    const loginForm = document.getElementById("form-login");
-    if (loginForm) {
-        loginForm.addEventListener("submit", handleLogin);
-    }
     const signupForm = document.getElementById("form-signup");
     if (signupForm) {
         signupForm.addEventListener("submit", handleSignup);
@@ -596,8 +509,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Initialize Google Calendar state
-    initGoogleCalendar();
 
-    // Initialize Auto Agente AI Co-Pilot
-    initAutoAgente();
 });

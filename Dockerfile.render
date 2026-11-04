@@ -1,0 +1,22 @@
+FROM maven:3.9.11-eclipse-temurin-21 AS build
+WORKDIR /build
+COPY backend/pom.xml ./pom.xml
+COPY backend/src ./src
+RUN mvn -B -DskipTests package
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=build /build/target/crm-2.0.0-SNAPSHOT.jar /app/app.jar
+COPY index.html app.js style.css manifest.json service-worker.js /app/web/
+COPY src/ /app/web/src/
+COPY --chmod=755 scripts/start-render.sh /app/start-render.sh
+ENV SPRING_PROFILES_ACTIVE=neon,web \
+    APP_BIND=0.0.0.0 \
+    FRONTEND_DIRECTORY=/app/web \
+    DB_MIGRATE=false \
+    IMPORT_DIRECTORY="" \
+    MALLOC_ARENA_MAX=2 \
+    JAVA_TOOL_OPTIONS="-Xms64m -Xmx256m -XX:+UseSerialGC -XX:ReservedCodeCacheSize=64m -Xss512k"
+USER 10001
+EXPOSE 10000
+ENTRYPOINT ["/app/start-render.sh"]

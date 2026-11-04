@@ -2,6 +2,14 @@
 // AUTO DRIVE CRM - STOCK MANAGEMENT FEATURE
 // ==========================================================================
 
+import { bindVehicleTrash } from './vehicle-trash.js';
+import { bindVehicleDeletion } from './vehicle-delete.js';
+import { createUserSearch } from './user-search.js';
+import { bindStockPeriod, readStockPeriod, showStockPeriodResult } from './stock-period.js';
+import { filterStock, stockPeriodResult } from '../../utils/stock.js';
+import { filterInventoryColumns } from './inventory-filters.js';
+import { pendingLabel, escapePending } from '../../utils/pendencias.js';
+import { renderPendingField, renderStatusMcField, renderCustomStatusField, renderPurchaseStoreField } from './pending-field.js';
 import { state } from '../../services/state.js';
 import { formatCurrency, calcDaysInStock, parseCurrencyBR } from '../../utils/helpers.js';
 import { persistLocalData, fetchCloudData } from '../../services/supabase.js';
@@ -11,7 +19,12 @@ export let estoqueSortColumn = 'id';
 export let estoqueSortDirection = 'desc';
 
 export let currentCdCarId = null;
+let deletingCdCarId = null;
 export let carDetailsOriginTab = 'estoque';
+
+function renderPendingSelect(value) {
+    renderPendingField(value, renderEstoque);
+}
 
 // Select stock visual view: List vs Grid
 export function setEstoqueView(mode) {
@@ -27,6 +40,12 @@ export function setEstoqueView(mode) {
     if (gridBtn) gridBtn.classList.toggle('active', mode === 'grade');
 }
 
+let stockSearch;
+function inventorySearch() {
+    const input = document.getElementById('search-estoque');
+    if (!input) return null;
+    return stockSearch ||= createUserSearch(input, renderEstoque);
+}
 export function filterEstoqueTable() {
     renderEstoque();
 }
@@ -86,6 +105,7 @@ export async function confirmDocUpload() {
             fileDataUrl = await readFileAsDataURL(file);
         } catch (e) {
             console.error("Erro ao ler arquivo como DataURL:", e);
+            return;
         }
 
         let effectiveUrl = fileDataUrl;
@@ -151,14 +171,11 @@ export async function confirmDocUpload() {
             }
         } catch (err) {
             console.error("Erro ao enviar documento para API central:", err);
+            return;
+            return;
         }
 
-        if (!savedDoc) {
-            const newId = (state.documentosVeiculo && state.documentosVeiculo.length > 0)
-                ? Math.max(...state.documentosVeiculo.map(d => Number(d.id) || 0)) + 1
-                : Date.now();
-            savedDoc = { id: newId, ...docPayload };
-        }
+        if (!savedDoc) { return; }
 
         // 4. Update in-memory state immediately
         if (!state.documentosVeiculo) state.documentosVeiculo = [];
@@ -175,8 +192,10 @@ export async function confirmDocUpload() {
 }
 
 // Sorting logic
-export function sortEstoque(column) {
-    if (estoqueSortColumn === column) {
+export function sortEstoque(column, direction) {
+    if (direction) {
+        estoqueSortColumn = column; estoqueSortDirection = direction;
+    } else if (estoqueSortColumn === column) {
         estoqueSortDirection = estoqueSortDirection === 'asc' ? 'desc' : 'asc';
     } else {
         estoqueSortColumn = column;
@@ -206,22 +225,42 @@ export function sortEstoque(column) {
 
 // Global update function for Stock
 export function updateEstoqueFilterCounts() {
-    const totalYard = (state.estoque || []).filter(c => c.status !== 'vendido').length;
+    const totalYard = (state.estoque || []).filter(car => !car.trashedAt).length;
     const btns = document.querySelectorAll('#filter-estoque-group .filter-btn');
     if (btns && btns.length > 0) {
-        btns[0].innerHTML = `Todos no Pátio (${totalYard})`;
+        btns[0].innerHTML = `Todos os veículos (${totalYard})`;
     }
 }
 window.updateEstoqueFilterCounts = updateEstoqueFilterCounts;
 
 export function renderEstoque() {
     updateEstoqueFilterCounts();
-    const searchVal = document.getElementById("search-estoque")?.value || '';
+    const searchVal = inventorySearch()?.value() || '';
     renderEstoqueTable(searchVal);
 }
 
-// Renders list or grid records - strictly unsold vehicles
-export function renderEstoqueTable(searchQuery = '') {
+function inventoryCell(car, column) {
+    switch (column) {
+        case 'model': return { value: String(car.id), label: [car.model, car.plate, car.color].filter(Boolean).join(' · ') + ' (#' + car.id + ')' };
+        case 'document_status': return { value: car.documentStatus || 'unreported', label: pendingLabel(car.documentStatus, state.pendencias) };
+        case 'status_mc': return { value: car.statusMc || 'unreported', label: pendingLabel(car.statusMc, state.status_mc_options) };
+        case 'custom_status': return { value: car.customStatus || 'unreported', label: pendingLabel(car.customStatus, state.status_options) };
+        case 'purchase_store': return { value: car.purchaseStore || 'unreported', label: pendingLabel(car.purchaseStore, state.purchase_store_options) };
+        case 'days': { const days = calcDaysInStock(car.purchaseDate); return { value: String(days), label: days + ' dias' }; }
+        case 'type': return { value: car.type === 'repasse' ? 'repasse' : car.type === 'outros' ? 'outros' : 'varejo', label: car.type === 'repasse' ? 'Repasse' : car.type === 'outros' ? 'Outros' : 'Varejo' };
+        case 'status': return { value: car.status || '', label: ({ disponivel: 'Disponível', vendido: 'Vendido', preparacao: 'Em preparação', reservado: 'Reservado' })[car.status] || car.status || 'Não informado' };
+    }
+}
+
+// Both inventory views include available and sold vehicles, according to the filter.
+export function renderEstoqueTable(searchQuery = inventorySearch()?.value() || '') {
+    bindStockPeriod(renderEstoque, () => state.serverDate);
+    bindVehicleTrash(() => state.estoque || [], async id => {
+        await fetch(`/api/crm/estoque/${encodeURIComponent(id)}/restore`, { method: 'POST' });
+        await fetchCloudData();
+        window.updateApplicationState();
+    });
+
     const listBody = document.getElementById("estoque-modern-list-body");
     const gridView = document.getElementById("estoque-grid-view");
     if (!listBody || !gridView) return;
@@ -229,21 +268,14 @@ export function renderEstoqueTable(searchQuery = '') {
     listBody.innerHTML = "";
     gridView.innerHTML = "";
 
-    // Flow: Only unsold vehicles remain in estoque; sold vehicles are displayed ONLY in Vendas
-    let filteredCars = (state.estoque || []).filter(car => {
-        if (car.status === 'vendido') return false;
-
-        const query = (searchQuery || '').trim().toLowerCase();
-        if (!query) return true;
-
-        return (
-            (car.model && car.model.toLowerCase().includes(query)) ||
-            (car.year && String(car.year).toLowerCase().includes(query)) ||
-            (car.plate && car.plate.toLowerCase().includes(query)) ||
-            (car.color && car.color.toLowerCase().includes(query)) ||
-            (car.chassis && car.chassis.toLowerCase().includes(query))
-        );
-    });
+    const status = document.getElementById('filter-estoque-status')?.value || 'todos';
+    const period = readStockPeriod();
+    const periodResult = stockPeriodResult(filterStock(state.estoque || [], searchQuery, period.mode === 'sale' ? 'vendido' : status), period, state.vendas || []);
+    showStockPeriodResult(periodResult);
+    let filteredCars = periodResult.cars;
+    filteredCars = filterInventoryColumns(filteredCars, inventoryCell, renderEstoque, sortEstoque);
+    const count = document.getElementById('estoque-filter-count');
+    if (count) count.textContent = `${filteredCars.length} de ${(state.estoque || []).filter(car => !car.trashedAt).length} veículos`;
 
     // Sort records
     filteredCars.sort((a, b) => {
@@ -259,13 +291,16 @@ export function renderEstoqueTable(searchQuery = '') {
                 valA = (a.sellPrice - a.buyPrice);
                 valB = (b.sellPrice - b.buyPrice);
                 break;
+            case 'status_mc': valA = pendingLabel(a.statusMc, state.status_mc_options); valB = pendingLabel(b.statusMc, state.status_mc_options); break;
+            case 'custom_status': valA = pendingLabel(a.customStatus, state.status_options); valB = pendingLabel(b.customStatus, state.status_options); break;
+            case 'purchase_store': valA = pendingLabel(a.purchaseStore, state.purchase_store_options); valB = pendingLabel(b.purchaseStore, state.purchase_store_options); break;
             case 'days':
                 valA = a.purchaseDate ? calcDaysInStock(a.purchaseDate) : 0;
                 valB = b.purchaseDate ? calcDaysInStock(b.purchaseDate) : 0;
                 break;
             case 'type': valA = a.type; valB = b.type; break;
             case 'status': valA = a.status; valB = b.status; break;
-            case 'document_status': valA = a.documentStatus; valB = b.documentStatus; break;
+            case 'document_status': valA = pendingLabel(a.documentStatus, state.pendencias); valB = pendingLabel(b.documentStatus, state.pendencias); break;
             default: valA = a.id; valB = b.id; break;
         }
 
@@ -294,8 +329,6 @@ export function renderEstoqueTable(searchQuery = '') {
     }
 
     filteredCars.forEach(car => {
-        const lucroEst = car.sellPrice - car.buyPrice;
-        const margemEst = car.sellPrice > 0 ? (lucroEst / car.sellPrice) * 100 : 0;
         const days = calcDaysInStock(car.purchaseDate);
         const isParado = days > 30 && car.status !== 'vendido';
         const daysClass = isParado ? "stock-days alert" : "stock-days";
@@ -308,25 +341,13 @@ export function renderEstoqueTable(searchQuery = '') {
             ? `<img src="${firstImageUrl}" alt="${car.model}" style="width:100%; height:100%; object-fit:cover;">`
             : `<i data-lucide="car"></i>`;
 
-        let docColor = 'var(--yellow-warning)';
-        let docTitle = 'Pendente';
-        let docIcon = 'file-clock';
-        if (car.documentStatus === 'sim') {
-            docColor = 'var(--green-profit)';
-            docTitle = 'Documento OK';
-            docIcon = 'file-check';
-        } else if (car.documentStatus === 'nao') {
-            docColor = 'var(--red-alert)';
-            docTitle = 'Sem Documento';
-            docIcon = 'file-x';
-        }
+        const docTitle = escapePending(pendingLabel(car.documentStatus, state.pendencias));
 
         // --- ROW (LIST) ---
         const listDiv = document.createElement("div");
         listDiv.className = "estoque-modern-row";
         listDiv.style.cursor = "pointer";
-        listDiv.onclick = (e) => {
-            if (e.target.closest('button')) return;
+        listDiv.onclick = () => {
             openCarDetails(car.id);
         };
         listDiv.innerHTML = `
@@ -344,17 +365,7 @@ export function renderEstoqueTable(searchQuery = '') {
                 </div>
             </div>
             <div class="col-doc">
-                <div style="display:flex; justify-content:flex-start; align-items:center; color:${docColor};" title="${docTitle}">
-                    <i data-lucide="${docIcon}" style="width:20px;height:20px;"></i>
-                </div>
-            </div>
-            <div class="col-year" style="font-weight:500;">${car.year}</div>
-            <div class="col-km" style="font-family:monospace; color:var(--text-light); font-weight:500;">${car.km.toLocaleString('pt-BR')} km</div>
-            <div class="col-buy" style="font-family:monospace; color:var(--text-muted);">${formatCurrency(car.buyPrice)}</div>
-            <div class="col-sell" style="font-family:monospace; font-weight:700; color:var(--blue-primary);">${formatCurrency(car.sellPrice)}</div>
-            <div class="col-margin">
-                <div style="font-weight:600; color: var(--green-profit); font-size:13px;">${formatCurrency(lucroEst)}</div>
-                <div style="font-size:10px; color: var(--text-muted); font-weight:500;">${margemEst.toFixed(1)}% margem</div>
+                <span class="pending-cell" title="${escapePending(pendingLabel(car.documentStatus, state.pendencias))}">${escapePending(pendingLabel(car.documentStatus, state.pendencias))}</span>
             </div>
             <div class="col-days">
                 <span class="${daysClass}">${daysContent}</span>
@@ -362,17 +373,11 @@ export function renderEstoqueTable(searchQuery = '') {
             <div class="col-type">
                 <span class="badge ${car.type}">${car.type === 'repasse' ? 'repasse' : (car.type === 'outros' ? 'outros' : 'varejo')}</span>
             </div>
+            <div class="col-status-mc"><span class="pending-cell">${escapePending(pendingLabel(car.statusMc, state.status_mc_options))}</span></div>
+            <div class="col-custom-status"><span class="pending-cell">${escapePending(pendingLabel(car.customStatus, state.status_options))}</span></div>
+            <div class="col-purchase-store"><span class="pending-cell">${escapePending(pendingLabel(car.purchaseStore, state.purchase_store_options))}</span></div>
             <div class="col-status">
                 <span class="badge ${car.status}">${car.status}</span>
-            </div>
-            <div class="col-actions" style="text-align: center;">
-                <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
-                    <button class="btn btn-secondary" style="padding:6px; border-radius:8px;" onclick="window.openCarDetails(${car.id})" title="Ficha Técnica / Editar"><i data-lucide="pencil" style="width:14px;height:14px;"></i></button>
-                    ${car.status !== 'vendido' 
-                        ? `<button class="btn btn-success" style="padding:6px; border-radius:8px;" onclick="window.openCarDetailsForSale(${car.id})" title="Registrar Venda"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>` 
-                        : `<button class="btn btn-secondary" style="padding:6px; border-radius:8px; color:var(--blue-primary);" onclick="const s = (state.vendas||[]).find(v => String(v.carId) === String('${car.id}') || String(v.car_id) === String('${car.id}')); if(s){ window.switchTab('vendas'); window.highlightVendaRow(s.id); } else { window.openCarDetailsForSale(${car.id}); }" title="Ver Venda no Menu de Vendas"><i data-lucide="badge-dollar-sign" style="width:14px;height:14px;"></i></button>`}
-                    <button class="btn" style="padding:6px; border-radius:8px; background-color:rgba(239,68,68,0.12); color:var(--red-alert); border:1px solid rgba(239,68,68,0.18)" onclick="window.deleteCarConfirm(${car.id})" title="Excluir"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
-                </div>
             </div>
         `;
         listBody.appendChild(listDiv);
@@ -380,8 +385,7 @@ export function renderEstoqueTable(searchQuery = '') {
         // --- CARD (GRID) ---
         const gridDiv = document.createElement("div");
         gridDiv.className = `estoque-grid-card ${car.status}`;
-        gridDiv.onclick = (e) => {
-            if (e.target.closest('button')) return;
+        gridDiv.onclick = () => {
             openCarDetails(car.id);
         };
         gridDiv.innerHTML = `
@@ -393,33 +397,14 @@ export function renderEstoqueTable(searchQuery = '') {
             <div class="card-details-content">
                 <h3 class="card-veh-title">${car.model}</h3>
                 <div class="card-veh-meta">
-                    <span>${car.year}</span>
-                    <span>•</span>
-                    <span>${car.km.toLocaleString('pt-BR')} km</span>
-                    ${car.plate ? `<span>•</span><span>Placa: ${car.plate}</span>` : ''}
+                    <span>ID: #${car.id}</span>
+                    ${car.plate ? `<span>Placa: ${car.plate}</span>` : ''}
+                    ${car.color ? `<span>Cor: ${car.color}</span>` : ''}
                 </div>
-                <div class="card-prices-row">
-                    <div class="card-price-block">
-                        <span class="price-lbl">Preço de Venda</span>
-                        <span class="price-val">${formatCurrency(car.sellPrice)}</span>
-                    </div>
-                    <div class="card-days-badge ${daysClass}">
-                        ${daysContent}
-                    </div>
-                </div>
-                <div class="card-margins-row">
-                    <span>Custo: ${formatCurrency(car.buyPrice)}</span>
-                    <span style="color:var(--green-profit); font-weight:600;">Lucro Est: ${formatCurrency(lucroEst)} (${margemEst.toFixed(0)}%)</span>
-                </div>
+                <div class="card-stock-time"><span class="${daysClass}">${daysContent}</span> no pátio</div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-color);">
-                    <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:${docColor}; font-weight:500;">
-                        <i data-lucide="${docIcon}" style="width:16px; height:16px;"></i> ${docTitle}
-                    </div>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn btn-secondary btn-sm" onclick="window.openCarDetails(${car.id})"><i data-lucide="pencil" style="width:12px; height:12px; margin-right:4px;"></i> Editar</button>
-                        ${car.status !== 'vendido' 
-                            ? `<button class="btn btn-success btn-sm" onclick="window.openCarDetailsForSale(${car.id})"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Vender</button>` 
-                            : `<button class="btn btn-secondary btn-sm" style="color:var(--blue-primary);" onclick="const s = (state.vendas||[]).find(v => String(v.carId) === String('${car.id}') || String(v.car_id) === String('${car.id}')); if(s){ window.switchTab('vendas'); window.highlightVendaRow(s.id); } else { window.openCarDetailsForSale(${car.id}); }"><i data-lucide="badge-dollar-sign" style="width:12px; height:12px; margin-right:4px;"></i> Ver Venda</button>`}
+                    <div style="font-size:12px; color:var(--text-muted); font-weight:500;">
+                        ${docTitle}
                     </div>
                 </div>
             </div>
@@ -499,7 +484,7 @@ export async function handleAddCar(event) {
     const color = colorInput ? colorInput.value.trim() : "";
     const chassis = chassisInput ? chassisInput.value.trim().toUpperCase() : "";
     const renavam = renavamInput ? renavamInput.value.trim() : "";
-    const documentStatus = documentStatusInput ? documentStatusInput.value : "pendente";
+    const documentStatus = documentStatusInput ? documentStatusInput.value : null;
     
     const imagesUrl = photoInput ? photoInput.getAttribute('data-base64') || null : null;
 
@@ -513,10 +498,8 @@ export async function handleAddCar(event) {
         color: color || null,
         chassis: chassis || null,
         renavam: renavam || null,
-        fipe_code: null,
-        fipe_price: 0,
         notes: null,
-        document_status: documentStatus || 'pendente',
+        document_status: documentStatus || null,
         image_url: imagesUrl || null
     };
 
@@ -529,10 +512,8 @@ export async function handleAddCar(event) {
         color: color || "",
         chassis: chassis || "",
         renavam: renavam || "",
-        fipeCode: "",
-        fipePrice: 0,
         notes: "",
-        documentStatus: documentStatus || 'pendente',
+        documentStatus: documentStatus || null,
         image_url: imagesUrl || null
     };
 
@@ -550,21 +531,14 @@ export async function handleAddCar(event) {
                 state.estoque.unshift(savedCar);
             }
         }
-    } catch (_) {}
+    } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
 
-    if (!savedCar) {
-        const newId = state.estoque.length > 0 ? Math.max(...state.estoque.map(c => Number(c.id) || 0)) + 1 : 1;
-        savedCar = { id: newId, ...newCarLocal };
-        state.estoque.unshift(savedCar);
-        if (!state.pendingOutbox) state.pendingOutbox = [];
-        state.pendingOutbox.push({ type: 'carro', data: savedCar });
-        try { localStorage.setItem('crm_pending_outbox', JSON.stringify(state.pendingOutbox)); } catch (_) {}
-    }
+    if (!savedCar) { return; }
 
     if (state.supabaseClient && state.sessionUser && state.sessionUser.id !== 'adm-master-session') {
         try {
             await state.supabaseClient.from('estoque').insert([carData]);
-        } catch (_) {}
+        } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
     }
 
     persistLocalData();
@@ -590,7 +564,29 @@ export function openCarDetails(id, originTab = null) {
     }
 
     const car = state.estoque.find(c => c.id == id);
-    if (!car) return;
+    if (!car || car.trashedAt) return;
+    bindVehicleDeletion(car, {
+        currentId: () => currentCdCarId,
+        afterAttempt: id => { if (deletingCdCarId === id) deletingCdCarId = null; },
+        beforeDelete: async id => {
+            if (isAutoSaving || pendingAutoSave || document.getElementById('cd-autosave-status')?.dataset.state === 'saving')
+                throw new Error('Aguarde o salvamento das alterações e confirme novamente.');
+            if (autoSaveDebounceTimer) { clearTimeout(autoSaveDebounceTimer); autoSaveDebounceTimer = null; }
+            deletingCdCarId = id;
+        },
+        remove: async id => {
+            await fetch('/api/crm/estoque/' + encodeURIComponent(id), { method: 'DELETE' });
+        },
+        onDeleted: async id => {
+            const removed = state.estoque.find(item => String(item.id) === String(id));
+            if (removed) removed.trashedAt = new Date().toISOString();
+            if (String(currentCdCarId) === String(id)) { window.currentCdCarId = null; carDetailsOriginTab = 'estoque'; closeCarDetails(); }
+            window.updateApplicationState();
+            window.showToast?.('Veículo movido para a lixeira.', 'success');
+            try { await fetchCloudData(); window.updateApplicationState(); }
+            catch { window.showToast?.('Veículo na lixeira. Atualize a página para conferir os demais dados.', 'warning'); }
+        }
+    });
 
     // Switch view to detailed specifications page
     switchDetailsTab('car-details');
@@ -668,17 +664,10 @@ export function openCarDetails(id, originTab = null) {
 
     // Auto-heal corrupted prices from former input mask dividing bug
     if (car.sellPrice > 0 && car.sellPrice < 500) {
-        if (car.fipePrice > 1000) {
-            car.sellPrice = car.fipePrice;
-        } else {
-            car.sellPrice = Math.round(car.sellPrice * 10000);
-        }
+        car.sellPrice = Math.round(car.sellPrice * 10000);
     }
     if (car.buyPrice > 0 && car.buyPrice < 500) {
         car.buyPrice = Math.round(car.buyPrice * 10000);
-    }
-    if (car.fipePrice > 0 && car.fipePrice < 500) {
-        car.fipePrice = Math.round(car.fipePrice * 10000);
     }
 
     // Pricing card details
@@ -728,24 +717,16 @@ export function openCarDetails(id, originTab = null) {
     if (cdRenavam) cdRenavam.value = car.renavam || "";
 
     const cdDocument = document.getElementById("cd-document");
-    if (cdDocument) cdDocument.value = car.documentStatus || "pendente";
+    if (cdDocument) renderPendingSelect(car.documentStatus);
+    renderStatusMcField(car.statusMc, renderEstoque);
+    renderCustomStatusField(car.customStatus, renderEstoque);
+    renderPurchaseStoreField(car.purchaseStore, renderEstoque);
 
     const cdType = document.getElementById("cd-type");
     if (cdType) cdType.value = car.type || "convencional";
 
     const cdStatusSelect = document.getElementById("cd-status-select");
     if (cdStatusSelect) cdStatusSelect.value = car.status || "disponivel";
-
-    const cdFipeCode = document.getElementById("cd-fipe-code");
-    if (cdFipeCode) cdFipeCode.value = car.fipeCode || "";
-
-    const cdFipePrice = document.getElementById("cd-fipe-price");
-    if (cdFipePrice) {
-        window.formatCurrencyInput(cdFipePrice, car.fipePrice || 0);
-    }
-
-    const cdPurchaseDate = document.getElementById("cd-purchase-date");
-    if (cdPurchaseDate) cdPurchaseDate.value = car.purchaseDate || "";
 
     const cdBuy = document.getElementById("cd-buy");
     if (cdBuy) {
@@ -803,13 +784,6 @@ export function openCarDetails(id, originTab = null) {
     const editCarRenavam = document.getElementById("edit-car-renavam");
     if (editCarRenavam) editCarRenavam.value = car.renavam || "";
     
-    const editCarFipeCode = document.getElementById("edit-car-fipe-code");
-    if (editCarFipeCode) editCarFipeCode.value = car.fipeCode || "";
-    
-    const fipePriceEl = document.getElementById("edit-car-fipe-price");
-    if (fipePriceEl) {
-        window.formatCurrencyInput(fipePriceEl, car.fipePrice || 0);
-    }
 
     const editCarNotes = document.getElementById("edit-car-notes");
     if (editCarNotes) editCarNotes.value = car.notes || "";
@@ -1053,6 +1027,7 @@ export function removeSinglePhoto(idx) {
             state.supabaseClient.from('estoque').update({ image_url: car.image_url }).eq('id', currentCdCarId)
                 .then(() => window.fetchCloudData && window.fetchCloudData())
                 .catch(err => console.error("Erro ao atualizar fotos na nuvem:", err));
+            return;
         }
     }
 }
@@ -1154,6 +1129,7 @@ export function previewDetailsPhotos(input) {
                             if (window.fetchCloudData) window.fetchCloudData();
                         })
                         .catch(err => console.error(err));
+            return;
                 }
                 input.value = '';
             }
@@ -1177,6 +1153,7 @@ export function clearCarPhotos() {
                 state.supabaseClient.from('estoque').update({ image_url: null }).eq('id', currentCdCarId)
                     .then(() => window.fetchCloudData())
                     .catch(err => console.error(err));
+            return;
             }
         },
         "Remover"
@@ -1196,27 +1173,6 @@ export function appendQuickNote(text) {
     }
 }
 
-export async function quickFipeSearch() {
-    const code = document.getElementById("cd-fipe-code")?.value.trim();
-    if (!code) return;
-    try {
-        const response = await fetch(`https://brasilapi.com.br/api/fipe/preco/v1/${code}`);
-        if (!response.ok) return;
-        const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-            const item = data[0];
-            const price = parseFloat(item.valor.replace(/[^\d]/g, "")) / 100;
-            const fipePriceEl = document.getElementById("cd-fipe-price");
-            if (fipePriceEl) {
-                window.formatCurrencyInput(fipePriceEl, price);
-                triggerCarDetailsAutoSave(0);
-            }
-        }
-    } catch (e) {
-        console.error("FIPE lookup failed", e);
-    }
-}
-
 // Auto-Save Management for Car Details Screen
 let autoSaveDebounceTimer = null;
 let isAutoSaving = false;
@@ -1224,7 +1180,7 @@ let pendingAutoSave = false;
 let carDetailsAutoSaveInitialized = false;
 
 export function triggerCarDetailsAutoSave(delay = 400) {
-    if (!currentCdCarId) return;
+    if (!currentCdCarId || deletingCdCarId === currentCdCarId) return;
 
     // Immediately update live computed previews on screen
     updateSummaryFields();
@@ -1252,6 +1208,7 @@ export function setAutoSaveStatus(status) {
     const icon = document.getElementById("cd-autosave-icon");
     const text = document.getElementById("cd-autosave-text");
     if (!indicator || !text || !icon) return;
+    indicator.dataset.state = status;
 
     if (status === 'saving') {
         icon.setAttribute('data-lucide', 'refresh-cw');
@@ -1259,10 +1216,10 @@ export function setAutoSaveStatus(status) {
         icon.style.color = 'var(--blue-primary)';
         text.innerText = 'Salvando...';
     } else if (status === 'saved') {
-        icon.setAttribute('data-lucide', 'cloud-check');
+        icon.setAttribute('data-lucide', 'check');
         icon.classList.remove('spin-animation');
         icon.style.color = 'var(--green-profit)';
-        text.innerText = 'Salvo automaticamente';
+        text.innerText = 'Salvo';
     } else if (status === 'error') {
         icon.setAttribute('data-lucide', 'alert-circle');
         icon.classList.remove('spin-animation');
@@ -1281,13 +1238,13 @@ export function initCarDetailsAutoSaveListeners() {
 
     // Listen to input events (typing in text, numbers, textarea, contenteditable)
     tab.addEventListener("input", (e) => {
-        if (e.target.type === 'file' || e.target.id === 'fipe-search-input') return;
+        if (e.target.type === 'file') return;
         triggerCarDetailsAutoSave(400);
     });
 
     // Listen to change events (selects, dates, finalized fields)
     tab.addEventListener("change", (e) => {
-        if (e.target.type === 'file' || e.target.id === 'fipe-search-input') return;
+        if (e.target.type === 'file') return;
         triggerCarDetailsAutoSave(0);
     });
 
@@ -1301,7 +1258,7 @@ export function initCarDetailsAutoSaveListeners() {
 }
 
 export async function saveCarDetails(options = { silent: true }) {
-    if (!currentCdCarId) return;
+    if (!currentCdCarId || deletingCdCarId === currentCdCarId) return;
     const car = state.estoque.find(c => c.id == currentCdCarId);
     if (!car) return;
 
@@ -1328,11 +1285,16 @@ export async function saveCarDetails(options = { silent: true }) {
     const plate = document.getElementById("cd-plate")?.value.trim().toUpperCase() || "";
     const chassis = document.getElementById("cd-chassis")?.value.trim().toUpperCase() || "";
     const renavam = document.getElementById("cd-renavam")?.value.trim() || "";
-    const documentStatus = document.getElementById("cd-document")?.value || car.documentStatus || "pendente";
+    const selectedPending = document.getElementById("cd-document")?.value;
+    const unresolvedPending = document.getElementById('cd-document')?.dataset.unresolvedValue;
+    const documentStatus = unresolvedPending || (selectedPending === 'unreported' ? null : (selectedPending || car.documentStatus || null));
+    const readStatus = (id, fallback) => { const input = document.getElementById(id); return input?.dataset.unresolvedValue || (input?.value === 'unreported' ? null : input?.value || fallback || null); };
+    const statusMc = readStatus('cd-status-mc', car.statusMc);
+    const customStatus = readStatus('cd-custom-status', car.customStatus);
+    const purchaseStore = readStatus('cd-purchase-store', car.purchaseStore);
+
     const type = document.getElementById("cd-type")?.value || car.type || "convencional";
     const status = document.getElementById("cd-status-select")?.value || car.status || "disponivel";
-    const fipeCode = document.getElementById("cd-fipe-code")?.value.trim() || "";
-    const fipePrice = parseCurrencyBR(document.getElementById("cd-fipe-price")?.value) || 0;
     const purchaseDate = document.getElementById("cd-purchase-date")?.value || null;
     const buyPrice = parseCurrencyBR(document.getElementById("cd-buy")?.value) || 0;
     const sellPrice = parseCurrencyBR(document.getElementById("cd-sell")?.value) || 0;
@@ -1351,10 +1313,11 @@ export async function saveCarDetails(options = { silent: true }) {
         color: color || null,
         chassis: chassis || null,
         renavam: renavam || null,
-        fipe_code: fipeCode || null,
-        fipe_price: fipePrice,
         notes: notes || null,
         document_status: documentStatus,
+        statusMc,
+        customStatus,
+        purchaseStore,
         image_url: car.image_url
     };
 
@@ -1369,10 +1332,11 @@ export async function saveCarDetails(options = { silent: true }) {
     car.chassis = chassis;
     car.renavam = renavam;
     car.documentStatus = documentStatus;
+    car.statusMc = statusMc;
+    car.customStatus = customStatus;
+    car.purchaseStore = purchaseStore;
     car.type = type;
     car.status = status;
-    car.fipeCode = fipeCode;
-    car.fipePrice = fipePrice;
     car.purchaseDate = purchaseDate;
     car.buyPrice = buyPrice;
     car.sellPrice = sellPrice;
@@ -1418,7 +1382,7 @@ export async function saveCarDetails(options = { silent: true }) {
                     date: sellDate,
                     type: sellType
                 })
-            }).catch(() => {});
+            }).catch(error => { window.showToast?.(error.message, 'error'); });
 
             if (state.isCloudActive && state.supabaseClient && state.sessionUser && state.sessionUser.id !== 'adm-master-session') {
                 try {
@@ -1428,6 +1392,7 @@ export async function saveCarDetails(options = { silent: true }) {
                     state.supabaseClient.from('vendas').update(saleUpdateData).eq('id', existingSale.id).then(() => {});
                 } catch (e) {
                     console.error("Erro ao auto-salvar venda:", e);
+            return;
                 }
             }
         }
@@ -1520,34 +1485,6 @@ export function switchDetailsTab(view) {
         const btn = document.querySelector('.cd-nav-item[onclick*="car-edit"]');
         if (btn) btn.classList.add("active");
     }
-}
-
-// Delete confirm dialog
-export async function deleteCarConfirm(id) {
-    showCustomConfirm(
-        "Excluir Veículo",
-        "Tem certeza que deseja excluir permanentemente este veículo do sistema?",
-        async () => {
-            try {
-                await fetch(`/api/crm/estoque/${id}`, { method: 'DELETE' });
-            } catch (_) {}
-
-            if (state.supabaseClient && state.sessionUser && state.sessionUser.id !== 'adm-master-session') {
-                try {
-                    await state.supabaseClient.from('estoque').delete().eq('id', id);
-                } catch (_) {}
-            }
-
-            state.estoque = state.estoque.filter(c => String(c.id) !== String(id));
-            persistLocalData();
-            closeCarDetails();
-            window.updateApplicationState();
-            if (window.showToast) {
-                window.showToast("Veículo removido com sucesso!", "success");
-            }
-        },
-        "Excluir Veículo"
-    );
 }
 
 // Render sub-expenses for spec page
@@ -1649,6 +1586,7 @@ export async function addCarExpenseInline() {
             }
         } catch (e) {
             console.error("Erro ao salvar despesa na nuvem:", e);
+            return;
         }
     }
 
@@ -1758,8 +1696,8 @@ export function openCarDoc(docId) {
     }
 
     const ext = (doc.fileName || '').split('.').pop().toLowerCase();
-    const isImage = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext) || doc.fileUrl.startsWith('data:image/');
-    const isPdf = ext === 'pdf' || doc.fileUrl.startsWith('data:application/pdf');
+    const isImage = doc.storageMediaType ? doc.storageMediaType.startsWith('image/') : ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext) || doc.fileUrl.startsWith('data:image/');
+    const isPdf = doc.storageMediaType ? doc.storageMediaType === 'application/pdf' : ext === 'pdf' || doc.fileUrl.startsWith('data:application/pdf');
 
     if (isImage) {
         previewBody.innerHTML = `<img src="${doc.fileUrl}" alt="${doc.fileName || 'Documento'}" style="max-width:100%; max-height:68vh; object-fit:contain; border-radius:8px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);" />`;
@@ -1844,6 +1782,7 @@ export async function downloadCarDoc(docId) {
         }
     } catch (e) {
         console.error("Erro ao baixar documento:", e);
+            return;
     }
 }
 window.downloadCarDoc = downloadCarDoc;
@@ -2055,17 +1994,7 @@ export async function deleteCarDoc(docId) {
                 await fetch(`/api/crm/documentos/${docId}`, { method: 'DELETE' });
             } catch (err) {
                 console.warn("Erro ao deletar documento na API central:", err);
-            }
-
-            // 5. Se a nuvem estiver ativa, tentar deletar no Supabase
-            if (state.isCloudActive && state.supabaseClient) {
-                try {
-                    const numericId = !isNaN(Number(docId)) ? Number(docId) : docId;
-                    await state.supabaseClient.from('documentos_veiculo').delete().eq('id', numericId);
-                    await state.supabaseClient.from('documentos_veiculo').delete().eq('id', docIdStr);
-                } catch (e) {
-                    console.error("Erro ao excluir documento na nuvem:", e);
-                }
+                return;
             }
 
             if (window.showToast) {
@@ -2074,267 +2003,6 @@ export async function deleteCarDoc(docId) {
         },
         "Excluir"
     );
-}
-
-// --------------------------------------------------------------------------
-// CONSULTAS TABELA FIPE (BRASILAPI INTEGRATION)
-// --------------------------------------------------------------------------
-let fipeSelectedBrand = '';
-let fipeSelectedModel = '';
-let fipeSelectedYear = '';
-let fipeSelectedPrice = 0;
-let fipeSelectedCode = '';
-let fipeSelectedMonth = '';
-
-export function openFipeSearchModal() {
-    const modal = document.getElementById("modal-fipe");
-    if (!modal) return;
-    modal.classList.add("active");
-
-    // Clear dropdowns
-    document.getElementById("fipe-brand").innerHTML = `<option value="">Selecione...</option>`;
-    document.getElementById("fipe-brand").disabled = true;
-    document.getElementById("fipe-model").innerHTML = `<option value="">Selecione...</option>`;
-    document.getElementById("fipe-model").disabled = true;
-    document.getElementById("fipe-year").innerHTML = `<option value="">Selecione...</option>`;
-    document.getElementById("fipe-year").disabled = true;
-    document.getElementById("fipe-result").style.display = "none";
-    document.getElementById("btn-apply-fipe").disabled = true;
-
-    // Fetch initial brands
-    fetchFipeBrands();
-}
-
-export function closeFipeSearchModal() {
-    const modal = document.getElementById("modal-fipe");
-    if (modal) modal.classList.remove("active");
-}
-
-export async function fetchFipeBrands() {
-    const type = document.getElementById("fipe-type")?.value || "carros";
-    const brandSel = document.getElementById("fipe-brand");
-    const modelSel = document.getElementById("fipe-model");
-    const yearSel = document.getElementById("fipe-year");
-    if (!brandSel) return;
-
-    brandSel.innerHTML = `<option value="">Carregando marcas...</option>`;
-    brandSel.disabled = true;
-    if (modelSel) { modelSel.innerHTML = `<option value="">Selecione...</option>`; modelSel.disabled = true; }
-    if (yearSel) { yearSel.innerHTML = `<option value="">Selecione...</option>`; yearSel.disabled = true; }
-
-    try {
-        const response = await fetch(`https://parallelum.com.br/fipe/api/v1/${type}/marcas`);
-        const data = await response.json();
-
-        if (!response.ok || !Array.isArray(data)) {
-            brandSel.innerHTML = `<option value="">Nenhuma marca encontrada</option>`;
-            return;
-        }
-
-        brandSel.innerHTML = `<option value="">Selecione...</option>` + 
-            data.map(b => `<option value="${b.codigo}">${b.nome}</option>`).join('');
-        brandSel.disabled = false;
-
-        // Auto-detect brand from explicitly entered brand input or car title
-        const cdBrandVal = document.getElementById("cd-brand")?.value?.trim().toLowerCase() || "";
-        const carTitle = document.getElementById("cd-title")?.innerText?.trim().toLowerCase() || "";
-        
-        let foundBrand = null;
-        if (cdBrandVal && cdBrandVal !== "-") {
-            foundBrand = data.find(b => b.nome && (b.nome.toLowerCase() === cdBrandVal || b.nome.toLowerCase().startsWith(cdBrandVal) || cdBrandVal.includes(b.nome.toLowerCase())));
-        }
-        if (!foundBrand && carTitle) {
-            foundBrand = data.find(b => b.nome && carTitle.includes(b.nome.toLowerCase()));
-        }
-
-        if (foundBrand) {
-            brandSel.value = foundBrand.codigo;
-            fetchFipeModels();
-        }
-    } catch (e) {
-        console.error(e);
-        brandSel.innerHTML = `<option value="">Erro ao carregar marcas</option>`;
-    }
-}
-
-export async function fetchFipeModels() {
-    const type = document.getElementById("fipe-type")?.value || "carros";
-    const brand = document.getElementById("fipe-brand")?.value;
-    const modelSel = document.getElementById("fipe-model");
-    const yearSel = document.getElementById("fipe-year");
-    if (!brand || !modelSel) return;
-
-    fipeSelectedBrand = brand;
-    modelSel.innerHTML = `<option value="">Carregando modelos...</option>`;
-    modelSel.disabled = true;
-    if (yearSel) { yearSel.innerHTML = `<option value="">Selecione...</option>`; yearSel.disabled = true; }
-
-    try {
-        const modelsRes = await fetch(`https://parallelum.com.br/fipe/api/v1/${type}/marcas/${brand}/modelos`);
-        const data = await modelsRes.json();
-
-        const modelsList = Array.isArray(data?.modelos) ? data.modelos : [];
-
-        if (!modelsRes.ok || modelsList.length === 0) {
-            modelSel.innerHTML = `<option value="">Nenhum modelo encontrado</option>`;
-            return;
-        }
-
-        modelSel.innerHTML = `<option value="">Selecione...</option>` + 
-            modelsList.map(m => `<option value="${m.codigo}">${m.nome}</option>`).join('');
-        modelSel.disabled = false;
-
-        // Auto-detect model from explicit cd-model or car title
-        const cdModelVal = document.getElementById("cd-model")?.value?.trim().toLowerCase() || "";
-        const carTitle = document.getElementById("cd-title")?.innerText?.trim().toLowerCase() || "";
-        const brandSel = document.getElementById("fipe-brand");
-        const brandOptionText = brandSel?.options[brandSel?.selectedIndex]?.text?.toLowerCase() || "";
-        
-        let searchString = (cdModelVal && cdModelVal !== "-") ? cdModelVal : carTitle;
-        if (searchString && brandOptionText) {
-            searchString = searchString.replace(brandOptionText, "");
-        }
-        
-        if (searchString) {
-            const targetWords = searchString.split(/[\s\-\/]+/).filter(w => w.length >= 2);
-            
-            if (targetWords.length > 0) {
-                let bestModel = null;
-                let bestScore = -1;
-
-                modelsList.forEach(m => {
-                    const mName = m.nome.toLowerCase();
-                    let score = 0;
-                    
-                    targetWords.forEach((word, index) => {
-                        if (mName.includes(word)) {
-                            score += (index === 0 ? 5 : 2);
-                        }
-                    });
-
-                    if (targetWords[0] && mName.startsWith(targetWords[0])) {
-                        score += 3;
-                    }
-
-                    if (score > bestScore && score > 0) {
-                        bestScore = score;
-                        bestModel = m;
-                    }
-                });
-
-                if (bestModel) {
-                    modelSel.value = bestModel.codigo;
-                    fetchFipeYears();
-                }
-            }
-        }
-    } catch (e) {
-        console.error(e);
-        modelSel.innerHTML = `<option value="">Erro ao carregar modelos</option>`;
-    }
-}
-
-export async function fetchFipeYears() {
-    const type = document.getElementById("fipe-type")?.value || "carros";
-    const brand = document.getElementById("fipe-brand")?.value;
-    const model = document.getElementById("fipe-model")?.value;
-    const yearSel = document.getElementById("fipe-year");
-    if (!brand || !model || !yearSel) return;
-
-    fipeSelectedModel = model;
-    yearSel.innerHTML = `<option value="">Carregando anos...</option>`;
-    yearSel.disabled = true;
-
-    try {
-        const response = await fetch(`https://parallelum.com.br/fipe/api/v1/${type}/marcas/${brand}/modelos/${model}/anos`);
-        const data = await response.json();
-
-        if (!response.ok || !Array.isArray(data)) {
-            yearSel.innerHTML = `<option value="">Nenhum ano encontrado</option>`;
-            return;
-        }
-
-        yearSel.innerHTML = `<option value="">Selecione...</option>` + 
-            data.map(y => `<option value="${y.codigo}">${y.nome}</option>`).join('');
-        yearSel.disabled = false;
-
-        // Auto-detect year if available
-        const carYear = document.getElementById("cd-year")?.value?.trim() || "";
-        if (carYear) {
-            const rawNumbers = carYear.match(/\d+/g) || [];
-            const parsedYears = rawNumbers.map(num => {
-                if (num.length === 2) return (parseInt(num, 10) > 50 ? "19" : "20") + num;
-                return num;
-            }).reverse(); // Check model year (last number) first
-
-            let foundYear = null;
-            for (const yearStr of parsedYears) {
-                foundYear = data.find(y => y.nome.includes(yearStr) || y.codigo.startsWith(yearStr));
-                if (foundYear) break;
-            }
-
-            if (foundYear) {
-                yearSel.value = foundYear.codigo;
-                fetchFipePrice();
-            }
-        }
-    } catch (e) {
-        console.error(e);
-        yearSel.innerHTML = `<option value="">Erro ao carregar anos</option>`;
-    }
-}
-
-export async function fetchFipePrice() {
-    const type = document.getElementById("fipe-type")?.value || "carros";
-    const brand = document.getElementById("fipe-brand")?.value;
-    const model = document.getElementById("fipe-model")?.value;
-    const year = document.getElementById("fipe-year")?.value;
-    const resultBox = document.getElementById("fipe-result");
-    const applyBtn = document.getElementById("btn-apply-fipe");
-    if (!brand || !model || !year || !resultBox || !applyBtn) return;
-
-    fipeSelectedYear = year;
-
-    try {
-        const response = await fetch(`https://parallelum.com.br/fipe/api/v1/${type}/marcas/${brand}/modelos/${model}/anos/${year}`);
-        const data = await response.json();
-
-        if (!response.ok || !data?.Valor) {
-            alert("Erro ao buscar preço Fipe para a seleção atual.");
-            return;
-        }
-
-        fipeSelectedPrice = parseFloat(data.Valor.replace(/[^\d]/g, "")) / 100;
-        fipeSelectedCode = data.CodigoFipe || '';
-        fipeSelectedMonth = data.MesReferencia || '';
-
-        const elMonth = document.getElementById("fipe-res-month");
-        const elCode = document.getElementById("fipe-res-code");
-        const elPrice = document.getElementById("fipe-res-price");
-        if (elMonth) elMonth.innerText = fipeSelectedMonth;
-        if (elCode) elCode.innerText = fipeSelectedCode;
-        if (elPrice) elPrice.innerText = data.Valor;
-
-        resultBox.style.display = "block";
-        applyBtn.disabled = false;
-    } catch (e) {
-        console.error(e);
-        alert("Erro ao buscar preço Fipe.");
-    }
-}
-
-export function applyFipeResult() {
-    // Inject pricing back into active form (Edit Car)
-    const inputPrice = document.getElementById("cd-fipe-price");
-    const inputCode = document.getElementById("cd-fipe-code");
-    if (inputPrice) { 
-        inputPrice.value = fipeSelectedPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-    if (inputCode) {
-        inputCode.value = fipeSelectedCode;
-    }
-
-    closeFipeSearchModal();
 }
 
 // --------------------------------------------------------------------------
@@ -2428,16 +2096,8 @@ export function openCarDetailsForSale(carId) {
         return;
     }
 
-    const existingSale = (state.vendas || []).find(v => (String(v.carId) === String(car.id) || String(v.car_id) === String(car.id)) && v.carId !== null);
-    if (existingSale) {
-        if (confirm(`O veículo "${car.model}" já possui uma venda registrada no sistema (Venda #${existingSale.id}). Deseja visualizar esta venda no Menu de Vendas?`)) {
-            if (window.switchTab) window.switchTab('vendas');
-            if (window.highlightVendaRow) window.highlightVendaRow(existingSale.id);
-            return;
-        }
-    }
-
-    openCarDetails(carId);
+    openCarDetails(carId, 'estoque');
+    switchCarDetailsTab('docs');
     setTimeout(() => {
         const saleCard = document.getElementById('cd-sale-card');
         if (saleCard) saleCard.scrollIntoView({ behavior: 'smooth' });
@@ -2462,10 +2122,7 @@ export async function confirmCarSale(event) {
 
     const existingSale = (state.vendas || []).find(v => (String(v.carId) === String(car.id) || String(v.car_id) === String(car.id)) && v.carId !== null);
     if (existingSale) {
-        if (confirm(`Este veículo ("${car.model}") já possui uma venda registrada no sistema (Venda #${existingSale.id}). Deseja visualizar esta venda no Menu de Vendas?`)) {
-            if (window.switchTab) window.switchTab('vendas');
-            if (window.highlightVendaRow) window.highlightVendaRow(existingSale.id);
-        }
+        openCarDetailsForSale(carId);
         return;
     }
 
@@ -2501,7 +2158,7 @@ export async function confirmCarSale(event) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newClientObj)
             }).catch(() => {});
-        } catch (_) {}
+        } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
         if (window.renderClientesTable) window.renderClientesTable();
     }
 
@@ -2553,15 +2210,10 @@ export async function confirmCarSale(event) {
         }
     } catch (err) {
         console.warn("Falha ao registrar venda no servidor:", err);
+        return;
     }
 
-    if (!savedSale) {
-        const fallbackId = state.vendas.length > 0 ? Math.max(...state.vendas.map(v => Number(v.id) || 0)) + 1 : 1;
-        savedSale = { id: fallbackId, ...saleData };
-        if (!state.pendingOutbox) state.pendingOutbox = [];
-        state.pendingOutbox.push({ type: 'venda', data: savedSale });
-        try { localStorage.setItem('crm_pending_outbox', JSON.stringify(state.pendingOutbox)); } catch (_) {}
-    }
+    if (!savedSale) { return; }
 
     // 2. Add to in-memory state
     state.vendas = state.vendas.filter(v => String(v.id) !== String(savedSale.id));
@@ -2588,7 +2240,7 @@ export async function confirmCarSale(event) {
             if (documentStr) supaSaleData.client_document = documentStr;
             if (sellerCnpj) supaSaleData.seller_cnpj = sellerCnpj;
             await state.supabaseClient.from('vendas').insert(supaSaleData);
-        } catch (_) {}
+        } catch (error) { window.showToast?.(error.message || 'Não foi possível salvar.', 'error'); return; }
     }
 
     // 6. Persist local storage and refresh state
@@ -2610,17 +2262,13 @@ export async function confirmCarSale(event) {
         if (carDetailsTab) carDetailsTab.classList.remove("active");
     }
 
-    // 9. Migrate immediately to the Sales Menu
-    if (window.switchTab) {
-        window.switchTab('vendas');
-    }
-    if (window.highlightVendaRow) {
-        window.highlightVendaRow(savedSale.id);
-    }
+    // Keep the sold vehicle visible in the unified inventory.
+    const statusFilter = document.getElementById('filter-estoque-status');
+    if (statusFilter) statusFilter.value = 'vendido';
+    inventorySearch()?.reset();
+    if (window.switchTab) window.switchTab('estoque');
+    if (window.showToast) window.showToast(`Venda do ${car.model} registrada com sucesso! Veículo disponível no filtro Vendido.`, 'success');
 
-    if (window.showToast) {
-        window.showToast(`Venda do ${car.model} registrada com sucesso! Veículo migrado para o Menu de Vendas.`, 'success');
-    }
 }
 
 // Populate and adapt the Fechamento e Venda card based on sale registration status
@@ -2679,8 +2327,8 @@ export function renderCarSaleCard(car) {
                     <button type="button" class="btn btn-secondary" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:42px; padding:0 16px; border-radius:10px;" onclick="window.generatePDFReceipt(${existingSale.id})" title="Emitir Recibo em PDF">
                         <i data-lucide="file-check" style="width:16px;height:16px; color:var(--blue-primary);"></i> Emitir Recibo
                     </button>
-                    <button type="button" class="btn btn-secondary" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:42px; padding:0 16px; border-radius:10px; color:var(--blue-primary);" onclick="window.switchTab('vendas'); if (window.highlightVendaRow) window.highlightVendaRow(${existingSale.id});" title="Ver no Menu de Vendas">
-                        <i data-lucide="badge-dollar-sign" style="width:16px;height:16px;"></i> Ver no Menu Vendas
+                    <button type="button" class="btn btn-secondary" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:42px; padding:0 16px; border-radius:10px; color:var(--blue-primary);" onclick="window.closeCarDetails();" title="Voltar ao estoque">
+                        <i data-lucide="badge-dollar-sign" style="width:16px;height:16px;"></i> Voltar ao Estoque
                     </button>
                     <button type="button" class="btn btn-danger" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; height:42px; padding:0 16px; border-radius:10px;" onclick="window.deleteVendaConfirm(${existingSale.id})" title="Reverter venda e devolver ao estoque">
                         <i data-lucide="undo-2" style="width:16px;height:16px;"></i> Reverter Venda
@@ -2709,7 +2357,7 @@ export function renderCarSaleCard(car) {
                 saleCardTitle.innerHTML = `Venda Pendente de Registro <span class="badge repasse" style="margin-left:8px; font-size:11px; vertical-align:middle; text-transform:uppercase;">Pendente</span>`;
             }
             if (saleCardSubtitle) {
-                saleCardSubtitle.innerHTML = `<span style="color:var(--yellow-warning); font-weight:500;">⚠️ Veículo consta como vendido no pátio. Confirme os dados abaixo para salvar e migrar para o Menu de Vendas.</span>`;
+                saleCardSubtitle.innerHTML = `<span style="color:var(--yellow-warning); font-weight:500;">⚠️ Veículo consta como vendido no pátio. Confirme os dados abaixo para salvar os dados da venda nesta ficha.</span>`;
             }
             if (saleCardIcon) {
                 saleCardIcon.setAttribute('data-lucide', 'badge-alert');
@@ -2718,7 +2366,7 @@ export function renderCarSaleCard(car) {
             if (saleActionRow) {
                 saleActionRow.innerHTML = `
                     <button class="btn btn-success btn-confirm-sale-premium" onclick="confirmCarSale(event)">
-                        <i data-lucide="check-circle" style="width:18px; height:18px;"></i> Salvar e Migrar Venda para o Menu de Vendas
+                        <i data-lucide="check-circle" style="width:18px; height:18px;"></i> Salvar dados da venda
                     </button>
                 `;
             }

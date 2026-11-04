@@ -1,0 +1,17 @@
+.git
+**/node_modules
+**/target
+frontend/dist
+.env
+storage
+.env.neon*
+*.log
+**/.env*
+backups
+database
+docs
+.aistudio
+**/*.zip
+**/*.dump
+*.sql
+**/storage

@@ -135,7 +135,7 @@ export function renderAutoAgentPanel() {
     if (!container) return;
 
     // Determine current user name & time greeting
-    const userName = state.sessionUser ? (state.sessionUser.name || state.sessionUser.email.split('@')[0]) : "Operador";
+    const userName = state.sessionUser?.name || state.sessionUser?.email?.split('@')[0] || "Operador";
     const hour = new Date().getHours();
     const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
 

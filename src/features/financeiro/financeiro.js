@@ -6,6 +6,7 @@ import { state } from '../../services/state.js';
 import { formatCurrency, parseCurrencyBR, parseId } from '../../utils/helpers.js';
 import { getFilteredDates, getPeriodLabel } from '../configuracoes/configuracoes.js';
 import { persistLocalData, fetchCloudData } from '../../services/supabase.js';
+import { summarizeFinance } from '../../utils/finance.js';
 
 // Global chart instance for cash flow distribution
 export let chartFinanceInstance = null;
@@ -18,35 +19,30 @@ export function renderFinanceiro() {
 
     const { start, end } = getFilteredDates();
 
-    // Filter sales & expenses within chosen interval
-    const vendasFiltradas = state.vendas.filter(v => {
-        const d = new Date(v.date + 'T12:00:00');
-        return d >= start && d <= end;
-    });
-    const despesasFiltradas = state.despesas.filter(d => {
-        const dt = new Date(d.date + 'T12:00:00');
-        return dt >= start && dt <= end;
-    });
-
-    const entradas = vendasFiltradas.reduce((sum, v) => sum + v.sellPrice, 0);
+    const summary = summarizeFinance(state.estoque, state.vendas, state.despesas, start, end);
+    const despesasFiltradas = summary.periodExpenses;
+    const entradas = summary.revenue;
     const entradasEl = document.getElementById("fin-entradas");
     if (entradasEl) entradasEl.innerText = formatCurrency(entradas);
 
-    // Outputs = buyPrice of all sold cars inside interval
-    const saidasCompraEstoque = vendasFiltradas.reduce((sum, v) => {
-        const car = state.estoque.find(c => c.id === v.carId);
-        return sum + (car ? car.buyPrice : 0);
-    }, 0);
+    const saidasCompraEstoque = summary.acquisitions;
     const saidasEl = document.getElementById("fin-saidas");
     if (saidasEl) saidasEl.innerText = formatCurrency(saidasCompraEstoque);
 
-    const totalDespesas = despesasFiltradas.reduce((sum, d) => sum + d.val, 0);
+    const totalDespesas = summary.operatingExpenses;
     const despesasEl = document.getElementById("fin-despesas");
     if (despesasEl) despesasEl.innerText = formatCurrency(totalDespesas);
 
-    const liquidoReal = entradas - saidasCompraEstoque - totalDespesas;
+    const liquidoReal = summary.cashBalance;
     const liquidoEl = document.getElementById("fin-liquido");
     if (liquidoEl) liquidoEl.innerText = formatCurrency(liquidoReal);
+    const lucroVendasEl = document.getElementById('fin-lucro-vendas');
+    if (lucroVendasEl) lucroVendasEl.innerText = formatCurrency(summary.salesProfit);
+    const notices = [];
+    if (summary.purchasesWithoutDate) notices.push(`${summary.purchasesWithoutDate} compra(s) sem data válida não entram nas saídas. Confira a data de aquisição na ficha.`);
+    if (summary.salesWithoutVehicle) notices.push(`${summary.salesWithoutVehicle} venda(s) sem veículo cadastrado não entram no lucro das vendas.`);
+    const noticeEl = document.getElementById('fin-data-notice');
+    if (noticeEl) { noticeEl.textContent = notices.join(' '); noticeEl.hidden = notices.length === 0; }
 
     // Render despesas ledger
     if (despesasFiltradas.length === 0) {
@@ -152,6 +148,7 @@ export async function saveNewDespesa(event) {
             }
         } catch (e) {
             console.error("Erro ao salvar despesa na nuvem:", e);
+            return;
         }
     }
 
@@ -203,6 +200,7 @@ export async function saveEditDespesa(event) {
             await state.supabaseClient.from('despesas').update({ description: desc, val, date, car_id: carId, category }).eq('id', despesaId);
         } catch (e) {
             console.error("Erro ao atualizar despesa na nuvem:", e);
+            return;
         }
     }
 
@@ -220,6 +218,7 @@ export async function deleteDespesaConfirm(despesaId) {
                 await state.supabaseClient.from('despesas').delete().eq('id', despesaId);
             } catch (e) {
                 console.error("Erro ao deletar despesa na nuvem:", e);
+            return;
             }
         }
 
@@ -244,6 +243,7 @@ export async function deleteDespesaFromDetails(despesaId) {
                 await state.supabaseClient.from('despesas').delete().eq('id', despesaId);
             } catch (e) {
                 console.error("Erro ao deletar despesa na nuvem:", e);
+            return;
             }
         }
         
