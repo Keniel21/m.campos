@@ -8339,10 +8339,13 @@ body.dark-mode .emerald-glow-card {
 .cd-delete-vehicle-action .btn { color: var(--red-alert); background: var(--card-bg); border: 1px solid var(--border-subtle); font-size: 12px; }
 .cd-delete-vehicle-action svg { width: 14px; height: 14px; }
 .cd-delete-vehicle-action small { color: var(--text-muted); font-size: 11px; }
-.vehicle-delete-dialog { width: min(460px, calc(100vw - 32px)); padding: 24px; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--card-bg); color: var(--text-light); box-shadow: 0 20px 60px #0003; }
+.vehicle-delete-dialog { position: fixed; inset: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; width: min(460px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; padding: 24px; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--card-bg); color: var(--text-light); box-shadow: 0 20px 60px #0003; }
 .vehicle-delete-dialog::backdrop { background: #0f172a80; }
 .vehicle-delete-dialog h3 { margin: 0 0 16px; font-size: 18px; }
 .vehicle-delete-dialog p { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
 #vehicle-delete-identity { font-weight: 600; }
 #vehicle-delete-error { color: var(--red-alert); }
 .vehicle-delete-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+#vehicle-delete-confirm { background: var(--red-alert); color: #fff; border: 1px solid transparent; }
+#vehicle-delete-confirm:disabled { opacity: .6; cursor: wait; }
