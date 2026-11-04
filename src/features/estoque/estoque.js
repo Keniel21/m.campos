@@ -5,7 +5,8 @@
 import { bindVehicleTrash } from './vehicle-trash.js';
 import { bindVehicleDeletion } from './vehicle-delete.js';
 import { createUserSearch } from './user-search.js';
-import { filterStock } from '../../utils/stock.js';
+import { bindStockPeriod, readStockPeriod, showStockPeriodResult } from './stock-period.js';
+import { filterStock, stockPeriodResult } from '../../utils/stock.js';
 import { filterInventoryColumns } from './inventory-filters.js';
 import { pendingLabel, escapePending } from '../../utils/pendencias.js';
 import { renderPendingField, renderStatusMcField, renderCustomStatusField, renderPurchaseStoreField } from './pending-field.js';
@@ -253,6 +254,7 @@ function inventoryCell(car, column) {
 
 // Both inventory views include available and sold vehicles, according to the filter.
 export function renderEstoqueTable(searchQuery = inventorySearch()?.value() || '') {
+    bindStockPeriod(renderEstoque, () => state.serverDate);
     bindVehicleTrash(() => state.estoque || [], async id => {
         await fetch(`/api/crm/estoque/${encodeURIComponent(id)}/restore`, { method: 'POST' });
         await fetchCloudData();
@@ -267,7 +269,10 @@ export function renderEstoqueTable(searchQuery = inventorySearch()?.value() || '
     gridView.innerHTML = "";
 
     const status = document.getElementById('filter-estoque-status')?.value || 'todos';
-    let filteredCars = filterStock(state.estoque || [], searchQuery, status);
+    const period = readStockPeriod();
+    const periodResult = stockPeriodResult(filterStock(state.estoque || [], searchQuery, period.mode === 'sale' ? 'vendido' : status), period, state.vendas || []);
+    showStockPeriodResult(periodResult);
+    let filteredCars = periodResult.cars;
     filteredCars = filterInventoryColumns(filteredCars, inventoryCell, renderEstoque, sortEstoque);
     const count = document.getElementById('estoque-filter-count');
     if (count) count.textContent = `${filteredCars.length} de ${(state.estoque || []).filter(car => !car.trashedAt).length} veículos`;

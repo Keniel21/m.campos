@@ -8355,3 +8355,14 @@ body.dark-mode .emerald-glow-card {
 .vehicle-trash-row span { display:block; font-size:13px; }
 .vehicle-trash-row small { display:block; margin-top:4px; font-size:11px; color:var(--text-secondary, #64748b); }
 .vehicle-trash-row button { flex-shrink:0; }
+
+.stock-period-controls { display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; margin:0 0 12px; }
+.stock-period-controls label { display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--text-muted); }
+.stock-period-controls .form-control { width:180px; height:38px; font-size:12px; }
+.stock-period-range { display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
+.stock-period-shortcuts { display:flex; flex-wrap:wrap; gap:6px; }
+.stock-period-controls .btn { min-height:38px; font-size:12px; padding:8px 12px; }
+#stock-period-note { flex-basis:100%; margin:0; color:var(--text-muted); font-size:12px; line-height:1.5; }
+#stock-period-note.is-error { color:var(--red-alert); }
+.stock-period-controls [hidden] { display:none !important; }
+@media (max-width:600px) { .stock-period-controls, .stock-period-range { gap:10px; } .stock-period-controls .form-control { width:160px; max-width:100%; } }

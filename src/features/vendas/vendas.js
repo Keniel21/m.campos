@@ -1,4 +1,5 @@
-import { filterStock } from '../../utils/stock.js';
+import { readStockPeriod } from '../estoque/stock-period.js';
+import { filterStock, stockPeriodResult } from '../../utils/stock.js';
 import { applyInventoryColumnFilters } from '../estoque/inventory-filters.js';
 import { pendingLabel } from '../../utils/pendencias.js';
 // ==========================================================================
@@ -471,8 +472,11 @@ export function downloadCSV(data, headers, fileName) {
 }
 
 export function exportEstoqueToExcel() {
+    const period = readStockPeriod();
+    const error = stockPeriodResult([], period).error;
+    if (error) { window.showToast?.(error, 'warning'); return; }
     const headers = ["ID", "Modelo", "Ano", "KM", "Valor Compra", "Valor Venda", "Tipo", "Situação no pátio", "Placa", "Cor", "Chassi", "Status MC", "Status", "Loja de compra"];
-    const activeCars = applyInventoryColumnFilters(filterStock(state.estoque, document.getElementById('search-estoque')?.value || '', document.getElementById('filter-estoque-status')?.value || 'todos'));
+    const activeCars = applyInventoryColumnFilters(filterStock(state.estoque, document.getElementById('search-estoque')?.value || '', document.getElementById('filter-estoque-status')?.value || 'todos', readStockPeriod(), state.vendas || []));
     const rows = activeCars.map(c => [
         c.id, c.model, c.year, c.km, c.buyPrice, c.sellPrice, c.type, c.status, c.plate || "", c.color || "", c.chassis || "", pendingLabel(c.statusMc, state.status_mc_options), pendingLabel(c.customStatus, state.status_options), pendingLabel(c.purchaseStore, state.purchase_store_options)
     ]);

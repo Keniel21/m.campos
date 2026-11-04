@@ -229,6 +229,26 @@
                 </div>
             </div>
 
+            <div class="stock-period-controls" aria-label="Filtro por período do estoque">
+                <label for="stock-period-mode">Filtrar por
+                    <select id="stock-period-mode" class="form-control">
+                        <option value="none">Sem período</option>
+                        <option value="sale">Data da venda</option>
+                        <option value="entry">Data de entrada</option>
+                    </select>
+                </label>
+                <div id="stock-period-range" class="stock-period-range" hidden>
+                    <label for="stock-period-start">De <input id="stock-period-start" type="date" class="form-control"></label>
+                    <label for="stock-period-end">Até <input id="stock-period-end" type="date" class="form-control"></label>
+                    <div class="stock-period-shortcuts" aria-label="Atalhos de período">
+                        <button type="button" class="btn btn-secondary" data-stock-period-preset="month">Este mês</button>
+                        <button type="button" class="btn btn-secondary" data-stock-period-preset="last-month">Mês passado</button>
+                        <button type="button" class="btn btn-secondary" data-stock-period-preset="year">Este ano</button>
+                    </div>
+                </div>
+                <button type="button" id="stock-period-clear" class="btn btn-secondary" hidden>Limpar período</button>
+                <p id="stock-period-note" role="status" aria-live="polite" hidden></p>
+            </div>
             <div class="stock-column-filter-summary"><button type="button" id="clear-stock-column-filters" hidden>Limpar filtros de coluna</button></div>
             <div class="estoque-modern-container" id="estoque-list-view">
                 <div class="estoque-modern-header">
