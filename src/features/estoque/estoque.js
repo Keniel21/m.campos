@@ -233,11 +233,6 @@ export function updateEstoqueFilterCounts() {
 window.updateEstoqueFilterCounts = updateEstoqueFilterCounts;
 
 export function renderEstoque() {
-    bindVehicleTrash(() => state.estoque || [], async id => {
-        await fetch(`/api/crm/estoque/${encodeURIComponent(id)}/restore`, { method: 'POST' });
-        await fetchCloudData();
-        window.updateApplicationState();
-    });
     updateEstoqueFilterCounts();
     const searchVal = inventorySearch()?.value() || '';
     renderEstoqueTable(searchVal);
@@ -258,6 +253,12 @@ function inventoryCell(car, column) {
 
 // Both inventory views include available and sold vehicles, according to the filter.
 export function renderEstoqueTable(searchQuery = inventorySearch()?.value() || '') {
+    bindVehicleTrash(() => state.estoque || [], async id => {
+        await fetch(`/api/crm/estoque/${encodeURIComponent(id)}/restore`, { method: 'POST' });
+        await fetchCloudData();
+        window.updateApplicationState();
+    });
+
     const listBody = document.getElementById("estoque-modern-list-body");
     const gridView = document.getElementById("estoque-grid-view");
     if (!listBody || !gridView) return;
