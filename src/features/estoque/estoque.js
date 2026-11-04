@@ -2,6 +2,7 @@
 // AUTO DRIVE CRM - STOCK MANAGEMENT FEATURE
 // ==========================================================================
 
+import { createUserSearch } from './user-search.js';
 import { filterStock } from '../../utils/stock.js';
 import { filterInventoryColumns } from './inventory-filters.js';
 import { pendingLabel, escapePending } from '../../utils/pendencias.js';
@@ -35,6 +36,12 @@ export function setEstoqueView(mode) {
     if (gridBtn) gridBtn.classList.toggle('active', mode === 'grade');
 }
 
+let stockSearch;
+function inventorySearch() {
+    const input = document.getElementById('search-estoque');
+    if (!input) return null;
+    return stockSearch ||= createUserSearch(input, renderEstoque);
+}
 export function filterEstoqueTable() {
     renderEstoque();
 }
@@ -224,7 +231,7 @@ window.updateEstoqueFilterCounts = updateEstoqueFilterCounts;
 
 export function renderEstoque() {
     updateEstoqueFilterCounts();
-    const searchVal = document.getElementById("search-estoque")?.value || '';
+    const searchVal = inventorySearch()?.value() || '';
     renderEstoqueTable(searchVal);
 }
 
@@ -242,7 +249,7 @@ function inventoryCell(car, column) {
 }
 
 // Both inventory views include available and sold vehicles, according to the filter.
-export function renderEstoqueTable(searchQuery = document.getElementById('search-estoque')?.value || '') {
+export function renderEstoqueTable(searchQuery = inventorySearch()?.value() || '') {
     const listBody = document.getElementById("estoque-modern-list-body");
     const gridView = document.getElementById("estoque-grid-view");
     if (!listBody || !gridView) return;
@@ -2222,8 +2229,7 @@ export async function confirmCarSale(event) {
     // Keep the sold vehicle visible in the unified inventory.
     const statusFilter = document.getElementById('filter-estoque-status');
     if (statusFilter) statusFilter.value = 'vendido';
-    const search = document.getElementById('search-estoque');
-    if (search) search.value = '';
+    inventorySearch()?.reset();
     if (window.switchTab) window.switchTab('estoque');
     if (window.showToast) window.showToast(`Venda do ${car.model} registrada com sucesso! Veículo disponível no filtro Vendido.`, 'success');
 
