@@ -83,6 +83,7 @@ public class DesktopService {
         result.put(switch(module) { case "estoque" -> "car"; case "vendas" -> "sale"; default -> "item"; }, item);
         return result;
     }
+    public void restoreVehicle(long id) { service.restoreVehicle(resolve("estoque", id).getId()); }
     public void delete(String module, long id) { service.delete(module, resolve(module,id).getId()); }
     public Map<String,Object> linkLocalCopy(long id, Map<String,Object> input) {
         var record = resolve("documentos",id);

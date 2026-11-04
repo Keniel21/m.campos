@@ -43,8 +43,11 @@ public class CrmService {
         module(module);
         var record = id == null ? new CrmRecord(module, Map.of()) : get(module, id);
         var previousVehicle = record.getVehicle();
+        if (previousVehicle != null) requireActive(previousVehicle);
         var data = new LinkedHashMap<>(record.getPayload());
         data.putAll(input);
+        data.remove("trashedAt");
+        if (module.equals("estoque") && id != null) requireActive(record);
         data.remove("id");
         if (CATALOG_FIELDS.containsKey(module)) {
             data.put("code", id == null ? (module.equals("pendencias") ? "pending:" : "catalog:") + record.getId() : record.getPayload().get("code"));
@@ -74,6 +77,7 @@ public class CrmService {
                 : data.getOrDefault(carKey, data.get("car_id"));
             if (carId != null && !carId.toString().isBlank()) {
                 var vehicle = get("estoque", carId.toString());
+                requireActive(vehicle);
                 if (module.equals("vendas")) {
                     if (record.getVehicle() != null && !record.getVehicle().getId().equals(vehicle.getId()))
                         throw bad("Não é possível trocar o veículo de uma venda; exclua e cadastre novamente.");
@@ -114,15 +118,15 @@ public class CrmService {
             Objects.equals(record.getPayload().get("code"), car.getPayload().get(CATALOG_FIELDS.get(module)))))
             throw bad("Esta opção está em uso. Altere os veículos vinculados antes de excluir.");
         if (module.equals("estoque")) {
-            var linked = records.findByVehicleId(id);
-            if (!linked.isEmpty()) {
-                var labels = Map.of("vendas", "venda", "despesas", "despesa", "documentos", "documento", "leads", "lead", "agenda", "compromisso");
-                var counts = new TreeMap<String,Long>();
-                linked.forEach(item -> counts.merge(labels.getOrDefault(item.getModule(), "registro"), 1L, Long::sum));
-                String detail = counts.entrySet().stream().map(e -> e.getValue() + " " + e.getKey() + (e.getValue() == 1 ? "" : "s")).collect(java.util.stream.Collectors.joining(", "));
-                throw bad("Não é possível excluir este veículo. Registros vinculados: " + detail + ". Nenhum registro foi excluído.");
+            if (!record.getPayload().containsKey("trashedAt")) {
+                var payload = new LinkedHashMap<>(record.getPayload());
+                payload.put("trashedAt", java.time.Instant.now().toString());
+                record.setPayload(payload);
+                records.saveAndFlush(record);
             }
+            return;
         }
+        if (record.getVehicle() != null) requireActive(record.getVehicle());
         if (module.equals("vendas") && record.getVehicle() != null && !records.existsByModuleAndVehicleIdAndIdNot("vendas", record.getVehicle().getId(), record.getId())) {
             var car = record.getVehicle();
             var payload = new LinkedHashMap<>(car.getPayload());
@@ -136,6 +140,17 @@ public class CrmService {
             records.flush();
             recalculateSales(record.getVehicle());
         }
+    }
+    public void restoreVehicle(String id) {
+        var record = get("estoque", id);
+        var payload = new LinkedHashMap<>(record.getPayload());
+        payload.remove("trashedAt");
+        record.setPayload(payload);
+        records.saveAndFlush(record);
+    }
+    void requireActive(CrmRecord vehicle) {
+        if (vehicle.getPayload().containsKey("trashedAt"))
+            throw bad("Este veículo está na lixeira. Restaure-o antes de alterar a ficha ou seus vínculos.");
     }
     void recalculateSales(CrmRecord vehicle) {
         BigDecimal cost = new BigDecimal(Objects.toString(vehicle.getPayload().get("buyPrice"), "0"));

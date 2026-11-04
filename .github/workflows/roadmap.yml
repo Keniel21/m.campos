@@ -96,6 +96,7 @@ jobs:
       - run: node --test scripts/stock-column-filters.test.cjs
       - run: node --test scripts/user-search.test.cjs
       - run: node --test scripts/vehicle-delete.test.cjs
+      - run: node --test scripts/vehicle-trash.test.cjs
       - run: node --test scripts/migrate-documents.test.cjs
       - run: node --test scripts/backup.test.cjs
       - run: node --experimental-vm-modules --test scripts/desktop-startup.test.cjs

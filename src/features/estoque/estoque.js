@@ -2,6 +2,7 @@
 // AUTO DRIVE CRM - STOCK MANAGEMENT FEATURE
 // ==========================================================================
 
+import { bindVehicleTrash } from './vehicle-trash.js';
 import { bindVehicleDeletion } from './vehicle-delete.js';
 import { createUserSearch } from './user-search.js';
 import { filterStock } from '../../utils/stock.js';
@@ -223,7 +224,7 @@ export function sortEstoque(column, direction) {
 
 // Global update function for Stock
 export function updateEstoqueFilterCounts() {
-    const totalYard = (state.estoque || []).length;
+    const totalYard = (state.estoque || []).filter(car => !car.trashedAt).length;
     const btns = document.querySelectorAll('#filter-estoque-group .filter-btn');
     if (btns && btns.length > 0) {
         btns[0].innerHTML = `Todos os veículos (${totalYard})`;
@@ -232,6 +233,11 @@ export function updateEstoqueFilterCounts() {
 window.updateEstoqueFilterCounts = updateEstoqueFilterCounts;
 
 export function renderEstoque() {
+    bindVehicleTrash(() => state.estoque || [], async id => {
+        await fetch(`/api/crm/estoque/${encodeURIComponent(id)}/restore`, { method: 'POST' });
+        await fetchCloudData();
+        window.updateApplicationState();
+    });
     updateEstoqueFilterCounts();
     const searchVal = inventorySearch()?.value() || '';
     renderEstoqueTable(searchVal);
@@ -263,7 +269,7 @@ export function renderEstoqueTable(searchQuery = inventorySearch()?.value() || '
     let filteredCars = filterStock(state.estoque || [], searchQuery, status);
     filteredCars = filterInventoryColumns(filteredCars, inventoryCell, renderEstoque, sortEstoque);
     const count = document.getElementById('estoque-filter-count');
-    if (count) count.textContent = `${filteredCars.length} de ${(state.estoque || []).length} veículos`;
+    if (count) count.textContent = `${filteredCars.length} de ${(state.estoque || []).filter(car => !car.trashedAt).length} veículos`;
 
     // Sort records
     filteredCars.sort((a, b) => {
@@ -552,7 +558,7 @@ export function openCarDetails(id, originTab = null) {
     }
 
     const car = state.estoque.find(c => c.id == id);
-    if (!car) return;
+    if (!car || car.trashedAt) return;
     bindVehicleDeletion(car, {
         currentId: () => currentCdCarId,
         afterAttempt: id => { if (deletingCdCarId === id) deletingCdCarId = null; },
@@ -566,12 +572,13 @@ export function openCarDetails(id, originTab = null) {
             await fetch('/api/crm/estoque/' + encodeURIComponent(id), { method: 'DELETE' });
         },
         onDeleted: async id => {
-            state.estoque = state.estoque.filter(item => String(item.id) !== String(id));
+            const removed = state.estoque.find(item => String(item.id) === String(id));
+            if (removed) removed.trashedAt = new Date().toISOString();
             if (String(currentCdCarId) === String(id)) { window.currentCdCarId = null; carDetailsOriginTab = 'estoque'; closeCarDetails(); }
             window.updateApplicationState();
-            window.showToast?.('Veículo excluído com sucesso.', 'success');
+            window.showToast?.('Veículo movido para a lixeira.', 'success');
             try { await fetchCloudData(); window.updateApplicationState(); }
-            catch { window.showToast?.('Veículo excluído. Atualize a página para conferir os demais dados.', 'warning'); }
+            catch { window.showToast?.('Veículo na lixeira. Atualize a página para conferir os demais dados.', 'warning'); }
         }
     });
 

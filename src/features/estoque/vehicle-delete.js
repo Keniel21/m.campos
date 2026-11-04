@@ -22,7 +22,7 @@ export function bindVehicleDeletion(car, { currentId, beforeDelete, remove, onDe
         if (busy) return;
         if (!sameVehicle()) { dialog.close(); return; }
         busy = true; confirm.disabled = cancel.disabled = true;
-        confirm.textContent = 'Excluindo…'; error.hidden = true;
+        confirm.textContent = 'Movendo…'; error.hidden = true;
         let prepared = false;
         try {
             await beforeDelete(car.id); prepared = true;
@@ -34,7 +34,7 @@ export function bindVehicleDeletion(car, { currentId, beforeDelete, remove, onDe
         } finally {
             if (prepared) afterAttempt(car.id);
             busy = false; confirm.disabled = cancel.disabled = false;
-            confirm.textContent = 'Excluir veículo';
+            confirm.textContent = 'Mover para a lixeira';
         }
     };
 }

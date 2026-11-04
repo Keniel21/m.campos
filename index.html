@@ -211,6 +211,7 @@
                 </label>
                 <span id="estoque-filter-count" aria-live="polite"></span>
                 <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary" id="open-vehicle-trash">Lixeira</button>
                     <div class="view-toggle" style="margin-right: 8px;">
                         <button class="view-toggle-btn active" id="toggle-estoque-lista"
                             onclick="setEstoqueView('lista')" title="Visualização em Lista">
@@ -411,7 +412,7 @@
 
                         <div class="cd-delete-vehicle-action">
                             <button type="button" id="cd-delete-vehicle" class="btn"><i data-lucide="trash-2" aria-hidden="true"></i> Excluir veículo</button>
-                            <small>Disponível somente para cadastros sem registros vinculados.</small>
+                            <small>A ficha e seus vínculos serão preservados na lixeira.</small>
                         </div>
 
                     </div>
@@ -2160,14 +2161,21 @@
     </div>
 
 
+    <dialog id="vehicle-trash-dialog" class="vehicle-delete-dialog vehicle-trash-dialog" aria-labelledby="vehicle-trash-title">
+        <h3 id="vehicle-trash-title">Lixeira de veículos</h3>
+        <p>Restaure um veículo para devolvê-lo ao estoque com sua ficha e vínculos. O histórico financeiro permanece preservado. Não há exclusão automática.</p>
+        <div id="vehicle-trash-items"></div>
+        <p id="vehicle-trash-error" role="alert" hidden></p>
+        <div class="vehicle-delete-actions"><button type="button" id="close-vehicle-trash" class="btn btn-secondary">Fechar</button></div>
+    </dialog>
     <dialog id="vehicle-delete-dialog" class="vehicle-delete-dialog" aria-labelledby="vehicle-delete-title" aria-describedby="vehicle-delete-description vehicle-delete-identity">
-        <h3 id="vehicle-delete-title">Excluir veículo?</h3>
+        <h3 id="vehicle-delete-title">Mover veículo para a lixeira?</h3>
         <p id="vehicle-delete-identity"></p>
-        <p id="vehicle-delete-description">Esta ação exclui permanentemente o cadastro. Veículos com registros vinculados não podem ser excluídos; seus documentos e lançamentos serão preservados.</p>
+        <p id="vehicle-delete-description">O veículo sairá da lista de estoque e poderá ser restaurado. Documentos, vendas e despesas serão preservados, inclusive no histórico financeiro. Não há exclusão automática da lixeira.</p>
         <p id="vehicle-delete-error" role="alert" hidden></p>
         <div class="vehicle-delete-actions">
             <button type="button" id="vehicle-delete-cancel" class="btn btn-secondary">Cancelar</button>
-            <button type="button" id="vehicle-delete-confirm" class="btn btn-danger">Excluir veículo</button>
+            <button type="button" id="vehicle-delete-confirm" class="btn btn-danger">Mover para a lixeira</button>
         </div>
     </dialog>
 

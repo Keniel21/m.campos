@@ -13,6 +13,8 @@ public class CrmController {
     @PostMapping("/{module}") @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> create(@PathVariable String module, @RequestBody Map<String, Object> body) { return service.save(module, null, body); }
     @PutMapping("/{module}/{id}") public Map<String, Object> update(@PathVariable String module, @PathVariable String id, @RequestBody Map<String, Object> body) { return service.save(module, id, body); }
+    @PostMapping("/estoque/{id}/restore") @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void restore(@PathVariable String id) { service.restoreVehicle(id); }
     @DeleteMapping("/{module}/{id}") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String module, @PathVariable String id) { service.delete(module, id); }
 }

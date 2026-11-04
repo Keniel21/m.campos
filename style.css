@@ -8346,6 +8346,12 @@ body.dark-mode .emerald-glow-card {
 #vehicle-delete-identity { font-weight: 600; }
 #vehicle-delete-error { color: var(--red-alert); }
 .vehicle-delete-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-
 #vehicle-delete-confirm { background: var(--red-alert); color: #fff; border: 1px solid transparent; }
 #vehicle-delete-confirm:disabled { opacity: .6; cursor: wait; }
+
+.vehicle-trash-dialog { width: min(680px, calc(100vw - 32px)); }
+.vehicle-trash-row { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0; border-bottom:1px solid var(--border-color, #e2e8f0); }
+.vehicle-trash-row > div { min-width:0; overflow-wrap:anywhere; }
+.vehicle-trash-row span { display:block; font-size:13px; }
+.vehicle-trash-row small { display:block; margin-top:4px; font-size:11px; color:var(--text-secondary, #64748b); }
+.vehicle-trash-row button { flex-shrink:0; }

@@ -53,7 +53,8 @@ class CrmIntegrationTest {
         mvc.perform(post("/api/crm/vendas").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(Map.of("client", "Bia", "carId", car, "sellPrice", 70000, "date", "2026-11-02"))))
             .andExpect(status().isBadRequest());
-        mvc.perform(delete("/api/crm/estoque/" + car).header("Authorization", token)).andExpect(status().isBadRequest());
+        mvc.perform(delete("/api/crm/estoque/" + car).header("Authorization", token)).andExpect(status().isNoContent());
+        mvc.perform(post("/api/crm/estoque/" + car + "/restore").header("Authorization", token)).andExpect(status().isNoContent());
         mvc.perform(delete("/api/crm/vendas/" + sale).header("Authorization", token)).andExpect(status().isNoContent());
         mvc.perform(get("/api/crm/estoque").header("Authorization", token)).andExpect(jsonPath("$[0].status").value("disponivel"));
     }
