@@ -85,6 +85,15 @@ export async function fetchCloudData() {
     state.operationalDate = data.serverDate;
     return data;
 }
+// A hidden, active password form can make password managers target a visible search.
+function setLoginFieldsActive(active) {
+    for (const id of ['login-email', 'login-password']) {
+        const input = document.getElementById(id);
+        if (!input) continue;
+        input.disabled = !active;
+        if (!active) input.value = '';
+    }
+}
 export async function checkActiveSession() {
     let stage = 'session';
     try {
@@ -94,9 +103,11 @@ export async function checkActiveSession() {
         const logout = document.getElementById('btn-web-logout');
         if (logout) logout.style.display = 'none';
         if (session.mode === 'web' && !session.authenticated) {
+            setLoginFieldsActive(true);
             document.getElementById('login-overlay')?.classList.add('active');
             return false;
         }
+        setLoginFieldsActive(false);
         state.sessionUser = { id: 'adm-master-session', name: session.userName || 'Operador', role: 'admin' };
         stage = 'data';
         await fetchCloudData();
@@ -107,6 +118,7 @@ export async function checkActiveSession() {
         window.initCharts?.();
         return true;
     } catch (error) {
+        setLoginFieldsActive(true);
         console.error(`Falha ao iniciar a aplicação (${stage}):`, error.message);
         const overlay = document.getElementById('login-overlay');
         if (overlay) {

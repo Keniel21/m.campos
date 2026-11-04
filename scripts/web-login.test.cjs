@@ -1,7 +1,7 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const vm=require('node:vm');
 async function fixture(handler){
  const calls=[];const active=new Set(['active']);const overlay={classList:{add:x=>active.add(x),remove:x=>active.delete(x)}};
- const nodes={'login-overlay':overlay,'login-email':{value:'operator@example.com'},'login-password':{value:'dummy-password'},'login-error-message':{style:{},textContent:''},'btn-web-logout':{style:{}}};
+ const nodes={'search-estoque':{value:'Hilux'},'login-overlay':overlay,'login-email':{value:'operator@example.com'},'login-password':{value:'dummy-password'},'login-error-message':{style:{},textContent:''},'btn-web-logout':{style:{}}};
  const button={disabled:false};let reloads=0,renders=0;
  const window={fetch:async(input,options={})=>{const url=String(input);calls.push({url,options});return handler(url,options);},updateApplicationState:()=>renders++,initCharts:()=>{}};
  const location={origin:'https://app.example',href:'https://app.example/',reload:()=>reloads++};
@@ -32,4 +32,24 @@ test('wrong credentials leave the login form active and never load records',asyn
 test('an expired session reloads the page to discard rendered private forms',async()=>{
  let expire=false;const f=await fixture(url=>url.endsWith('/session')?response(session(true)):expire?response({},401):response({estoque:[]}));await f.api.checkActiveSession();expire=true;
  await assert.rejects(f.api.fetchCloudData(),/sessão expirou/);assert.equal(f.reloads,1);
+});
+
+test('login fields are disabled and cleared after authentication without clearing vehicle search',async()=>{
+ const f=await fixture(url=>response(url.endsWith('/session')?session(true):{estoque:[]}));
+ assert.equal(await f.api.checkActiveSession(),true);
+ for(const id of ['login-email','login-password']){assert.equal(f.nodes[id].disabled,true);assert.equal(f.nodes[id].value,'');}
+ assert.equal(f.nodes['search-estoque'].value,'Hilux');
+});
+test('anonymous and failed startup keep login fields usable',async()=>{
+ const f=await fixture(()=>response(session(false)));f.nodes['login-email'].disabled=true;f.nodes['login-password'].disabled=true;
+ assert.equal(await f.api.checkActiveSession(),false);assert.equal(f.nodes['login-email'].disabled,false);assert.equal(f.nodes['login-password'].disabled,false);
+ const broken=await fixture(url=>url.endsWith('/session')?response(session(true)):response({},503));
+ assert.equal(await broken.api.checkActiveSession(),false);assert.equal(broken.nodes['login-email'].disabled,false);assert.equal(broken.nodes['login-password'].disabled,false);
+});
+test('inventory search and login have separate browser autofill semantics',()=>{
+ const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
+ const field=html.match(/<input[^>]+id="search-estoque"[^>]*>/)[0];
+ assert.match(field,/type="search"/);assert.match(field,/name="inventory-search"/);assert.match(field,/autocomplete="off"/);
+ assert.match(html,/<input[^>]+id="login-email"[^>]+name="email"[^>]+autocomplete="username"/);
+ assert.match(html,/<input[^>]+id="login-password"[^>]+name="password"[^>]+autocomplete="current-password"/);
 });
