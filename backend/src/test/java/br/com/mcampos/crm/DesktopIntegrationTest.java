@@ -87,6 +87,25 @@ class DesktopIntegrationTest {
         desktop.delete("status_mc_options", ((Number)mc.get("id")).longValue());
         desktop.delete("status_options", ((Number)custom.get("id")).longValue());
     }
+    @Test void deletesOnlyUnlinkedVehiclesAndPreservesAllLinkedRecords() throws Exception {
+        var empty = desktop.save("estoque", null, java.util.Map.of("model", "Duplicado", "status", "disponivel"));
+        long emptyId = ((Number)empty.get("id")).longValue();
+        desktop.delete("estoque", emptyId);
+        assertTrue(desktop.list("estoque").isEmpty());
+        var car = desktop.save("estoque", null, java.util.Map.of("model", "Histórico", "status", "disponivel"));
+        long id = ((Number)car.get("id")).longValue();
+        desktop.save("despesas", null, java.util.Map.of("desc", "Revisão", "date", "2026-11-04", "val", 100, "carId", id));
+        desktop.save("vendas", null, java.util.Map.of("client", "Cliente", "date", "2026-11-04", "sellPrice", 12000, "carId", id));
+        byte[] bytes = "%PDF-1.4\n%%EOF\n".getBytes(java.nio.charset.StandardCharsets.US_ASCII);
+        var document = desktop.save("documentos", null, java.util.Map.of("fileName", "Preservar.pdf", "carId", id, "fileUrl", "data:application/pdf;base64," + java.util.Base64.getEncoder().encodeToString(bytes)));
+        var before = desktop.snapshot();
+        var error = assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> desktop.delete("estoque", id));
+        assertTrue(error.getReason().contains("1 venda"));
+        assertTrue(error.getReason().contains("1 despesa"));
+        assertTrue(error.getReason().contains("1 documento"));
+        assertEquals(before, desktop.snapshot());
+        mvc.perform(get(document.get("fileUrl").toString())).andExpect(status().isOk()).andExpect(content().bytes(bytes));
+    }
     @Test void purchaseStoreCatalogIsSharedAndProtectsVehicleReferences() throws Exception {
         var option = desktop.save("purchase_store_options", null, java.util.Map.of("name", "Loja de origem"));
         long optionId = ((Number)option.get("id")).longValue();

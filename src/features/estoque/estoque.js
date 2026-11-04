@@ -2,6 +2,7 @@
 // AUTO DRIVE CRM - STOCK MANAGEMENT FEATURE
 // ==========================================================================
 
+import { bindVehicleDeletion } from './vehicle-delete.js';
 import { createUserSearch } from './user-search.js';
 import { filterStock } from '../../utils/stock.js';
 import { filterInventoryColumns } from './inventory-filters.js';
@@ -16,6 +17,7 @@ export let estoqueSortColumn = 'id';
 export let estoqueSortDirection = 'desc';
 
 export let currentCdCarId = null;
+let deletingCdCarId = null;
 export let carDetailsOriginTab = 'estoque';
 
 function renderPendingSelect(value) {
@@ -551,6 +553,27 @@ export function openCarDetails(id, originTab = null) {
 
     const car = state.estoque.find(c => c.id == id);
     if (!car) return;
+    bindVehicleDeletion(car, {
+        currentId: () => currentCdCarId,
+        afterAttempt: id => { if (deletingCdCarId === id) deletingCdCarId = null; },
+        beforeDelete: async id => {
+            if (isAutoSaving || pendingAutoSave || document.getElementById('cd-autosave-status')?.dataset.state === 'saving')
+                throw new Error('Aguarde o salvamento das alterações e confirme novamente.');
+            if (autoSaveDebounceTimer) { clearTimeout(autoSaveDebounceTimer); autoSaveDebounceTimer = null; }
+            deletingCdCarId = id;
+        },
+        remove: async id => {
+            await fetch('/api/crm/estoque/' + encodeURIComponent(id), { method: 'DELETE' });
+        },
+        onDeleted: async id => {
+            state.estoque = state.estoque.filter(item => String(item.id) !== String(id));
+            if (String(currentCdCarId) === String(id)) { window.currentCdCarId = null; carDetailsOriginTab = 'estoque'; closeCarDetails(); }
+            window.updateApplicationState();
+            window.showToast?.('Veículo excluído com sucesso.', 'success');
+            try { await fetchCloudData(); window.updateApplicationState(); }
+            catch { window.showToast?.('Veículo excluído. Atualize a página para conferir os demais dados.', 'warning'); }
+        }
+    });
 
     // Switch view to detailed specifications page
     switchDetailsTab('car-details');
@@ -1144,7 +1167,7 @@ let pendingAutoSave = false;
 let carDetailsAutoSaveInitialized = false;
 
 export function triggerCarDetailsAutoSave(delay = 400) {
-    if (!currentCdCarId) return;
+    if (!currentCdCarId || deletingCdCarId === currentCdCarId) return;
 
     // Immediately update live computed previews on screen
     updateSummaryFields();
@@ -1222,7 +1245,7 @@ export function initCarDetailsAutoSaveListeners() {
 }
 
 export async function saveCarDetails(options = { silent: true }) {
-    if (!currentCdCarId) return;
+    if (!currentCdCarId || deletingCdCarId === currentCdCarId) return;
     const car = state.estoque.find(c => c.id == currentCdCarId);
     if (!car) return;
 

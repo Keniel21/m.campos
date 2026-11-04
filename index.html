@@ -409,6 +409,11 @@
                             </div>
                         </div>
 
+                        <div class="cd-delete-vehicle-action">
+                            <button type="button" id="cd-delete-vehicle" class="btn"><i data-lucide="trash-2" aria-hidden="true"></i> Excluir veículo</button>
+                            <small>Disponível somente para cadastros sem registros vinculados.</small>
+                        </div>
+
                     </div>
 
                     <!-- COLUNA DA DIREITA (Tab-swapped modular widgets) -->
@@ -2153,6 +2158,18 @@
             </div>
         </div>
     </div>
+
+
+    <dialog id="vehicle-delete-dialog" class="vehicle-delete-dialog" aria-labelledby="vehicle-delete-title" aria-describedby="vehicle-delete-description vehicle-delete-identity">
+        <h3 id="vehicle-delete-title">Excluir veículo?</h3>
+        <p id="vehicle-delete-identity"></p>
+        <p id="vehicle-delete-description">Esta ação exclui permanentemente o cadastro. Veículos com registros vinculados não podem ser excluídos; seus documentos e lançamentos serão preservados.</p>
+        <p id="vehicle-delete-error" role="alert" hidden></p>
+        <div class="vehicle-delete-actions">
+            <button type="button" id="vehicle-delete-cancel" class="btn btn-secondary">Cancelar</button>
+            <button type="button" id="vehicle-delete-confirm" class="btn btn-danger">Excluir veículo</button>
+        </div>
+    </dialog>
 
     <!-- TELA DE LOGIN (OVERLAY SAAS PREMIUM) -->
     <div class="modal-overlay active" id="login-overlay" style="z-index: 99999; backdrop-filter: blur(25px); background-color: rgba(15, 23, 42, 0.35);">

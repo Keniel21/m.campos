@@ -113,8 +113,16 @@ public class CrmService {
         if (CATALOG_FIELDS.containsKey(module) && records.findByModuleOrderByIdAsc("estoque").stream().anyMatch(car ->
             Objects.equals(record.getPayload().get("code"), car.getPayload().get(CATALOG_FIELDS.get(module)))))
             throw bad("Esta opção está em uso. Altere os veículos vinculados antes de excluir.");
-        if (module.equals("estoque") && records.existsByVehicleId(id))
-            throw bad("O veículo possui registros vinculados e não pode ser excluído.");
+        if (module.equals("estoque")) {
+            var linked = records.findByVehicleId(id);
+            if (!linked.isEmpty()) {
+                var labels = Map.of("vendas", "venda", "despesas", "despesa", "documentos", "documento", "leads", "lead", "agenda", "compromisso");
+                var counts = new TreeMap<String,Long>();
+                linked.forEach(item -> counts.merge(labels.getOrDefault(item.getModule(), "registro"), 1L, Long::sum));
+                String detail = counts.entrySet().stream().map(e -> e.getValue() + " " + e.getKey() + (e.getValue() == 1 ? "" : "s")).collect(java.util.stream.Collectors.joining(", "));
+                throw bad("Não é possível excluir este veículo. Registros vinculados: " + detail + ". Nenhum registro foi excluído.");
+            }
+        }
         if (module.equals("vendas") && record.getVehicle() != null && !records.existsByModuleAndVehicleIdAndIdNot("vendas", record.getVehicle().getId(), record.getId())) {
             var car = record.getVehicle();
             var payload = new LinkedHashMap<>(car.getPayload());
